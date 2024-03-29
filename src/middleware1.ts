@@ -2,6 +2,8 @@ import { updateSession } from '@/lib/supabase/middleware'
 import { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  console.log('no load')
+
   return await updateSession(request)
 }
 

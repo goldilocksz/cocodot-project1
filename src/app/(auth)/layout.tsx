@@ -2,6 +2,8 @@ import Side from '@/components/layout/side'
 import Header from '@/components/layout/header'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
+import { Loader2 } from 'lucide-react'
 
 export default async function layout({
   children,
@@ -13,6 +15,7 @@ export default async function layout({
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
   if (!user) {
     return redirect('/login')
   }
@@ -21,7 +24,7 @@ export default async function layout({
       <Side />
 
       <div className="flex flex-col">
-        <Header />
+        <Header user={user} />
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           {children}
         </main>

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -45,7 +45,6 @@ const formSchema = z.object({
 
 export default function page() {
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
   const [isLoading, startTransition] = useTransition()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,7 +91,7 @@ export default function page() {
                   <FormControl>
                     <Input
                       placeholder="email@example.com"
-                      disabled={loading}
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -111,7 +110,7 @@ export default function page() {
                       placeholder="******"
                       type="password"
                       autoComplete="off"
-                      disabled={loading}
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -119,8 +118,8 @@ export default function page() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-6 w-full" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            <Button type="submit" className="mt-6 w-full" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Login
             </Button>
           </form>

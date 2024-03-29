@@ -27,15 +27,18 @@ import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { User } from '@supabase/supabase-js'
 
-export default async function header() {
+export default async function header({
+  user,
+}: {
+  user: User | null | undefined
+}) {
   const supabase = createClient()
   const router = useRouter()
 
-  const handleLogout = async () => {
-    console.log('asd')
-
-    await supabase.auth.signOut()
+  const handleLogout = () => {
+    supabase.auth.signOut()
     router.push('/login')
   }
 
@@ -117,8 +120,8 @@ export default async function header() {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex items-center gap-2">
-            {/* <div>{user?.email}</div> */}
+          <div className="flex cursor-pointer items-center gap-2">
+            <div>{user?.email}</div>
             <Button variant="secondary" size="icon" className="rounded-full">
               <CircleUser className="h-5 w-5" />
               <span className="sr-only">Toggle user menu</span>
@@ -128,7 +131,9 @@ export default async function header() {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Settings</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push('/setting')}>
+            Settings
+          </DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
