@@ -24,14 +24,20 @@ import {
   CreditCard,
   Activity,
   ArrowUpRight,
+  ArrowUp,
 } from 'lucide-react'
 import Link from 'next/link'
 import CountUp from 'react-countup'
+import dynamic from 'next/dynamic'
+
+const Chart = dynamic(() => import('react-apexcharts'), {
+  ssr: false,
+})
 
 export default function index() {
   return (
     <>
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
@@ -39,7 +45,7 @@ export default function index() {
           </CardHeader>
           <CardContent>
             <div className="h-8 text-2xl font-bold">
-              <CountUp prefix="$" decimal="," end={45231} />
+              <CountUp duration={1} prefix="$" decimal="," end={45231} />
             </div>
             <p className="text-xs text-muted-foreground">
               +20.1% from last month
@@ -53,11 +59,14 @@ export default function index() {
           </CardHeader>
           <CardContent>
             <div className="h-8 text-2xl font-bold">
-              <CountUp decimal="," end={2350} />
+              <CountUp duration={1} decimal="," end={2350} />
             </div>
-            <p className="text-xs text-muted-foreground">
-              +180.1% from last month
-            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <Badge variant="destructive">
+                <ArrowUp className="h-3 w-3" />
+                19%
+              </Badge>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -67,11 +76,14 @@ export default function index() {
           </CardHeader>
           <CardContent>
             <div className="h-8 text-2xl font-bold">
-              <CountUp decimal="," end={200_000_000} />
+              <CountUp duration={1} decimal="," end={200_000}></CountUp>
             </div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <Badge variant="success">
+                <ArrowUp className="h-3 w-3" />
+                19%
+              </Badge>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -81,7 +93,7 @@ export default function index() {
           </CardHeader>
           <CardContent>
             <div className="h-8 text-2xl font-bold">
-              <CountUp decimal="," end={505} />
+              <CountUp duration={1} decimal="," end={505} />
             </div>
             <p className="text-xs text-muted-foreground">
               +201 since last hour
@@ -89,7 +101,104 @@ export default function index() {
           </CardContent>
         </Card>
       </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+        <Card className="xl:col-span-2">
+          <CardHeader>
+            <CardTitle>Recent Sales</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Chart
+              options={{
+                chart: {
+                  toolbar: {
+                    show: false,
+                  },
+                  zoom: {
+                    enabled: false,
+                  },
+                  animations: {
+                    speed: 1000,
+                  },
+                },
+                dataLabels: {
+                  enabled: false,
+                },
+                colors: ['#020617'],
+                stroke: {
+                  lineCap: 'round',
+                  curve: 'smooth',
+                },
+                markers: {
+                  size: 0,
+                },
+                xaxis: {
+                  axisTicks: {
+                    show: false,
+                  },
+                  axisBorder: {
+                    show: false,
+                  },
+                  labels: {
+                    style: {
+                      colors: '#616161',
+                      fontSize: '12px',
+                      fontFamily: 'inherit',
+                      fontWeight: 400,
+                    },
+                  },
+                  categories: [
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec',
+                  ],
+                },
+                yaxis: {
+                  labels: {
+                    style: {
+                      colors: '#616161',
+                      fontSize: '12px',
+                      fontFamily: 'inherit',
+                      fontWeight: 400,
+                    },
+                  },
+                },
+                grid: {
+                  show: true,
+                  borderColor: '#dddddd',
+                  strokeDashArray: 3,
+                  xaxis: {
+                    lines: {
+                      show: false,
+                    },
+                  },
+                },
+                fill: {
+                  opacity: 0.8,
+                },
+                tooltip: {
+                  theme: 'dark',
+                },
+              }}
+              series={[
+                {
+                  name: 'series',
+                  data: [30, 40, 45, 50, 49, 60, 70, 91],
+                },
+              ]}
+              type="line"
+              width="100%"
+              height={350}
+            ></Chart>
+          </CardContent>
+        </Card>
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
@@ -224,7 +333,7 @@ export default function index() {
           <CardContent className="grid gap-8">
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/01.png" alt="Avatar" />
+                <AvatarImage src="/images/avatars/avatar_1.jpg" alt="Avatar" />
                 <AvatarFallback>OM</AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
@@ -235,11 +344,11 @@ export default function index() {
                   olivia.martin@email.com
                 </p>
               </div>
-              <div className="ml-auto font-medium">+$1,999.00</div>
+              <div className="ml-auto font-medium">$1,999.00</div>
             </div>
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/02.png" alt="Avatar" />
+                <AvatarImage src="/images/avatars/avatar_2.jpg" alt="Avatar" />
                 <AvatarFallback>JL</AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
@@ -248,11 +357,11 @@ export default function index() {
                   jackson.lee@email.com
                 </p>
               </div>
-              <div className="ml-auto font-medium">+$39.00</div>
+              <div className="ml-auto font-medium">$39.00</div>
             </div>
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/03.png" alt="Avatar" />
+                <AvatarImage src="/images/avatars/avatar_3.jpg" alt="Avatar" />
                 <AvatarFallback>IN</AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
@@ -263,22 +372,22 @@ export default function index() {
                   isabella.nguyen@email.com
                 </p>
               </div>
-              <div className="ml-auto font-medium">+$299.00</div>
+              <div className="ml-auto font-medium">$299.00</div>
             </div>
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/04.png" alt="Avatar" />
+                <AvatarImage src="/images/avatars/avatar_4.jpg" alt="Avatar" />
                 <AvatarFallback>WK</AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
                 <p className="text-sm font-medium leading-none">William Kim</p>
                 <p className="text-sm text-muted-foreground">will@email.com</p>
               </div>
-              <div className="ml-auto font-medium">+$99.00</div>
+              <div className="ml-auto font-medium">$99.00</div>
             </div>
             <div className="flex items-center gap-4">
               <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/05.png" alt="Avatar" />
+                <AvatarImage src="/images/avatars/avatar_5.jpg" alt="Avatar" />
                 <AvatarFallback>SD</AvatarFallback>
               </Avatar>
               <div className="grid gap-1">
@@ -287,7 +396,7 @@ export default function index() {
                   sofia.davis@email.com
                 </p>
               </div>
-              <div className="ml-auto font-medium">+$39.00</div>
+              <div className="ml-auto font-medium">$39.00</div>
             </div>
           </CardContent>
         </Card>

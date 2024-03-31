@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import {
-  CircleUser,
   Home,
   LineChart,
   Menu,
@@ -28,6 +27,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
 export default async function header({
   user,
@@ -41,11 +41,6 @@ export default async function header({
     supabase.auth.signOut()
     router.push('/login')
   }
-
-  // const supabase = createClient()
-  // const {
-  //   data: { user },
-  // } = await supabase.auth.getUser()
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -123,7 +118,10 @@ export default async function header({
           <div className="flex cursor-pointer items-center gap-2">
             <div>{user?.email}</div>
             <Button variant="secondary" size="icon" className="rounded-full">
-              <CircleUser className="h-5 w-5" />
+              <Avatar className="hidden h-9 w-9 sm:flex">
+                <AvatarImage src="/images/avatars/avatar_17.jpg" alt="Avatar" />
+                <AvatarFallback>WK</AvatarFallback>
+              </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
           </div>
