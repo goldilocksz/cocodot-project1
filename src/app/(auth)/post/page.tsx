@@ -8,7 +8,10 @@ export default function page() {
     <>
       <div className="flex-middle justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Post List</h1>
-        <Link href="/post/create" className={cn(buttonVariants())}>
+        <Link
+          href="/post/create"
+          className={cn(buttonVariants({ size: 'sm' }))}
+        >
           Create
         </Link>
       </div>

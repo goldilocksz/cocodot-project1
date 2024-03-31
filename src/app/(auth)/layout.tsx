@@ -2,8 +2,6 @@ import Side from '@/components/layout/side'
 import Header from '@/components/layout/header'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Suspense } from 'react'
-import { Loader2 } from 'lucide-react'
 import Breadcrumb from '@/components/breadcrumb'
 
 export default async function layout({

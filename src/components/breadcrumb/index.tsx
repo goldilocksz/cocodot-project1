@@ -27,10 +27,14 @@ export default function index() {
         return { href, text: subpath }
       })
 
-      return [{ href: '/', text: 'home' }, ...crumblist]
+      return [{ href: '/', text: 'dashboard' }, ...crumblist]
     },
     [pathname],
   )
+
+  if (pathname === '/') {
+    return null
+  }
 
   return (
     <Breadcrumb className="hidden md:flex">
