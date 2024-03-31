@@ -5,6 +5,7 @@ import {
   LineChart,
   Package,
   Package2,
+  ScrollText,
   ShoppingCart,
   Users,
 } from 'lucide-react'
@@ -68,6 +69,13 @@ export default function side() {
             >
               <LineChart className="h-4 w-4" />
               Analytics
+            </Link>
+            <Link
+              href="/post"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+            >
+              <ScrollText className="h-4 w-4" />
+              Post
             </Link>
           </nav>
         </div>

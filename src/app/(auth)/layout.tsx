@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import { Loader2 } from 'lucide-react'
+import Breadcrumb from '@/components/breadcrumb'
 
 export default async function layout({
   children,
@@ -26,6 +27,7 @@ export default async function layout({
       <div className="flex flex-col">
         <Header user={user} />
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <Breadcrumb />
           {children}
         </main>
       </div>

@@ -74,3 +74,18 @@
     @apply bg-background text-foreground;
   }
 }
+/* 
+@layer components {
+  .flex-middle {
+    @apply flex items-center;
+  }
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  .flex-col-center {
+    @apply flex flex-col items-center justify-center;
+  }
+  .flex-row-center {
+    @apply flex items-center justify-center;
+  }
+} */
