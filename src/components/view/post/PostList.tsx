@@ -3,8 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import useSupabase from '@/hooks/useSupabase'
 import { useQuery } from '@tanstack/react-query'
-import dayjs from 'dayjs'
 import Link from 'next/link'
+import { format } from 'timeago.js'
 
 export default function PostList() {
   const supabase = useSupabase()
@@ -18,7 +18,7 @@ export default function PostList() {
     },
   })
   return (
-    <div>
+    <div className="mt-6 flex flex-col gap-4">
       {data?.map((post) => (
         <Card key={post.id}>
           <CardHeader className="flex flex-row items-center justify-between">
@@ -26,7 +26,7 @@ export default function PostList() {
               <Link href={`/post/detail?postId=${post.id}`}>{post.title}</Link>
             </CardTitle>
             <div className="text-sm text-muted-foreground">
-              {dayjs(post.createdAt).format('YYYY-MM-DD hh:mm:ss')}
+              {post.createdAt && format(new Date(post.createdAt))}
             </div>
           </CardHeader>
           <CardContent>
