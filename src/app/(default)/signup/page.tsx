@@ -45,6 +45,9 @@ const formSchema = z
     confirmPassword: z.string().min(6, {
       message: 'Password must be at least 6 characters long',
     }),
+    name: z.string().min(1, {
+      message: 'Name is required',
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',
@@ -60,19 +63,30 @@ export default function page() {
       email: '',
       password: '',
       confirmPassword: '',
+      name: '',
     },
   })
 
-  const onSubmit = async (value: z.infer<typeof formSchema>) => {
+  const onSubmit = async (user: z.infer<typeof formSchema>) => {
     const supabase = createClient()
     startTransition(async () => {
-      const { error } = await supabase.auth.signUp(value)
+      console.log(user.name)
+
+      const { error } = await supabase.auth.signUp({
+        email: user.email,
+        password: user.password,
+        options: {
+          data: {
+            name: user.name,
+          },
+        },
+      })
       if (error) {
         toast.error(error.message, {
           duration: 5000,
         })
       } else {
-        toast.success('Login successful')
+        toast.success('SignUp successful')
         router.push('/')
       }
     })
@@ -91,6 +105,25 @@ export default function page() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="name"
+                      type="text"
+                      autoComplete="off"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"

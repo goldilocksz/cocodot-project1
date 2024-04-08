@@ -57,8 +57,7 @@ export default async function header({
               href="#"
               className="flex items-center gap-2 text-lg font-semibold"
             >
-              <Package2 className="h-6 w-6" />
-              <span className="sr-only">Acme Inc</span>
+              <img src="/images/logo.png" alt="" className="h-[30px]" />
             </Link>
             <Link
               href="#"

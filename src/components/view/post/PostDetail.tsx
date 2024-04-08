@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { format } from 'timeago.js'
+import editorParser from 'editorjs-parser'
 
 export default function PostDetail() {
   const params = useSearchParams()
@@ -30,6 +31,13 @@ export default function PostDetail() {
       return data
     },
   })
+
+  useEffect(() => {
+    if (post?.content) {
+      const data = new editorParser(undefined, post.content)
+      console.log(data)
+    }
+  }, [post?.content])
 
   useEffect(() => {
     if (params.get('postId')) {
@@ -55,7 +63,7 @@ export default function PostDetail() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="whitespace-pre-line">{post?.content}</div>
+          {/* <div className="whitespace-pre-line">{post?.content}</div> */}
         </CardContent>
       </Card>
     </div>

@@ -1,14 +1,5 @@
 import Link from 'next/link'
-import {
-  Bell,
-  Home,
-  LineChart,
-  Package,
-  Package2,
-  ScrollText,
-  ShoppingCart,
-  Users,
-} from 'lucide-react'
+import { Bell } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import Navbar from './navbar'
@@ -22,8 +13,7 @@ export default function side() {
             href="/"
             className="flex flex-1 items-center gap-2 font-semibold"
           >
-            <Package2 className="h-6 w-6" />
-            <span className="">Acme Inc</span>
+            <img src="/images/logo.png" alt="" className="h-[30px]" />
           </Link>
           <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
             <Bell className="h-4 w-4" />

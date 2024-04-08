@@ -2,14 +2,7 @@
 
 import Link from 'next/link'
 
-import {
-  Home,
-  LineChart,
-  Package,
-  ScrollText,
-  ShoppingCart,
-  Users,
-} from 'lucide-react'
+import { Database, Home, Monitor, ShoppingCart, Users } from 'lucide-react'
 
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -21,29 +14,24 @@ const Menu = [
     href: '/',
   },
   {
+    name: 'Monitoring',
+    icon: Monitor,
+    href: '/monitoring',
+  },
+  {
+    name: 'Users',
+    icon: Users,
+    href: '/users',
+  },
+  {
     name: 'Orders',
     icon: ShoppingCart,
     href: '/orders',
   },
   {
-    name: 'Products',
-    icon: Package,
-    href: '/products',
-  },
-  {
-    name: 'Customers',
-    icon: Users,
-    href: '/customers',
-  },
-  {
-    name: 'Analytics',
-    icon: LineChart,
-    href: '/analytics',
-  },
-  {
-    name: 'Post',
-    icon: ScrollText,
-    href: '/post',
+    name: 'Database',
+    icon: Database,
+    href: '/database',
   },
 ]
 

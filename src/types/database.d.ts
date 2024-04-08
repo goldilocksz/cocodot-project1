@@ -39,7 +39,7 @@ export type Database = {
           content: string
           createdAt: string | null
           id: string
-          ip: string
+          ip: string | null
           title: string
           type: string | null
           updatedAt: string | null
@@ -50,7 +50,7 @@ export type Database = {
           content: string
           createdAt?: string | null
           id?: string
-          ip: string
+          ip?: string | null
           title: string
           type?: string | null
           updatedAt?: string | null
@@ -61,14 +61,48 @@ export type Database = {
           content?: string
           createdAt?: string | null
           id?: string
-          ip?: string
+          ip?: string | null
           title?: string
           type?: string | null
           updatedAt?: string | null
           user_id?: string
           views?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "post_user_id_users_id_fk"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      users: {
+        Row: {
+          email: string
+          id: string
+          name: string
+        }
+        Insert: {
+          email: string
+          id: string
+          name: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

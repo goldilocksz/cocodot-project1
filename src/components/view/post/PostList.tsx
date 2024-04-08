@@ -30,7 +30,7 @@ export default function PostList() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="line-clamp-3">{post.content}</div>
+            <div className="line-clamp-3"></div>
           </CardContent>
         </Card>
       ))}

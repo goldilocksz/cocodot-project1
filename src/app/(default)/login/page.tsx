@@ -72,7 +72,7 @@ export default function page() {
     <Card className="mx-auto w-96 max-w-md">
       <CardHeader>
         <div className="flex items-center justify-center py-6">
-          <img src="/images/logo.svg" alt="" className="h-5" />
+          <img src="/images/logo.png" alt="" className="w-[236px]" />
         </div>
         <CardTitle className="text-2xl">Login</CardTitle>
         <CardDescription>

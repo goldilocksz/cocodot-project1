@@ -7,16 +7,13 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core'
-import { users } from './user'
 
-export const post = pgTable('post', {
+export const admin_dashboard = pgTable('admin_dashboard', {
   id: uuid('id')
     .primaryKey()
     .default(sql`uuid_generate_v4()`)
     .notNull(),
-  user_id: uuid('user_id')
-    .references(() => users.id)
-    .notNull(),
+  user_id: uuid('user_id').notNull(),
   title: text('title').notNull(),
   content: text('content').notNull(),
   ip: text('ip'),
