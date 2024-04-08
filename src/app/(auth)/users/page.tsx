@@ -3,14 +3,6 @@
 import AddUserDialog from '@/components/dialog/AddUserDialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import {
@@ -21,14 +13,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Edit, Plus, Trash2 } from 'lucide-react'
+import { Edit, Plus, Trash2, User } from 'lucide-react'
 import { useState } from 'react'
 import Pagination from '@/components/pagination'
+import { UserData } from '@/lib/data/users'
 
 export default function UsersPage() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('30')
   const [isOpen, setIsOpen] = useState(false)
+  const [detail, setDetail] = useState<(typeof UserData)[number] | undefined>(
+    undefined,
+  )
 
   return (
     <section>
@@ -54,7 +50,10 @@ export default function UsersPage() {
             <div className="text-sm text-muted-foreground">Page:</div>
             <Select
               defaultValue={pageSize}
-              onChange={(e) => setPageSize(e.target.value)}
+              onChange={(e) => {
+                setPage(1)
+                setPageSize(e.target.value)
+              }}
             >
               <option value="10">10</option>
               <option value="30">30</option>
@@ -64,7 +63,7 @@ export default function UsersPage() {
           </div>
         </div>
 
-        <Table className="mt-6 min-w-[1280px] table-fixed">
+        <Table className="mt-6 min-w-[1280px]">
           <TableHeader>
             <TableRow>
               <TableHead>LSP CODE</TableHead>
@@ -80,20 +79,27 @@ export default function UsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Array.from({ length: parseInt(pageSize) }).map((_, index) => (
-              <TableRow key={index}>
-                <TableCell>GDLCN</TableCell>
-                <TableCell>HANS</TableCell>
-                <TableCell>1862223333</TableCell>
-                <TableCell>3</TableCell>
-                <TableCell>RD1234</TableCell>
-                <TableCell>45FT</TableCell>
-                <TableCell>CHINA</TableCell>
-                <TableCell>2</TableCell>
+            {UserData.slice(
+              (page - 1) * parseInt(pageSize),
+              page * parseInt(pageSize),
+            ).map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.lsp_code}</TableCell>
+                <TableCell>{user.user_name}</TableCell>
+                <TableCell>{user.tell_no}</TableCell>
+                <TableCell>{user.grade}</TableCell>
+                <TableCell>{user.truck_no}</TableCell>
+                <TableCell>{user.truck_type}</TableCell>
+                <TableCell>{user.nation_cd}</TableCell>
+                <TableCell>ㅂ</TableCell>
                 <TableCell className="py-0">
                   <Button
                     variant="ghost"
                     className="h-10 w-10 rounded-full p-0"
+                    onClick={() => {
+                      setDetail(user)
+                      setIsOpen(true)
+                    }}
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
@@ -111,10 +117,14 @@ export default function UsersPage() {
           </TableBody>
         </Table>
 
-        <Pagination page={page} setPage={setPage} />
+        <Pagination
+          totalPages={Math.ceil(UserData.length / parseInt(pageSize))}
+          currentPage={page}
+          setCurrentPage={setPage}
+        />
       </Card>
 
-      <AddUserDialog detail={undefined} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <AddUserDialog detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
     </section>
   )
 }
