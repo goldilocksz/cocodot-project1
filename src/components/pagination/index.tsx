@@ -45,7 +45,6 @@ export default function PaginationUI({
       if (showRightEllipsis) {
         end--
       }
-      console.log(totalPages, totalPagesToDisplay)
 
       return Array.from({ length: end - start + 1 }, (_, i) => start + i)
     }

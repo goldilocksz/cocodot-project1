@@ -1,4 +1,4 @@
-import { useTransition } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog'
+import { Textarea } from '../ui/textarea'
 
 type Props = {
   detail: any
@@ -44,7 +45,7 @@ const formSchema = z.object({
   driver_name: z.string().min(1, {
     message: 'Driver Name is required',
   }),
-  telno: z.string().min(1, {
+  tell_no: z.string().min(1, {
     message: 'Tel No is required',
   }),
   nation_cd: z.string().min(1, {
@@ -71,22 +72,35 @@ const formSchema = z.object({
 })
 
 export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
-  const [isLoading, startTransition] = useTransition()
+  const [isLoading, setIsLoading] = useState()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       lsp_code: '',
+      tell_no: '',
+      remark: '',
       password: '',
     },
   })
+
+  useLayoutEffect(() => {
+    if (detail) {
+      console.log(detail)
+
+      form.reset(detail)
+    }
+  }, [detail])
+
   const onSubmit = async (value: z.infer<typeof formSchema>) => {}
 
   return (
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>Add User Information</DialogTitle>
-          <DialogDescription>Shipping information</DialogDescription>
+          <DialogTitle>{detail ? 'Edit' : 'Add'} User Information</DialogTitle>
+          <DialogDescription>
+            Shipping information{form.getValues('lsp_code')}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -101,10 +115,9 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
                   <FormLabel>LSP_CODE</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="name"
+                      placeholder="LSP_CODE"
                       type="text"
                       autoComplete="off"
-                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -114,16 +127,12 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="email"
+              name="tell_no"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>TELL_NO</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="email@example.com"
-                      disabled={isLoading}
-                      {...field}
-                    />
+                    <Input placeholder="Tell no" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -140,7 +149,6 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
                       placeholder="******"
                       type="password"
                       autoComplete="off"
-                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -171,8 +179,21 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="truck_type"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>REMARK</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="REMARK"></Textarea>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="col-span-2 flex items-center justify-center">
-              <Button type="submit" className="mt-6" disabled={isLoading}>
+              <Button type="submit" className="mt-6">
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Save
               </Button>
