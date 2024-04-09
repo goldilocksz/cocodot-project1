@@ -22,26 +22,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
-import { User } from '@supabase/supabase-js'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 
-export default async function header({
-  user,
-}: {
-  user: User | null | undefined
-}) {
-  const supabase = createClient()
-  const router = useRouter()
-
-  const handleLogout = () => {
-    supabase.auth.signOut()
-    router.push('/login')
-  }
-
+export default function header() {
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -100,7 +84,7 @@ export default async function header({
           </nav>
         </SheetContent>
       </Sheet>
-      <div className="w-full flex-1">
+      {/* <div className="w-full flex-1">
         <form>
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -111,11 +95,11 @@ export default async function header({
             />
           </div>
         </form>
-      </div>
+      </div> */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex cursor-pointer items-center gap-2">
-            <div>{user?.email}</div>
+          <div className="ml-auto flex cursor-pointer items-center gap-2">
+            {/* <div>{user?.email}</div> */}
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar className="hidden h-9 w-9 sm:flex">
                 <AvatarImage src="/images/avatars/avatar_17.jpg" alt="Avatar" />
@@ -128,12 +112,10 @@ export default async function header({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push('/setting')}>
-            Settings
-          </DropdownMenuItem>
+          <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+          <DropdownMenuItem>Logout</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

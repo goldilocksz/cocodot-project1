@@ -20,7 +20,7 @@ import { UserData } from '@/lib/data/users'
 
 export default function UsersPage() {
   const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState('30')
+  const [pageSize, setPageSize] = useState('10')
   const [isOpen, setIsOpen] = useState(false)
   const [detail, setDetail] = useState<(typeof UserData)[number] | undefined>(
     undefined,
@@ -83,7 +83,13 @@ export default function UsersPage() {
               (page - 1) * parseInt(pageSize),
               page * parseInt(pageSize),
             ).map((user) => (
-              <TableRow key={user.id}>
+              <TableRow
+                key={user.id}
+                onDoubleClick={() => {
+                  setDetail(user)
+                  setIsOpen(true)
+                }}
+              >
                 <TableCell>{user.lsp_code}</TableCell>
                 <TableCell>{user.user_name}</TableCell>
                 <TableCell>{user.tell_no}</TableCell>

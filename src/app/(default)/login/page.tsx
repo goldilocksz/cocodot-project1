@@ -55,18 +55,21 @@ export default function page() {
   })
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    const supabase = createClient()
-    startTransition(async () => {
-      const { error } = await supabase.auth.signInWithPassword(value)
-      if (error) {
-        toast.error(error.message, {
-          duration: 5000,
-        })
-      } else {
-        toast.success('Login successful')
-        router.push('/')
-      }
-    })
+    // const supabase = createClient()
+    // startTransition(async () => {
+    //   const { error } = await supabase.auth.signInWithPassword(value)
+    //   if (error) {
+    //     toast.error(error.message, {
+    //       duration: 5000,
+    //     })
+    //   } else {
+    //     toast.success('Login successful')
+    //     router.push('/')
+    //   }
+    // })
+
+    toast.success('Login successful')
+    router.push('/')
   }
   return (
     <Card className="mx-auto w-96 max-w-md">
