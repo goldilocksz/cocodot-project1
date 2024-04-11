@@ -30,10 +30,32 @@ import Link from 'next/link'
 import CountUp from 'react-countup'
 import { Input } from '@/components/ui/input'
 import Chart from '@/components/chart'
+import dayjs from 'dayjs'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { useEffect, useState } from 'react'
+import { Select } from '@/components/ui/select'
 
 export default function index() {
   return (
     <>
+      <div className="grid grid-cols-2 items-center justify-start gap-2 lg:flex lg:justify-end lg:gap-6">
+        <div className="flex items-center gap-2">
+          <Label htmlFor="airplane-mode" className="cursor-pointer">
+            Auto Refetch
+          </Label>
+          <Switch id="airplane-mode" checked={true} />
+        </div>
+        <Select className="w-[120px] justify-self-end">
+          <option value="10">10 minutes</option>
+        </Select>
+        <div className="col-span-2">
+          <span className="text-sm text-muted-foreground">Last UpdatedAt:</span>{' '}
+          <span suppressHydrationWarning>
+            {dayjs(new Date()).format('YYYY-MM-DD hh:mm:ss')}
+          </span>
+        </div>
+      </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -226,7 +248,7 @@ export default function index() {
               </TableHeader>
               <TableBody>
                 {Array.from({ length: 5 }).map((_, index) => (
-                  <TableRow>
+                  <TableRow key={index}>
                     <TableCell>
                       <Input placeholder="BL no. or TR no."></Input>
                     </TableCell>

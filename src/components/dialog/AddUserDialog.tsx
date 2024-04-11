@@ -13,7 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Loader2 } from 'lucide-react'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import { Select } from '../ui/select'
 import {
   Dialog,
@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from '../ui/dialog'
 import { Textarea } from '../ui/textarea'
+import GoogleMap from '../map'
 
 type Props = {
   detail: any
@@ -114,12 +115,7 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
                 <FormItem>
                   <FormLabel>LSP_CODE</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="LSP_CODE"
-                      type="text"
-                      autoComplete="off"
-                      {...field}
-                    />
+                    <Input placeholder="LSP_CODE" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -30,8 +30,9 @@ export default function DatabasePage() {
 
   return (
     <section>
-      <div className="flex-middle">
+      <div className="flex-middle justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Database</h1>
+        <Button>Create</Button>
       </div>
       <Card className="mt-6 p-6">
         <div className="flex items-center justify-between gap-2">
