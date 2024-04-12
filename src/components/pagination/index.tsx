@@ -21,8 +21,10 @@ export default function PaginationUI({
   currentPage,
   setCurrentPage,
 }: PaginationProps) {
-  const showLeftEllipsis = currentPage - 1 > totalPagesToDisplay / 2
-  const showRightEllipsis = totalPages - currentPage > totalPagesToDisplay / 2
+  const showLeftEllipsis = currentPage > 4
+  const showRightEllipsis = totalPages > 4
+
+  if (!totalPages) return
 
   const getPageNumbers = () => {
     if (totalPages <= totalPagesToDisplay) {

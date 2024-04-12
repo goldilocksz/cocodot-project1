@@ -13,10 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Edit, Plus, Trash2, User } from 'lucide-react'
+import { Edit, Plus, Search, Trash2, User, X } from 'lucide-react'
 import { FormEvent, useRef, useState } from 'react'
 import Pagination from '@/components/pagination'
 import { UserData } from '@/lib/data/users'
+import Fuse from 'fuse.js'
 
 interface SearchElement extends HTMLFormControlsCollection {
   search: HTMLInputElement
@@ -27,24 +28,29 @@ interface SearchFormProps extends HTMLFormElement {
 }
 
 export default function UsersPage() {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState<string>('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [isOpen, setIsOpen] = useState(false)
+  const [data, setData] = useState(UserData)
   const [detail, setDetail] = useState<(typeof UserData)[number] | undefined>(
     undefined,
   )
 
   const handleSearch = (event: FormEvent<SearchFormProps>) => {
     event.preventDefault()
-    const search = event.currentTarget.search.value
     setPage(1)
     if (!search.trim()) {
       event.currentTarget.search.focus()
       setSearch('')
+      setData(UserData)
     } else {
-      setSearch(search)
+      const fuse = new Fuse(UserData, {
+        includeScore: true,
+        threshold: 0.3,
+        keys: ['ls_code', 'user_name', 'tell_no'],
+      })
+      setData(fuse.search(search).map((item) => item.item))
     }
   }
 
@@ -59,19 +65,34 @@ export default function UsersPage() {
       </div>
       <Card className="mt-6 p-6">
         <div className="flex items-center justify-between gap-2">
-          <form className="flex items-center gap-2" onSubmit={handleSearch}>
-            <Select className="w-[100px]">
-              <option value="name">Name</option>
-              <option value="tell">Tell</option>
-              <option value="truck">Truck</option>
-            </Select>
-            <Input
-              placeholder="Search..."
-              name="search"
-              className="max-w-xs"
-              autoComplete="off"
-            ></Input>
-            <Button type="submit">Search</Button>
+          <form
+            className="flex w-80 items-center gap-2"
+            onSubmit={handleSearch}
+          >
+            <div className="relative">
+              <Input
+                placeholder="search..."
+                name="search"
+                autoComplete="off"
+                className="w-auto pr-10"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              ></Input>
+              {search.trim() && (
+                <div
+                  className="absolute right-0 top-0 cursor-pointer p-3"
+                  onClick={() => {
+                    setSearch('')
+                    setData(UserData)
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </div>
+              )}
+            </div>
+            <Button type="submit" disabled={search.trim().length === 0}>
+              Search
+            </Button>
           </form>
           <div className="flex items-center gap-2">
             <div className="text-sm text-muted-foreground">Page:</div>
@@ -106,9 +127,14 @@ export default function UsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {UserData.filter((user) =>
-              search ? user.user_name.includes(search) : user,
-            )
+            {data?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={10} className="text-center">
+                  No data found
+                </TableCell>
+              </TableRow>
+            )}
+            {data
               .slice((page - 1) * parseInt(pageSize), page * parseInt(pageSize))
               .map((user) => (
                 <TableRow
@@ -152,11 +178,7 @@ export default function UsersPage() {
         </Table>
 
         <Pagination
-          totalPages={Math.ceil(
-            UserData.filter((user) =>
-              search ? user.user_name.includes(search) : user,
-            ).length / parseInt(pageSize),
-          )}
+          totalPages={Math.ceil(data.length / parseInt(pageSize))}
           currentPage={page}
           setCurrentPage={setPage}
         />

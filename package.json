@@ -36,6 +36,7 @@
     "dayjs": "^1.11.10",
     "drizzle-orm": "^0.30.6",
     "framer-motion": "^11.0.25",
+    "fuse.js": "^7.0.0",
     "google-map-react": "^2.2.1",
     "ip": "^2.0.1",
     "lucide-react": "^0.363.0",
