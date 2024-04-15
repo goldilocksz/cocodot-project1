@@ -69,18 +69,15 @@ export default function UsersPage() {
   const { data: UserData, isPending } = useQuery({
     queryKey: ['getUserList'],
     queryFn: async () => {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + '/user/getUserList',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            licenceKey: 'dfoTg05dkQflgpsVdklub',
-          }),
+      const response = await fetch('/api/user/getUserList', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
+        body: JSON.stringify({
+          licenceKey: 'dfoTg05dkQflgpsVdklub',
+        }),
+      })
       const data = await response.json()
       if (data?.error) {
         toast.error(data.error)
