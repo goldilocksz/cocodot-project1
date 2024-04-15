@@ -13,8 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Edit, Plus, Search, Trash2, User, X } from 'lucide-react'
-import { FormEvent, useRef, useState } from 'react'
+import { Edit, Loader2, Plus, Search, Trash2, User, X } from 'lucide-react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import Pagination from '@/components/pagination'
 // import { UserData } from '@/lib/data/users'
 import Fuse from 'fuse.js'
@@ -64,7 +64,7 @@ export default function UsersPage() {
   const [pageSize, setPageSize] = useState('10')
   const [isOpen, setIsOpen] = useState(false)
   const [userList, setUserList] = useState<User[]>([])
-  const [detail, setDetail] = useState<User | undefined>(undefined)
+  const [detail, setDetail] = useState<User | undefined>()
 
   const { data: UserData, isPending } = useQuery({
     queryKey: ['getUserList'],
@@ -91,6 +91,12 @@ export default function UsersPage() {
       return data ?? []
     },
   })
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDetail(undefined)
+    }
+  }, [isOpen])
 
   const handleSearch = (event: FormEvent<SearchFormProps>) => {
     event.preventDefault()
@@ -125,7 +131,12 @@ export default function UsersPage() {
           Add User
         </Button>
       </div>
-      <Card className="mt-6 p-6">
+      <Card className="relative mt-6 p-6">
+        {isPending && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+            <Loader2 className="h-10 w-10 animate-spin" />
+          </div>
+        )}
         <div className="flex items-center justify-between gap-2">
           <form
             className="flex w-80 items-center gap-2"
@@ -177,13 +188,14 @@ export default function UsersPage() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader>
             <TableRow>
-              <TableHead>USER ID</TableHead>
-              <TableHead>USER NAME</TableHead>
-              <TableHead>LSP CODE</TableHead>
-              <TableHead>TELL NO.</TableHead>
+              <TableHead>USER_ID</TableHead>
+              <TableHead>USER_NAME</TableHead>
+              <TableHead>COMPANY_CODE</TableHead>
+              <TableHead>LSP_CODE</TableHead>
+              <TableHead>TELL_NO.</TableHead>
               <TableHead>GRADE</TableHead>
-              <TableHead>TRUCK NO</TableHead>
-              <TableHead>TRUCK TYPE</TableHead>
+              <TableHead>TRUCK_NO</TableHead>
+              <TableHead>TRUCK_TYPE</TableHead>
               <TableHead>STATUS</TableHead>
               <TableHead>NATION_CD</TableHead>
               <TableHead>REMARK</TableHead>

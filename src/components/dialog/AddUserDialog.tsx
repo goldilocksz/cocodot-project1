@@ -99,8 +99,6 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
     enabled: false,
   })
 
-  console.log(process.env.NEXT_PUBLIC_API_URL)
-
   const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
       const response = await fetch(
@@ -123,11 +121,19 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
 
   useEffect(() => {
     if (detail) {
-      console.log(detail)
-
       form.reset(detail)
+    } else {
+      form.reset({
+        USER_ID: '',
+        PW: '',
+        COMPANY_CODE: '',
+        CUSTOMER_CODE: '',
+        DEPT_CODE: '',
+        TEL_NO: '',
+        REMARKS: '',
+      })
     }
-  }, [detail])
+  }, [isOpen, detail])
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     if (detail) {

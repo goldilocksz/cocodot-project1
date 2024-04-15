@@ -24,7 +24,7 @@ import {
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { LoginAction } from '@/actions/LoginAction'
-import { useFormState, useFormStatus } from 'react-dom'
+import { useFormState } from 'react-dom'
 
 export const formSchema = z.object({
   USER_ID: z.string().min(1, {
@@ -35,16 +35,6 @@ export const formSchema = z.object({
   }),
 })
 
-function SubmitButton() {
-  const { pending, data } = useFormStatus()
-
-  return (
-    <Button type="submit" className="mt-4 w-full" disabled={pending}>
-      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      Login
-    </Button>
-  )
-}
 export default function page() {
   const [state, fromAction] = useFormState(LoginAction, {
     message: '',
@@ -57,7 +47,6 @@ export default function page() {
     defaultValues: {
       USER_ID: '',
       PW: '',
-      ...(state?.fields ?? {}),
     },
   })
 
@@ -84,7 +73,6 @@ export default function page() {
             ref={formRef}
             action={fromAction}
             onSubmit={(e) => {
-              e.preventDefault()
               form.handleSubmit(() => {
                 setIsPending(true)
                 formRef.current?.submit()

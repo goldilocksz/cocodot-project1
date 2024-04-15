@@ -5,9 +5,6 @@ import { redirect } from 'next/navigation'
 
 export type FormState = {
   message: string
-  fields?: {
-    [k: string]: FormDataEntryValue
-  }
 }
 
 export const LoginAction = async (
@@ -33,7 +30,6 @@ export const LoginAction = async (
   if (data.length === 0 || data.error) {
     return {
       message: 'Invalid UserId or Password',
-      fields: formData,
     }
   }
 
