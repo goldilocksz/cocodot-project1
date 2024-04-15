@@ -19,8 +19,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <QueryClientProvider>{children}</QueryClientProvider>
         <Toaster position="top-center" richColors />
+        <QueryClientProvider>{children}</QueryClientProvider>
       </body>
     </html>
   )

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -24,6 +24,7 @@ import {
 } from '../ui/dialog'
 import { Textarea } from '../ui/textarea'
 import GoogleMap from '../map'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 type Props = {
   detail: any
@@ -32,44 +33,32 @@ type Props = {
 }
 
 const formSchema = z.object({
-  email: z
-    .string()
-    .min(1, {
-      message: 'Email is required',
-    })
-    .email({
-      message: 'Invalid email address',
-    }),
-  lsp_code: z.string().min(1, {
-    message: 'LSP Code is required',
+  USER_ID: z.string().min(1, {
+    message: 'UserId is required',
   }),
-  driver_name: z.string().min(1, {
-    message: 'Driver Name is required',
+  PW: z.string().min(1, {
+    message: 'Password is required',
   }),
-  tell_no: z.string().min(1, {
+  COMPANY_CODE: z.string().min(1, {
+    message: 'Company Code is required',
+  }),
+  CUSTOMER_CODE: z.string().min(1, {
+    message: 'Customer Code is required',
+  }),
+  DEPT_CODE: z.string().min(1, {
+    message: 'Department Code is required',
+  }),
+  TEL_NO: z.string().min(1, {
     message: 'Tel No is required',
   }),
-  nation_cd: z.string().min(1, {
-    message: 'Nation Code is required',
-  }),
-  driver_lang: z.string().min(1, {
-    message: 'Nation Code is required',
-  }),
-  time_zone: z.string().min(1, {
-    message: 'Nation Code is required',
-  }),
-  truck_no: z.string().min(1, {
-    message: 'Nation Code is required',
-  }),
-  truck_type: z.string().min(1, {
-    message: 'Nation Code is required',
-  }),
-  remark: z.string().min(1, {
-    message: 'Nation Code is required',
-  }),
-  password: z.string().min(6, {
-    message: 'Password must be at least 6 characters long',
-  }),
+  REMARKS: z
+    .string()
+    .min(1, {
+      message: 'Remarks is required',
+    })
+    .max(100, {
+      message: 'Remarks must be less than 100 characters',
+    }),
 })
 
 export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
@@ -77,14 +66,62 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      lsp_code: '',
-      tell_no: '',
-      remark: '',
-      password: '',
+      USER_ID: '',
+      PW: '',
+      COMPANY_CODE: '',
+      CUSTOMER_CODE: '',
+      DEPT_CODE: '',
+      TEL_NO: '',
+      REMARKS: '',
     },
   })
 
-  useLayoutEffect(() => {
+  const { data: CommonCode, isPending } = useQuery({
+    queryKey: ['getCommonCode'],
+    queryFn: async () => {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL + '/webCommon/getLSPCode',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            licenceKey: 'dfoTg05dkQflgpsVdklub',
+          }),
+        },
+      )
+      const data = await response.json()
+      console.log(data)
+
+      return data
+    },
+    enabled: false,
+  })
+
+  console.log(process.env.NEXT_PUBLIC_API_URL)
+
+  const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
+    mutationFn: async (value: z.infer<typeof formSchema>) => {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL + '/user/userUpdate',
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            ...value,
+            licenceKey: 'dfoTg05dkQflgpsVdklub',
+          }),
+        },
+      )
+      const data = await response.json()
+      console.log(data)
+    },
+  })
+
+  useEffect(() => {
     if (detail) {
       console.log(detail)
 
@@ -92,30 +129,32 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
     }
   }, [detail])
 
-  const onSubmit = async (value: z.infer<typeof formSchema>) => {}
+  const onSubmit = async (value: z.infer<typeof formSchema>) => {
+    if (detail) {
+      UpdateUser(value)
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>{detail ? 'Edit' : 'Add'} User Information</DialogTitle>
-          <DialogDescription>
-            Shipping information{form.getValues('lsp_code')}
-          </DialogDescription>
+          <DialogDescription>Shipping information</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="grid grid-cols-2 gap-4"
+            className="relative grid grid-cols-2 gap-4"
           >
             <FormField
               control={form.control}
-              name="lsp_code"
+              name="USER_ID"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>LSP_CODE</FormLabel>
+                  <FormLabel>USER_ID</FormLabel>
                   <FormControl>
-                    <Input placeholder="LSP_CODE" {...field} />
+                    <Input placeholder="USER_ID" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -123,12 +162,12 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="tell_no"
+              name="PW"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>TELL_NO</FormLabel>
+                  <FormLabel>PASSWORD</FormLabel>
                   <FormControl>
-                    <Input placeholder="Tell no" {...field} />
+                    <Input placeholder="LSP_CODE" type="password" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -136,17 +175,12 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="password"
+              name="COMPANY_CODE"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>COMPANY_CODE</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="******"
-                      type="password"
-                      autoComplete="off"
-                      {...field}
-                    />
+                    <Input placeholder="COMPANY_CODE" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,7 +188,20 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="truck_type"
+              name="CUSTOMER_CODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>CUSTOMER_CODE</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="DEPT_CODE"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>TRUCK_TYPE</FormLabel>
@@ -177,21 +224,39 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="truck_type"
+              name="TEL_NO"
               render={({ field }) => (
-                <FormItem className="col-span-2">
+                <FormItem>
                   <FormLabel>REMARK</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="REMARK"></Textarea>
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="col-span-2 flex items-center justify-center">
-              <Button type="submit" className="mt-6">
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save
+            <FormField
+              control={form.control}
+              name="REMARKS"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>REMARKS</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="REMARK" {...field}></Textarea>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="col-span-2 mt-6 flex items-center justify-center gap-4">
+              <Button type="submit">
+                {isUpdateUser && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {detail ? 'Update' : 'Add'}
+              </Button>
+              <Button variant="outline" onClick={() => setIsOpen(false)}>
+                Cancel
               </Button>
             </div>
           </form>

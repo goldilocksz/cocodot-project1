@@ -6,8 +6,6 @@ import {
   LineChart,
   Menu,
   Package,
-  Package2,
-  Search,
   ShoppingCart,
   Users,
 } from 'lucide-react'
@@ -24,8 +22,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { User } from '@/types/data'
+import { LogoutAction } from '@/actions/LoginAction'
 
-export default function header() {
+export default function header({ user }: { user: User }) {
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -99,7 +99,7 @@ export default function header() {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="ml-auto flex cursor-pointer items-center gap-2">
-            {/* <div>{user?.email}</div> */}
+            <div>{user.USER_NAME}</div>
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar className="hidden h-9 w-9 sm:flex">
                 <AvatarImage src="/images/avatars/avatar_17.jpg" alt="Avatar" />
@@ -115,7 +115,17 @@ export default function header() {
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Logout</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <form action={LogoutAction}>
+              <Button
+                type="submit"
+                variant="outline"
+                className="h-auto w-full justify-start border-0 bg-inherit p-0 hover:bg-inherit"
+              >
+                Logout
+              </Button>
+            </form>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>

@@ -16,8 +16,10 @@ import {
 import { Edit, Plus, Search, Trash2, User, X } from 'lucide-react'
 import { FormEvent, useRef, useState } from 'react'
 import Pagination from '@/components/pagination'
-import { UserData } from '@/lib/data/users'
+// import { UserData } from '@/lib/data/users'
 import Fuse from 'fuse.js'
+import { useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 interface SearchElement extends HTMLFormControlsCollection {
   search: HTMLInputElement
@@ -27,15 +29,68 @@ interface SearchFormProps extends HTMLFormElement {
   readonly elements: SearchElement
 }
 
+interface User {
+  ID: number
+  COMPANY_CODE: string
+  USER_ID: string
+  CUSTOMER_CODE: string
+  PW: string
+  USER_NAME: string
+  DEPT_CODE: string
+  TEL_NO: string
+  EMAIL: string
+  TRUCK_NO: string
+  TRUCK_TYPE: string
+  NATION_CD: string
+  USE_YN: string
+  LAST_LOGIN_DATE: string
+  USER_LANG: string
+  ACCOUNT_NAME: string
+  GRADE: string
+  STATUS: string
+  REMARKS: string
+  TIME_ZONE: string
+  ADD_DATE: Date
+  ADD_USER_ID: string
+  ADD_USER_NAME: string
+  UPDATE_DATE: Date
+  UPDATE_USER_ID: string
+  UPDATE_USER_NAME: string
+}
+
 export default function UsersPage() {
   const [search, setSearch] = useState<string>('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [isOpen, setIsOpen] = useState(false)
-  const [data, setData] = useState(UserData)
-  const [detail, setDetail] = useState<(typeof UserData)[number] | undefined>(
-    undefined,
-  )
+  const [userList, setUserList] = useState<User[]>([])
+  const [detail, setDetail] = useState<User | undefined>(undefined)
+
+  const { data: UserData, isPending } = useQuery({
+    queryKey: ['getUserList'],
+    queryFn: async () => {
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_API_URL + '/user/getUserList',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            licenceKey: 'dfoTg05dkQflgpsVdklub',
+          }),
+        },
+      )
+      const data = await response.json()
+      if (data?.error) {
+        toast.error(data.error)
+        return []
+      }
+
+      setUserList(data)
+      return data ?? []
+    },
+  })
 
   const handleSearch = (event: FormEvent<SearchFormProps>) => {
     event.preventDefault()
@@ -43,14 +98,21 @@ export default function UsersPage() {
     if (!search.trim()) {
       event.currentTarget.search.focus()
       setSearch('')
-      setData(UserData)
+      setUserList(UserData ?? [])
     } else {
+      if (!UserData) return
       const fuse = new Fuse(UserData, {
         includeScore: true,
         threshold: 0.3,
-        keys: ['ls_code', 'user_name', 'tell_no'],
+        keys: [
+          'COMPANY_CODE',
+          'USER_ID',
+          'CUSTOMER_CODE',
+          'USER_NAME',
+          'TEL_NO',
+        ],
       })
-      setData(fuse.search(search).map((item) => item.item))
+      setUserList(fuse.search(search).map((item) => item.item) as User[])
     }
   }
 
@@ -83,7 +145,7 @@ export default function UsersPage() {
                   className="absolute right-0 top-0 cursor-pointer p-3"
                   onClick={() => {
                     setSearch('')
-                    setData(UserData)
+                    setUserList(UserData ?? [])
                   }}
                 >
                   <X className="h-4 w-4" />
@@ -91,6 +153,7 @@ export default function UsersPage() {
               )}
             </div>
             <Button type="submit" disabled={search.trim().length === 0}>
+              <Search className="mr-1 h-4 w-4" />
               Search
             </Button>
           </form>
@@ -114,12 +177,14 @@ export default function UsersPage() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader>
             <TableRow>
-              <TableHead>LSP CODE</TableHead>
+              <TableHead>USER ID</TableHead>
               <TableHead>USER NAME</TableHead>
+              <TableHead>LSP CODE</TableHead>
               <TableHead>TELL NO.</TableHead>
               <TableHead>GRADE</TableHead>
-              <TableHead>TRUCK NO.</TableHead>
+              <TableHead>TRUCK NO</TableHead>
               <TableHead>TRUCK TYPE</TableHead>
+              <TableHead>STATUS</TableHead>
               <TableHead>NATION_CD</TableHead>
               <TableHead>REMARK</TableHead>
               <TableHead>REVISE</TableHead>
@@ -127,31 +192,36 @@ export default function UsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.length === 0 && (
+            {userList?.length === 0 && (
               <TableRow>
                 <TableCell colSpan={10} className="text-center">
                   No data found
                 </TableCell>
               </TableRow>
             )}
-            {data
-              .slice((page - 1) * parseInt(pageSize), page * parseInt(pageSize))
+            {userList
+              ?.slice(
+                (page - 1) * parseInt(pageSize),
+                page * parseInt(pageSize),
+              )
               .map((user) => (
                 <TableRow
-                  key={user.id}
+                  key={user.USER_ID}
                   onDoubleClick={() => {
                     setDetail(user)
                     setIsOpen(true)
                   }}
                 >
-                  <TableCell>{user.lsp_code}</TableCell>
-                  <TableCell>{user.user_name}</TableCell>
-                  <TableCell>{user.tell_no}</TableCell>
-                  <TableCell>{user.grade}</TableCell>
-                  <TableCell>{user.truck_no}</TableCell>
-                  <TableCell>{user.truck_type}</TableCell>
-                  <TableCell>{user.nation_cd}</TableCell>
-                  <TableCell>ㅂ</TableCell>
+                  <TableCell>{user.USER_ID}</TableCell>
+                  <TableCell>{user.COMPANY_CODE}</TableCell>
+                  <TableCell>{user.USER_NAME}</TableCell>
+                  <TableCell>{user.TEL_NO}</TableCell>
+                  <TableCell>{user.GRADE}</TableCell>
+                  <TableCell>{user.TRUCK_NO}</TableCell>
+                  <TableCell>{user.TRUCK_TYPE}</TableCell>
+                  <TableCell>{user.STATUS}</TableCell>
+                  <TableCell>{user.NATION_CD}</TableCell>
+                  <TableCell>{user.REMARKS}</TableCell>
                   <TableCell className="py-0">
                     <Button
                       variant="ghost"
@@ -178,7 +248,11 @@ export default function UsersPage() {
         </Table>
 
         <Pagination
-          totalPages={Math.ceil(data.length / parseInt(pageSize))}
+          totalPages={
+            userList?.length
+              ? Math.ceil(userList.length / parseInt(pageSize))
+              : 1
+          }
           currentPage={page}
           setCurrentPage={setPage}
         />
