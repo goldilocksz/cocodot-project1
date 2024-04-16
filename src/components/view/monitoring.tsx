@@ -15,8 +15,37 @@ import {
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { User } from '@/types/data'
+import { toast } from 'sonner'
 
 export default function index() {
+  const [userList, setUserList] = useState<User[]>([])
+  const { data: LoginData } = useQuery({
+    queryKey: ['getLoginInfo'],
+    queryFn: async () => {
+      const response = await fetch('/api/webCommon/getRouteMst', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          licenceKey: 'dfoTg05dkQflgpsVdklub',
+        }),
+      })
+      const data = await response.json()
+
+      if (data.length === 0 || data?.error) {
+        toast.error(data.error)
+        return []
+      }
+
+      setUserList(data)
+      return data ?? []
+    },
+  })
+
   return (
     <section>
       <div className="flex-middle h-10 justify-between">
@@ -45,6 +74,7 @@ export default function index() {
         </Dialog>
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <pre>{JSON.stringify(LoginData, null, 2)}</pre>
         {Array.from({ length: 10 }).map((_, index) => (
           <motion.div
             key={index}

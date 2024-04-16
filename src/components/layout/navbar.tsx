@@ -2,7 +2,15 @@
 
 import Link from 'next/link'
 
-import { Database, Home, Monitor, ShoppingCart, Users } from 'lucide-react'
+import {
+  Code,
+  Database,
+  Home,
+  Monitor,
+  Route,
+  ShoppingCart,
+  Users,
+} from 'lucide-react'
 
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -32,6 +40,16 @@ const Menu = [
     name: 'Database',
     icon: Database,
     href: '/database',
+  },
+  {
+    name: 'Common',
+    icon: Code,
+    href: '/common',
+  },
+  {
+    name: 'Route',
+    icon: Route,
+    href: '/route',
   },
 ]
 

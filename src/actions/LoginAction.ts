@@ -14,7 +14,7 @@ export const LoginAction = async (
   const formData = Object.fromEntries(value)
 
   const response = await fetch(
-    process.env.NEXT_PUBLIC_API_URL + 'webCommon/getLoginInfo',
+    process.env.NEXT_PUBLIC_API_URL + '/webCommon/getLoginInfo',
     {
       method: 'POST',
       headers: {

@@ -62,7 +62,6 @@ const formSchema = z.object({
 })
 
 export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
-  const [isLoading, setIsLoading] = useState()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -79,30 +78,30 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
   const { data: CommonCode, isPending } = useQuery({
     queryKey: ['getCommonCode'],
     queryFn: async () => {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + '/webCommon/getLSPCode',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            licenceKey: 'dfoTg05dkQflgpsVdklub',
-          }),
+      const response = await fetch('/api/webCommon/getCommonCode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      )
-      const data = await response.json()
+        body: JSON.stringify({
+          licenceKey: 'dfoTg05dkQflgpsVdklub',
+        }),
+      })
+      const data = (await response.json()) as {
+        DT_CODE: string
+        LOC_VALUE: string
+      }[]
       console.log(data)
 
-      return data
+      return data ?? []
     },
-    enabled: false,
+    enabled: isOpen,
   })
 
   const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
       const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + '/user/userUpdate',
+        process.env.NEXT_PUBLIC_API_URL + '/user/userSave',
         {
           method: 'POST',
           headers: {
@@ -213,15 +212,11 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
                   <FormLabel>TRUCK_TYPE</FormLabel>
                   <FormControl>
                     <Select {...field}>
-                      <option value="45FT">45FT</option>
-                      <option value="45FTA">45FT AIRSUS</option>
-                      <option value="40RF">40RF</option>
-                      <option value="10T">10T</option>
-                      <option value="8T">8T</option>
-                      <option value="5T">5T</option>
-                      <option value="3.5T">3.5T</option>
-                      <option value="2.5T">2.5T</option>
-                      <option value="1.5T">1.5T</option>
+                      {CommonCode?.map((item) => (
+                        <option key={item.DT_CODE} value={item.LOC_VALUE}>
+                          {item.LOC_VALUE}
+                        </option>
+                      ))}
                     </Select>
                   </FormControl>
                   <FormMessage />

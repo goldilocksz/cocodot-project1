@@ -115,12 +115,12 @@ export default function header({ user }: { user: User }) {
           <DropdownMenuItem>Settings</DropdownMenuItem>
           <DropdownMenuItem>Support</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem asChild className="p-0">
             <form action={LogoutAction}>
               <Button
                 type="submit"
                 variant="outline"
-                className="h-auto w-full justify-start border-0 bg-inherit p-0 hover:bg-inherit"
+                className="h-auto w-full justify-start border-0 bg-inherit px-2 py-1.5 hover:bg-inherit"
               >
                 Logout
               </Button>
