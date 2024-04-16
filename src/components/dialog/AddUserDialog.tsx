@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -13,20 +13,24 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
-import { Select } from '../ui/select'
+import { Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog'
 import { Textarea } from '../ui/textarea'
-import GoogleMap from '../map'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
+import TruckType from '../form/TruckType'
+import NationCode from '../form/NationCode'
+import { User } from '@/types/data'
+import { toast } from 'sonner'
 
 type Props = {
+  auth: User
   detail: any
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
@@ -35,6 +39,12 @@ type Props = {
 const formSchema = z.object({
   USER_ID: z.string().min(1, {
     message: 'UserId is required',
+  }),
+  USER_NAME: z.string().min(1, {
+    message: 'UserName is required',
+  }),
+  TEL_NO: z.string().min(1, {
+    message: 'Tel No is required',
   }),
   PW: z.string().min(1, {
     message: 'Password is required',
@@ -45,11 +55,20 @@ const formSchema = z.object({
   CUSTOMER_CODE: z.string().min(1, {
     message: 'Customer Code is required',
   }),
+  NATION_CD: z.string().min(1, {
+    message: 'Customer Code is required',
+  }),
+  TRUCK_TYPE: z.string().min(1, {
+    message: 'Customer Code is required',
+  }),
+  TRUCK_NO: z.string().min(1, {
+    message: 'Trunck no is required',
+  }),
+  STATUS: z.string().min(1, {
+    message: 'Status is required',
+  }),
   DEPT_CODE: z.string().min(1, {
     message: 'Department Code is required',
-  }),
-  TEL_NO: z.string().min(1, {
-    message: 'Tel No is required',
   }),
   REMARKS: z
     .string()
@@ -61,60 +80,53 @@ const formSchema = z.object({
     }),
 })
 
-export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
+export default function AddUserDialog({
+  auth,
+  detail,
+  isOpen,
+  setIsOpen,
+}: Props) {
+  const defaultValues = {
+    USER_ID: '',
+    USER_NAME: '',
+    TEL_NO: '',
+    PW: '',
+    COMPANY_CODE: '',
+    CUSTOMER_CODE: '',
+    NATION_CD: '',
+    TRUCK_TYPE: '',
+    TRUCK_NO: '',
+    STATUS: '',
+    DEPT_CODE: '',
+    REMARKS: '',
+  }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      USER_ID: '',
-      PW: '',
-      COMPANY_CODE: '',
-      CUSTOMER_CODE: '',
-      DEPT_CODE: '',
-      TEL_NO: '',
-      REMARKS: '',
-    },
+    defaultValues,
   })
 
-  const { data: CommonCode, isPending } = useQuery({
-    queryKey: ['getCommonCode'],
-    queryFn: async () => {
-      const response = await fetch('/api/webCommon/getCommonCode', {
+  const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
+    mutationFn: async (value: z.infer<typeof formSchema>) => {
+      const response = await fetch('/api/user/userSave', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          ...value,
+          S_USER_ID: auth.USER_ID,
+          S_USER_NAME: auth.USER_NAME,
+          S_COMPANY_CODE: auth.COMPANY_CODE,
           licenceKey: 'dfoTg05dkQflgpsVdklub',
         }),
       })
-      const data = (await response.json()) as {
-        DT_CODE: string
-        LOC_VALUE: string
-      }[]
-      console.log(data)
-
-      return data ?? []
-    },
-    enabled: isOpen,
-  })
-
-  const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
-    mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_API_URL + '/user/userSave',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ...value,
-            licenceKey: 'dfoTg05dkQflgpsVdklub',
-          }),
-        },
-      )
       const data = await response.json()
-      console.log(data)
+      if (data === 0) {
+        toast.error('Failed to update user information')
+        return
+      }
+      setIsOpen(false)
+      window.location.reload()
     },
   })
 
@@ -122,15 +134,7 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
     if (detail) {
       form.reset(detail)
     } else {
-      form.reset({
-        USER_ID: '',
-        PW: '',
-        COMPANY_CODE: '',
-        CUSTOMER_CODE: '',
-        DEPT_CODE: '',
-        TEL_NO: '',
-        REMARKS: '',
-      })
+      form.reset(defaultValues)
     }
   }, [isOpen, detail])
 
@@ -149,6 +153,7 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
         </DialogHeader>
         <Form {...form}>
           <form
+            id="userForm"
             onSubmit={form.handleSubmit(onSubmit)}
             className="relative grid grid-cols-2 gap-4"
           >
@@ -159,7 +164,7 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
                 <FormItem>
                   <FormLabel>USER_ID</FormLabel>
                   <FormControl>
-                    <Input placeholder="USER_ID" {...field} />
+                    <Input placeholder="USER_ID" readOnly {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -167,25 +172,12 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="PW"
+              name="USER_NAME"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>PASSWORD</FormLabel>
+                  <FormLabel>USER_NAME</FormLabel>
                   <FormControl>
-                    <Input placeholder="LSP_CODE" type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="COMPANY_CODE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>COMPANY_CODE</FormLabel>
-                  <FormControl>
-                    <Input placeholder="COMPANY_CODE" {...field} />
+                    <Input placeholder="USER_NAME" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -206,18 +198,38 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="DEPT_CODE"
+              name="TRUCK_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>TRUCK_NO</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TRUCK_TYPE"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>TRUCK_TYPE</FormLabel>
                   <FormControl>
-                    <Select {...field}>
-                      {CommonCode?.map((item) => (
-                        <option key={item.DT_CODE} value={item.LOC_VALUE}>
-                          {item.LOC_VALUE}
-                        </option>
-                      ))}
-                    </Select>
+                    <TruckType {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="NATION_CD"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>NATION_CD</FormLabel>
+                  <FormControl>
+                    <NationCode {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -228,7 +240,20 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
               name="TEL_NO"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>REMARK</FormLabel>
+                  <FormLabel>TEL_NO</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="STATUS"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>STATUS</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -249,19 +274,17 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
                 </FormItem>
               )}
             />
-            <div className="col-span-2 mt-6 flex items-center justify-center gap-4">
-              <Button type="submit">
-                {isUpdateUser && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {detail ? 'Update' : 'Add'}
-              </Button>
-              <Button variant="outline" onClick={() => setIsOpen(false)}>
-                Cancel
-              </Button>
-            </div>
           </form>
         </Form>
+        <DialogFooter className="sm:justify-center">
+          <Button type="submit" form="userForm">
+            {isUpdateUser && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {detail ? 'Update' : 'Add'}
+          </Button>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

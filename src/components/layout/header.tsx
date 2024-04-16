@@ -99,14 +99,15 @@ export default function header({ user }: { user: User }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="ml-auto flex cursor-pointer items-center gap-2">
-            <div>{user.USER_NAME}</div>
+            <div>Company Code: {user.COMPANY_CODE}</div>
             <Button variant="secondary" size="icon" className="rounded-full">
-              <Avatar className="hidden h-9 w-9 sm:flex">
+              <Avatar className="h-9 w-9 sm:flex">
                 <AvatarImage src="/images/avatars/avatar_17.jpg" alt="Avatar" />
                 <AvatarFallback>WK</AvatarFallback>
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
+            <div>{user.USER_NAME}</div>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

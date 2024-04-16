@@ -6,6 +6,8 @@ import Breadcrumb from '@/components/breadcrumb'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { User } from '@/types/data'
+import { Suspense } from 'react'
+import { Loader2 } from 'lucide-react'
 
 export default function layout({ children }: { children: React.ReactNode }) {
   const cookieStore = cookies()
@@ -19,9 +21,17 @@ export default function layout({ children }: { children: React.ReactNode }) {
 
       <div className="flex flex-col overflow-hidden">
         <Header user={user} />
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <main className="relative flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           <Breadcrumb />
-          {children}
+          <Suspense
+            fallback={
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+                <Loader2 className="h-10 w-10 animate-spin" />
+              </div>
+            }
+          >
+            {children}
+          </Suspense>
         </main>
       </div>
     </div>
