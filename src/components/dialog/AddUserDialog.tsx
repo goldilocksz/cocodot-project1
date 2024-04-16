@@ -104,7 +104,7 @@ export default function AddUserDialog({ detail, isOpen, setIsOpen }: Props) {
       const response = await fetch(
         process.env.NEXT_PUBLIC_API_URL + '/user/userUpdate',
         {
-          method: 'PATCH',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },

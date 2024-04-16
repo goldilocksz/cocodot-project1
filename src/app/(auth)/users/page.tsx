@@ -18,8 +18,9 @@ import { FormEvent, useEffect, useRef, useState } from 'react'
 import Pagination from '@/components/pagination'
 // import { UserData } from '@/lib/data/users'
 import Fuse from 'fuse.js'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 
 interface SearchElement extends HTMLFormControlsCollection {
   search: HTMLInputElement
@@ -65,8 +66,19 @@ export default function UsersPage() {
   const [isOpen, setIsOpen] = useState(false)
   const [userList, setUserList] = useState<User[]>([])
   const [detail, setDetail] = useState<User | undefined>()
+  const [isConfirm, setIsConfirm] = useState(false)
 
-  const { data: UserData, isPending } = useQuery({
+  useEffect(() => {
+    if (!isOpen) {
+      setDetail(undefined)
+    }
+  }, [isOpen])
+
+  const {
+    data: UserData,
+    refetch,
+    isPending: isGetUserData,
+  } = useQuery({
     queryKey: ['getUserList'],
     queryFn: async () => {
       const response = await fetch('/api/user/getUserList', {
@@ -79,21 +91,57 @@ export default function UsersPage() {
         }),
       })
       const data = await response.json()
-      if (data?.error) {
+
+      if (data.length === 0 || data?.error) {
         toast.error(data.error)
         return []
       }
 
-      setUserList(data)
-      return data ?? []
+      const users = data.filter((item: User) => item.USE_YN === 'Y')
+
+      setUserList(users)
+      return users ?? []
     },
   })
 
-  useEffect(() => {
-    if (!isOpen) {
-      setDetail(undefined)
-    }
-  }, [isOpen])
+  const { mutate: deleteUser, isPending: isDeleteUser } = useMutation({
+    mutationFn: async ({
+      USER_ID,
+      COMPANY_CODE,
+    }: {
+      USER_ID: string
+      COMPANY_CODE: string
+    }) => {
+      const response = await fetch('/api/user/userDelete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          USER_ID,
+          COMPANY_CODE,
+          licenceKey: 'dfoTg05dkQflgpsVdklub',
+        }),
+      })
+      const data = await response.json()
+
+      if (data.error) {
+        toast.error(data.error)
+      } else {
+        toast.success('User deleted successfully')
+        refetch()
+      }
+    },
+  })
+
+  const handleDelete = () => {
+    if (!detail) return
+    deleteUser({
+      USER_ID: detail.USER_ID,
+      COMPANY_CODE: detail.COMPANY_CODE,
+    })
+    setIsConfirm(false)
+  }
 
   const handleSearch = (event: FormEvent<SearchFormProps>) => {
     event.preventDefault()
@@ -129,7 +177,7 @@ export default function UsersPage() {
         </Button>
       </div>
       <Card className="relative mt-6 p-6">
-        {isPending && (
+        {(isGetUserData || isDeleteUser) && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
             <Loader2 className="h-10 w-10 animate-spin" />
           </div>
@@ -165,20 +213,26 @@ export default function UsersPage() {
               Search
             </Button>
           </form>
-          <div className="flex items-center gap-2">
-            <div className="text-sm text-muted-foreground">Page:</div>
-            <Select
-              defaultValue={pageSize}
-              onChange={(e) => {
-                setPage(1)
-                setPageSize(e.target.value)
-              }}
-            >
-              <option value="10">10</option>
-              <option value="30">30</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </Select>
+          <div className="flex items-center gap-6 whitespace-nowrap">
+            <div>
+              <span className="text-sm text-muted-foreground">Count: </span>
+              {userList?.length}
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-muted-foreground">Page:</div>
+              <Select
+                defaultValue={pageSize}
+                onChange={(e) => {
+                  setPage(1)
+                  setPageSize(e.target.value)
+                }}
+              >
+                <option value="10">10</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </Select>
+            </div>
           </div>
         </div>
 
@@ -188,7 +242,6 @@ export default function UsersPage() {
               <TableHead>USER_ID</TableHead>
               <TableHead>USER_NAME</TableHead>
               <TableHead>COMPANY_CODE</TableHead>
-              <TableHead>LSP_CODE</TableHead>
               <TableHead>TELL_NO.</TableHead>
               <TableHead>GRADE</TableHead>
               <TableHead>TRUCK_NO</TableHead>
@@ -222,8 +275,8 @@ export default function UsersPage() {
                   }}
                 >
                   <TableCell>{user.USER_ID}</TableCell>
-                  <TableCell>{user.COMPANY_CODE}</TableCell>
                   <TableCell>{user.USER_NAME}</TableCell>
+                  <TableCell>{user.COMPANY_CODE}</TableCell>
                   <TableCell>{user.TEL_NO}</TableCell>
                   <TableCell>{user.GRADE}</TableCell>
                   <TableCell>{user.TRUCK_NO}</TableCell>
@@ -247,6 +300,10 @@ export default function UsersPage() {
                     <Button
                       variant="ghost"
                       className="h-10 w-10 rounded-full p-0"
+                      onClick={() => {
+                        setDetail(user)
+                        setIsConfirm(true)
+                      }}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -268,6 +325,13 @@ export default function UsersPage() {
       </Card>
 
       <AddUserDialog detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <ConfirmDialog
+        title="Delete User"
+        desc={`Are you sure you want to delete user ${detail?.USER_NAME}`}
+        isOpen={isConfirm}
+        setIsOpen={setIsConfirm}
+        callback={() => handleDelete()}
+      />
     </section>
   )
 }
