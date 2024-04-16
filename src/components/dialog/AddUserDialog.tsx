@@ -26,11 +26,11 @@ import { Textarea } from '../ui/textarea'
 import { useMutation } from '@tanstack/react-query'
 import TruckType from '../form/TruckType'
 import NationCode from '../form/NationCode'
-import { User } from '@/types/data'
+import { Auth } from '@/types/data'
 import { toast } from 'sonner'
 
 type Props = {
-  auth: User
+  auth: Auth
   detail: any
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
@@ -132,6 +132,8 @@ export default function AddUserDialog({
 
   useEffect(() => {
     if (detail) {
+      console.log(detail)
+
       form.reset(detail)
     } else {
       form.reset(defaultValues)

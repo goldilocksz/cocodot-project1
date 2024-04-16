@@ -5,7 +5,7 @@ import { FormEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { Card } from '../ui/card'
 import { Edit, Search, Trash2, X } from 'lucide-react'
-import { Route, User } from '@/types/data'
+import { Route, Auth } from '@/types/data'
 import {
   Table,
   TableBody,
@@ -31,10 +31,10 @@ interface SearchFormProps extends HTMLFormElement {
 }
 
 export default function route({
-  user,
+  auth,
   routes,
 }: {
-  user: User
+  auth: Auth
   routes: Route[]
 }) {
   const [routeList, setRouteList] = useState<Route[]>(routes)
@@ -59,7 +59,7 @@ export default function route({
   //         'Content-Type': 'application/json',
   //       },
   //       body: JSON.stringify({
-  //         COMPANY_CODE: user.COMPANY_CODE,
+  //         COMPANY_CODE: auth.COMPANY_CODE,
   //         licenceKey: 'dfoTg05dkQflgpsVdklub',
   //       }),
   //     })

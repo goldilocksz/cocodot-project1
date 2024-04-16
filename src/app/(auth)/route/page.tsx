@@ -1,10 +1,10 @@
 import Route from '@/components/view/route'
-import { User } from '@/types/data'
+import { Auth } from '@/types/data'
 import { cookies } from 'next/headers'
 
 export default async function page() {
   const cookieStore = cookies()
-  const user = JSON.parse(cookieStore.get('user')?.value!) as User
+  const user = JSON.parse(cookieStore.get('user')?.value!) as Auth
 
   const response = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/webCommon/getRouteMstList',
@@ -25,5 +25,5 @@ export default async function page() {
     id: index + 1,
   }))
 
-  return <Route user={user} routes={routes} />
+  return <Route auth={user} routes={routes} />
 }

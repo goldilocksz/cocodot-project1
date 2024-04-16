@@ -22,10 +22,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
-import { User } from '@/types/data'
+import { Auth } from '@/types/data'
 import { LogoutAction } from '@/actions/LoginAction'
 
-export default function header({ user }: { user: User }) {
+export default function header({ auth }: { auth: Auth }) {
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -99,7 +99,7 @@ export default function header({ user }: { user: User }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="ml-auto flex cursor-pointer items-center gap-2">
-            <div>Company Code: {user.COMPANY_CODE}</div>
+            <div>Company Code: {auth.COMPANY_CODE}</div>
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar className="h-9 w-9 sm:flex">
                 <AvatarImage src="/images/avatars/avatar_17.jpg" alt="Avatar" />
@@ -107,7 +107,7 @@ export default function header({ user }: { user: User }) {
               </Avatar>
               <span className="sr-only">Toggle user menu</span>
             </Button>
-            <div>{user.USER_NAME}</div>
+            <div>{auth.USER_NAME}</div>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

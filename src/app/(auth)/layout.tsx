@@ -5,7 +5,7 @@ import Header from '@/components/layout/header'
 import Breadcrumb from '@/components/breadcrumb'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { User } from '@/types/data'
+import { Auth } from '@/types/data'
 import { Suspense } from 'react'
 import { Loader2 } from 'lucide-react'
 
@@ -14,13 +14,13 @@ export default function layout({ children }: { children: React.ReactNode }) {
   if (!cookieStore.get('user')?.value) {
     redirect('/login')
   }
-  const user = JSON.parse(cookieStore.get('user')?.value!) as User
+  const auth = JSON.parse(cookieStore.get('user')?.value!) as Auth
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <Side />
 
       <div className="flex flex-col overflow-hidden">
-        <Header user={user} />
+        <Header auth={auth} />
         <main className="relative flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           <Breadcrumb />
           <Suspense

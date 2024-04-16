@@ -3,8 +3,6 @@
 import AddUserDialog from '@/components/dialog/AddUserDialog'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -13,16 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Edit, Loader2, Plus, Search, Trash2, X } from 'lucide-react'
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { Edit, Plus, Trash2 } from 'lucide-react'
+import { FormEvent, useEffect, useState } from 'react'
 import Pagination from '@/components/pagination'
-// import { UserData } from '@/lib/data/users'
 import Fuse from 'fuse.js'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import { revalidatePath } from 'next/cache'
-import { User } from '@/types/data'
+import { Auth, User } from '@/types/data'
+import SearchLine from '../form/SearchLine'
 
 interface SearchElement extends HTMLFormControlsCollection {
   search: HTMLInputElement
@@ -32,48 +30,19 @@ interface SearchFormProps extends HTMLFormElement {
   readonly elements: SearchElement
 }
 
-interface UserType {
-  ID: number
-  COMPANY_CODE: string
-  USER_ID: string
-  CUSTOMER_CODE: string
-  PW: string
-  USER_NAME: string
-  DEPT_CODE: string
-  TEL_NO: string
-  EMAIL: string
-  TRUCK_NO: string
-  TRUCK_TYPE: string
-  NATION_CD: string
-  USE_YN: string
-  LAST_LOGIN_DATE: string
-  USER_LANG: string
-  ACCOUNT_NAME: string
-  GRADE: string
-  STATUS: string
-  REMARKS: string
-  TIME_ZONE: string
-  ADD_DATE: Date
-  ADD_USER_ID: string
-  ADD_USER_NAME: string
-  UPDATE_DATE: Date
-  UPDATE_USER_ID: string
-  UPDATE_USER_NAME: string
-}
-
 export default function UsersPage({
   auth,
   users,
 }: {
-  auth: User
-  users: UserType[]
+  auth: Auth
+  users: User[]
 }) {
   const [search, setSearch] = useState<string>('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [isOpen, setIsOpen] = useState(false)
-  const [userList, setUserList] = useState<UserType[]>(users)
-  const [detail, setDetail] = useState<UserType | undefined>()
+  const [userList, setUserList] = useState<User[]>(users)
+  const [detail, setDetail] = useState<User | undefined>()
   const [isConfirm, setIsConfirm] = useState(false)
 
   useEffect(() => {
@@ -173,7 +142,7 @@ export default function UsersPage({
           'TEL_NO',
         ],
       })
-      setUserList(fuse.search(search).map((item) => item.item) as UserType[])
+      setUserList(fuse.search(search).map((item) => item.item) as User[])
     }
   }
 
@@ -186,65 +155,23 @@ export default function UsersPage({
           Add User
         </Button>
       </div>
+
       <Card className="relative mt-6 p-6">
-        {isDeleteUser && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-            <Loader2 className="h-10 w-10 animate-spin" />
-          </div>
-        )}
-        <div className="flex items-center justify-between gap-2">
-          <form
-            className="flex w-80 items-center gap-2"
-            onSubmit={handleSearch}
-          >
-            <div className="relative">
-              <Input
-                placeholder="search..."
-                name="search"
-                autoComplete="off"
-                className="w-auto pr-10"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              ></Input>
-              {search.trim() && (
-                <div
-                  className="absolute right-0 top-0 cursor-pointer p-3"
-                  onClick={() => {
-                    setSearch('')
-                    setUserList(users ?? [])
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </div>
-              )}
-            </div>
-            <Button type="submit" disabled={search.trim().length === 0}>
-              <Search className="mr-1 h-4 w-4" />
-              Search
-            </Button>
-          </form>
-          <div className="flex items-center gap-6 whitespace-nowrap">
-            <div>
-              <span className="text-sm text-muted-foreground">Count: </span>
-              {userList?.length}
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-muted-foreground">Page:</div>
-              <Select
-                defaultValue={pageSize}
-                onChange={(e) => {
-                  setPage(1)
-                  setPageSize(e.target.value)
-                }}
-              >
-                <option value="10">10</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </Select>
-            </div>
-          </div>
-        </div>
+        <SearchLine
+          setPage={setPage}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          initData={users}
+          list={userList}
+          setList={setUserList}
+          searchKey={[
+            'COMPANY_CODE',
+            'USER_ID',
+            'CUSTOMER_CODE',
+            'USER_NAME',
+            'TEL_NO',
+          ]}
+        />
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader>
@@ -280,6 +207,8 @@ export default function UsersPage({
                 <TableRow
                   key={user.USER_ID}
                   onDoubleClick={() => {
+                    console.log(user)
+
                     setDetail(user)
                     setIsOpen(true)
                   }}

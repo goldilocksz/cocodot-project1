@@ -1,10 +1,10 @@
 import Common from '@/components/view/common'
-import { User } from '@/types/data'
+import { Auth } from '@/types/data'
 import { cookies } from 'next/headers'
 
 export default async function page() {
   const cookieStore = cookies()
-  const user = JSON.parse(cookieStore.get('user')?.value!) as User
+  const user = JSON.parse(cookieStore.get('user')?.value!) as Auth
 
   const response = await fetch(
     process.env.NEXT_PUBLIC_API_URL + '/webCommon/getCommonCodeList',

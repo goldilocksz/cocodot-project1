@@ -1,4 +1,4 @@
-export type User = {
+export type Auth = {
   COMPANY_CODE: string
   USER_ID: string
   USER_NAME: string
@@ -15,6 +15,35 @@ export type User = {
   STATUS: string
   REMARKS: string
   TIME_ZONE: string
+}
+
+export interface User {
+  ID: number
+  COMPANY_CODE: string
+  USER_ID: string
+  CUSTOMER_CODE: string
+  PW: string
+  USER_NAME: string
+  DEPT_CODE: string
+  TEL_NO: string
+  EMAIL: string
+  TRUCK_NO: string
+  TRUCK_TYPE: string
+  NATION_CD: string
+  USE_YN: string
+  LAST_LOGIN_DATE: string
+  USER_LANG: string
+  ACCOUNT_NAME: string
+  GRADE: string
+  STATUS: string
+  REMARKS: string
+  TIME_ZONE: string
+  ADD_DATE: Date
+  ADD_USER_ID: string
+  ADD_USER_NAME: string
+  UPDATE_DATE: Date
+  UPDATE_USER_ID: string
+  UPDATE_USER_NAME: string
 }
 
 export interface Code {
