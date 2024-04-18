@@ -29,7 +29,7 @@ const PolForm = forwardRef<HTMLSelectElement, SelectProps>(
 
     return (
       <Select ref={ref} {...props}>
-        {isPending && <option>Loading...</option>}
+        {isPending ? <option>Loading...</option> : <option>Select</option>}
         {Pol?.map((item) => (
           <option key={item.DT_CODE} value={item.LOC_VALUE}>
             {item.LOC_VALUE}

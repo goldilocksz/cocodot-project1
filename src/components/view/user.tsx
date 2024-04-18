@@ -11,24 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Edit, Plus, Trash2 } from 'lucide-react'
-import { FormEvent, useEffect, useState } from 'react'
+import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import Pagination from '@/components/pagination'
-import Fuse from 'fuse.js'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
-import { revalidatePath } from 'next/cache'
 import { Auth, User } from '@/types/data'
 import SearchLine from '../form/SearchLine'
-
-interface SearchElement extends HTMLFormControlsCollection {
-  search: HTMLInputElement
-}
-
-interface SearchFormProps extends HTMLFormElement {
-  readonly elements: SearchElement
-}
+import request from '@/lib/request'
 
 export default function UsersPage({
   auth,
@@ -37,51 +28,19 @@ export default function UsersPage({
   auth: Auth
   users: User[]
 }) {
-  const [search, setSearch] = useState<string>('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [isOpen, setIsOpen] = useState(false)
   const [userList, setUserList] = useState<User[]>(users)
   const [detail, setDetail] = useState<User | undefined>()
   const [isConfirm, setIsConfirm] = useState(false)
+  const [isConfirmReset, setIsConfirmReset] = useState(false)
 
   useEffect(() => {
     if (!isOpen) {
       setDetail(undefined)
     }
   }, [isOpen])
-
-  // const {
-  //   data: UserData,
-  //   refetch,
-  //   isLoading: isGetUserData,
-  //   isRefetching: isRefetchingUserData,
-  // } = useQuery({
-  //   queryKey: ['getUserList'],
-  //   queryFn: async () => {
-  //     const response = await fetch('/api/user/getUserList', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         licenceKey: 'dfoTg05dkQflgpsVdklub',
-  //       }),
-  //     })
-  //     const data = await response.json()
-
-  //     if (data.length === 0 || data?.error) {
-  //       toast.error(data.error)
-  //       return []
-  //     }
-
-  //     const users = data.filter((item: User) => item.USE_YN === 'Y')
-
-  //     setUserList(users)
-  //     return users ?? []
-  //   },
-  //   staleTime: 0,
-  // })
 
   const { mutate: deleteUser, isPending: isDeleteUser } = useMutation({
     mutationFn: async ({
@@ -91,27 +50,58 @@ export default function UsersPage({
       USER_ID: string
       COMPANY_CODE: string
     }) => {
-      const response = await fetch('/api/user/userDelete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const response = await request({
+        url: '/user/userDelete',
+        body: {
+          S_USER_ID: auth.USER_ID,
+          S_COMPANY_CODE: auth.COMPANY_CODE,
           USER_ID,
           COMPANY_CODE,
-          licenceKey: 'dfoTg05dkQflgpsVdklub',
-        }),
+        },
       })
-      const data = await response.json()
 
-      if (data.error) {
-        toast.error(data.error)
+      if (!response) {
+        toast.error('Failed to delete user')
       } else {
-        toast.success('User deleted successfully')
-        revalidatePath('/users')
+        window.location.reload()
       }
     },
   })
+
+  const { mutate: resetPassword, isPending: isResetPassword } = useMutation({
+    mutationFn: async ({
+      USER_ID,
+      COMPANY_CODE,
+    }: {
+      USER_ID: string
+      COMPANY_CODE: string
+    }) => {
+      const response = await request({
+        url: '/user/PWRest',
+        body: {
+          S_USER_ID: auth.USER_ID,
+          S_USER_NAME: auth.USER_NAME,
+          S_COMPANY_CODE: auth.COMPANY_CODE,
+          USER_ID,
+          COMPANY_CODE,
+        },
+      })
+
+      if (!response) {
+        toast.error('Failed to delete user')
+      } else {
+        // window.location.reload()
+      }
+    },
+  })
+
+  const handleReset = () => {
+    if (!detail) return
+    resetPassword({
+      USER_ID: detail.USER_ID,
+      COMPANY_CODE: detail.COMPANY_CODE,
+    })
+  }
 
   const handleDelete = () => {
     if (!detail) return
@@ -119,31 +109,6 @@ export default function UsersPage({
       USER_ID: detail.USER_ID,
       COMPANY_CODE: detail.COMPANY_CODE,
     })
-    setIsConfirm(false)
-  }
-
-  const handleSearch = (event: FormEvent<SearchFormProps>) => {
-    event.preventDefault()
-    setPage(1)
-    if (!search.trim()) {
-      event.currentTarget.search.focus()
-      setSearch('')
-      setUserList(users ?? [])
-    } else {
-      if (!users) return
-      const fuse = new Fuse(users, {
-        includeScore: true,
-        threshold: 0.3,
-        keys: [
-          'COMPANY_CODE',
-          'USER_ID',
-          'CUSTOMER_CODE',
-          'USER_NAME',
-          'TEL_NO',
-        ],
-      })
-      setUserList(fuse.search(search).map((item) => item.item) as User[])
-    }
   }
 
   return (
@@ -186,7 +151,8 @@ export default function UsersPage({
               <TableHead>STATUS</TableHead>
               <TableHead>NATION_CD</TableHead>
               <TableHead>REMARK</TableHead>
-              <TableHead>REVISE</TableHead>
+              <TableHead>EDIT</TableHead>
+              <TableHead>RESET</TableHead>
               <TableHead>DELETE</TableHead>
             </TableRow>
           </TableHeader>
@@ -207,8 +173,6 @@ export default function UsersPage({
                 <TableRow
                   key={user.USER_ID}
                   onDoubleClick={() => {
-                    console.log(user)
-
                     setDetail(user)
                     setIsOpen(true)
                   }}
@@ -233,6 +197,18 @@ export default function UsersPage({
                       }}
                     >
                       <Edit className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                  <TableCell className="py-0">
+                    <Button
+                      variant="ghost"
+                      className="h-10 w-10 rounded-full p-0"
+                      onClick={() => {
+                        setDetail(user)
+                        setIsConfirmReset(true)
+                      }}
+                    >
+                      <RotateCcw className="h-4 w-4" />
                     </Button>
                   </TableCell>
                   <TableCell className="py-0">
@@ -270,8 +246,19 @@ export default function UsersPage({
         setIsOpen={setIsOpen}
       />
       <ConfirmDialog
+        title="Reset Password"
+        desc={`Are you sure you want to reset password for user ${detail?.USER_NAME}`}
+        btnText="Reset"
+        loading={isResetPassword}
+        isOpen={isConfirmReset}
+        setIsOpen={setIsConfirmReset}
+        callback={() => handleReset()}
+      />
+      <ConfirmDialog
         title="Delete User"
         desc={`Are you sure you want to delete user ${detail?.USER_NAME}`}
+        btnText="Delete"
+        loading={isDeleteUser}
         isOpen={isConfirm}
         setIsOpen={setIsConfirm}
         callback={() => handleDelete()}

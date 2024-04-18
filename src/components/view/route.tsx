@@ -21,6 +21,7 @@ import Fuse from 'fuse.js'
 import { Input } from '../ui/input'
 import { Select } from '../ui/select'
 import ConfirmDialog from '../dialog/ConfirmDialog'
+import request from '@/lib/request'
 
 interface SearchElement extends HTMLFormControlsCollection {
   search: HTMLInputElement
@@ -91,20 +92,15 @@ export default function route({
       ROUTE_CODE: string
       SEQ: string
     }) => {
-      const response = await fetch('/api/webCommon/RouteMstDelete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const data = await request({
+        url: '/webCommon/RouteMstDelete',
+        body: {
           COMPANY_CODE,
           CUSTOMER_CODE,
           ROUTE_CODE,
           SEQ,
-          licenceKey: 'dfoTg05dkQflgpsVdklub',
-        }),
+        },
       })
-      const data = await response.json()
 
       if (data.error) {
         toast.error(data.error)
@@ -292,6 +288,8 @@ export default function route({
       <ConfirmDialog
         title="Delete Route"
         desc="Are you sure you want to delete route"
+        btnText="Delete"
+        loading={isDeleteRoute}
         isOpen={isConfirm}
         setIsOpen={setIsConfirm}
         callback={() => handleDelete()}

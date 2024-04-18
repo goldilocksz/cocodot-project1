@@ -1,6 +1,6 @@
 'use client'
 
-import { Code } from '@/types/data'
+import { Auth, Code } from '@/types/data'
 import {
   Table,
   TableBody,
@@ -9,15 +9,18 @@ import {
   TableHeader,
   TableRow,
 } from '../ui/table'
-import { Edit, Search, Trash2, X } from 'lucide-react'
+import { Edit, Plus, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
-import page from './login'
 import { FormEvent, useState } from 'react'
 import { Card } from '../ui/card'
 import Pagination from '../pagination'
-import { Select } from '../ui/select'
 import Fuse from 'fuse.js'
-import { Input } from '../ui/input'
+import SearchLine from '../form/SearchLine'
+import CommonControl from '../dialog/CommonControl'
+import ConfirmDialog from '../dialog/ConfirmDialog'
+import { useMutation } from '@tanstack/react-query'
+import request from '@/lib/request'
+import { toast } from 'sonner'
 
 interface SearchElement extends HTMLFormControlsCollection {
   search: HTMLInputElement
@@ -27,14 +30,38 @@ interface SearchFormProps extends HTMLFormElement {
   readonly elements: SearchElement
 }
 
-export default function common({ data }: { data: Code[] }) {
+export default function common({ auth, data }: { auth: Auth; data: Code[] }) {
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [codeList, setCodeList] = useState<Code[]>(data)
-  const [detail, setDetail] = useState<Code | null>(null)
+  const [detail, setDetail] = useState<Code | undefined>()
   const [isOpen, setIsOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
+
+  const { mutate: deleteCode, isPending: isDeleteCode } = useMutation({
+    mutationFn: async ({
+      GROUP_CODE,
+      DT_CODE,
+    }: {
+      GROUP_CODE: string
+      DT_CODE: string
+    }) => {
+      const response = await request({
+        url: '/webCommon/CommonCodeDelete',
+        body: {
+          GROUP_CODE,
+          DT_CODE,
+        },
+      })
+
+      if (!response) {
+        toast.error('Failed to delete user')
+      } else {
+        window.location.reload()
+      }
+    },
+  })
 
   const handleSearch = (event: FormEvent<SearchFormProps>) => {
     event.preventDefault()
@@ -58,61 +85,27 @@ export default function common({ data }: { data: Code[] }) {
     <section>
       <div className="flex-middle h-10 justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Common Code</h1>
+        <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+          <Plus className="h-4 w-4" />
+          Add Code
+        </Button>
       </div>
+
       <Card className="mt-6 p-6">
-        <div className="flex items-center justify-between gap-2">
-          <form
-            className="flex w-80 items-center gap-2"
-            onSubmit={handleSearch}
-          >
-            <div className="relative">
-              <Input
-                placeholder="search..."
-                name="search"
-                autoComplete="off"
-                className="w-auto pr-10"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              ></Input>
-              {search.trim() && (
-                <div
-                  className="absolute right-0 top-0 cursor-pointer p-3"
-                  onClick={() => {
-                    setSearch('')
-                    setCodeList(data ?? [])
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </div>
-              )}
-            </div>
-            <Button type="submit" disabled={search.trim().length === 0}>
-              <Search className="mr-1 h-4 w-4" />
-              Search
-            </Button>
-          </form>
-          <div className="flex items-center gap-6 whitespace-nowrap">
-            <div>
-              <span className="text-sm text-muted-foreground">Count: </span>
-              {codeList?.length}
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-muted-foreground">Page:</div>
-              <Select
-                defaultValue={pageSize}
-                onChange={(e) => {
-                  setPage(1)
-                  setPageSize(e.target.value)
-                }}
-              >
-                <option value="10">10</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </Select>
-            </div>
-          </div>
-        </div>
+        <SearchLine
+          setPage={setPage}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          initData={data}
+          list={codeList}
+          setList={setCodeList}
+          searchKey={[
+            'COMPANY_CODE',
+            'CUSTOMER_CODE',
+            'ADD_USER_ID',
+            'ADD_USER_NAME',
+          ]}
+        />
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader>
@@ -225,6 +218,26 @@ export default function common({ data }: { data: Code[] }) {
           setCurrentPage={setPage}
         />
       </Card>
+      <CommonControl
+        auth={auth}
+        detail={detail}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+      />
+      <ConfirmDialog
+        title="Delete Code"
+        desc={`Are you sure you want to delete code`}
+        btnText="Delete"
+        loading={isDeleteCode}
+        isOpen={isConfirm}
+        setIsOpen={setIsConfirm}
+        callback={() =>
+          deleteCode({
+            GROUP_CODE: detail?.GROUP_CODE ?? '',
+            DT_CODE: detail?.DT_CODE ?? '',
+          })
+        }
+      />
     </section>
   )
 }

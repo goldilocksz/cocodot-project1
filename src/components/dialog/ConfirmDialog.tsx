@@ -6,10 +6,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog'
+import { Loader2 } from 'lucide-react'
 
 type Props = {
   title: string
   desc: string
+  btnText: string
+  loading: boolean
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   callback: () => void
@@ -18,6 +21,8 @@ type Props = {
 export default function ConfirmDialog({
   title,
   desc,
+  btnText,
+  loading,
   isOpen,
   setIsOpen,
   callback,
@@ -30,8 +35,13 @@ export default function ConfirmDialog({
         </DialogHeader>
         <div className="text-center">{desc}</div>
         <DialogFooter className="sm:justify-center">
-          <Button variant="destructive" onClick={() => callback()}>
-            Delete
+          <Button
+            variant="destructive"
+            disabled={loading}
+            onClick={() => callback()}
+          >
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {btnText}
           </Button>
           <Button
             className="mr-2"

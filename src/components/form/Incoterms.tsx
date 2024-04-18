@@ -29,7 +29,7 @@ const IncotermsForm = forwardRef<HTMLSelectElement, SelectProps>(
 
     return (
       <Select ref={ref} {...props}>
-        {isPending && <option>Loading...</option>}
+        {isPending ? <option>Loading...</option> : <option>Select</option>}
         {Incoterms?.map((item) => (
           <option key={item.DT_CODE} value={item.LOC_VALUE}>
             {item.LOC_VALUE}
