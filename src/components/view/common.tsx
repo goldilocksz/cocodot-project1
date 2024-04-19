@@ -11,7 +11,7 @@ import {
 } from '../ui/table'
 import { Edit, Plus, Trash2 } from 'lucide-react'
 import { Button } from '../ui/button'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { Card } from '../ui/card'
 import Pagination from '../pagination'
 import Fuse from 'fuse.js'
@@ -22,22 +22,25 @@ import { useMutation } from '@tanstack/react-query'
 import request from '@/lib/request'
 import { toast } from 'sonner'
 
-interface SearchElement extends HTMLFormControlsCollection {
-  search: HTMLInputElement
-}
-
-interface SearchFormProps extends HTMLFormElement {
-  readonly elements: SearchElement
-}
-
-export default function common({ auth, data }: { auth: Auth; data: Code[] }) {
-  const [search, setSearch] = useState('')
+export default function CommonView({
+  auth,
+  data,
+}: {
+  auth: Auth
+  data: Code[]
+}) {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [codeList, setCodeList] = useState<Code[]>(data)
-  const [detail, setDetail] = useState<Code | undefined>()
+  const [detail, setDetail] = useState<Code>()
   const [isOpen, setIsOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDetail(undefined)
+    }
+  }, [isOpen])
 
   const { mutate: deleteCode, isPending: isDeleteCode } = useMutation({
     mutationFn: async ({
@@ -63,24 +66,6 @@ export default function common({ auth, data }: { auth: Auth; data: Code[] }) {
     },
   })
 
-  const handleSearch = (event: FormEvent<SearchFormProps>) => {
-    event.preventDefault()
-    setPage(1)
-    if (!search.trim()) {
-      event.currentTarget.search.focus()
-      setSearch('')
-      setCodeList(data ?? [])
-    } else {
-      if (!data) return
-      const fuse = new Fuse(data, {
-        includeScore: true,
-        threshold: 0.3,
-        keys: ['COMPANY_CODE', 'CUSTOMER_CODE', 'ADD_USER_ID', 'ADD_USER_NAME'],
-      })
-      setCodeList(fuse.search(search).map((item) => item.item) as Code[])
-    }
-  }
-
   return (
     <section>
       <div className="flex-middle h-10 justify-between">
@@ -99,12 +84,6 @@ export default function common({ auth, data }: { auth: Auth; data: Code[] }) {
           initData={data}
           list={codeList}
           setList={setCodeList}
-          searchKey={[
-            'COMPANY_CODE',
-            'CUSTOMER_CODE',
-            'ADD_USER_ID',
-            'ADD_USER_NAME',
-          ]}
         />
 
         <Table className="mt-6 min-w-[1280px]">
@@ -123,15 +102,7 @@ export default function common({ auth, data }: { auth: Auth; data: Code[] }) {
               <TableHead>ETC6</TableHead>
               <TableHead>ETC7</TableHead>
               <TableHead>SORT_SEQ_NO</TableHead>
-              <TableHead>STATUS</TableHead>
               <TableHead>REMARKS</TableHead>
-              <TableHead>TIME_ZONE</TableHead>
-              <TableHead>ADD_DATE</TableHead>
-              <TableHead>ADD_USER_ID</TableHead>
-              <TableHead>ADD_USER_NAME</TableHead>
-              <TableHead>UPDATE_DATE</TableHead>
-              <TableHead>UPDATE_USER_ID</TableHead>
-              <TableHead>UPDATE_USER_NAME</TableHead>
               <TableHead>EDIT</TableHead>
               <TableHead>DELETE</TableHead>
             </TableRow>
@@ -170,15 +141,7 @@ export default function common({ auth, data }: { auth: Auth; data: Code[] }) {
                   <TableCell>{item.ETC6}</TableCell>
                   <TableCell>{item.ETC7}</TableCell>
                   <TableCell>{item.SORT_SEQ_NO}</TableCell>
-                  <TableCell>{item.STATUS}</TableCell>
                   <TableCell>{item.REMARKS}</TableCell>
-                  <TableCell>{item.TIME_ZONE}</TableCell>
-                  <TableCell>{item.ADD_DATE}</TableCell>
-                  <TableCell>{item.ADD_USER_ID}</TableCell>
-                  <TableCell>{item.ADD_USER_NAME}</TableCell>
-                  <TableCell>{item.UPDATE_DATE}</TableCell>
-                  <TableCell>{item.UPDATE_USER_ID}</TableCell>
-                  <TableCell>{item.UPDATE_USER_NAME}</TableCell>
                   <TableCell className="py-0">
                     <Button
                       variant="ghost"

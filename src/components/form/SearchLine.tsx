@@ -20,7 +20,7 @@ interface Props<T> {
   initData: T[]
   list: T[]
   setList: Dispatch<SetStateAction<T[]>>
-  searchKey: string[]
+  searchKey?: string[]
 }
 
 export default function SearchLine<T>({
@@ -45,7 +45,7 @@ export default function SearchLine<T>({
       const fuse = new Fuse(initData, {
         includeScore: true,
         threshold: 0.3,
-        keys: searchKey,
+        keys: searchKey ? searchKey : Object.keys(initData[0]!),
       })
       setList(fuse.search(search).map((item) => item.item))
     }

@@ -21,7 +21,7 @@ import { Auth, User } from '@/types/data'
 import SearchLine from '../form/SearchLine'
 import request from '@/lib/request'
 
-export default function UsersPage({
+export default function UsersView({
   auth,
   users,
 }: {
@@ -130,8 +130,8 @@ export default function UsersPage({
           list={userList}
           setList={setUserList}
           searchKey={[
-            'COMPANY_CODE',
             'USER_ID',
+            'COMPANY_CODE',
             'CUSTOMER_CODE',
             'USER_NAME',
             'TEL_NO',

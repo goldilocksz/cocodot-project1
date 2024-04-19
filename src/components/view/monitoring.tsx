@@ -20,7 +20,7 @@ import { useState } from 'react'
 import { User } from '@/types/data'
 import { toast } from 'sonner'
 
-export default function index() {
+export default function MonitoringView() {
   const [userList, setUserList] = useState<User[]>([])
   const { data: LoginData } = useQuery({
     queryKey: ['getLoginInfo'],

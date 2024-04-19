@@ -36,7 +36,7 @@ import { Switch } from '@/components/ui/switch'
 import { useEffect, useState } from 'react'
 import { Select } from '@/components/ui/select'
 
-export default function index() {
+export default function DashboardView() {
   return (
     <>
       <div className="grid grid-cols-2 items-center justify-start gap-2 lg:flex lg:justify-end lg:gap-6">

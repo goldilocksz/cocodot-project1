@@ -35,7 +35,7 @@ export const formSchema = z.object({
   }),
 })
 
-export default function page() {
+export default function LoginView() {
   const [state, fromAction] = useFormState(LoginAction, {
     message: '',
   })

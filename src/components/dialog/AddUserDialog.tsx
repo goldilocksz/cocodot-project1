@@ -163,6 +163,7 @@ export default function AddUserDialog({
     ACCOUNT_NAME: '',
     GRADE: '',
   }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -222,46 +223,43 @@ export default function AddUserDialog({
                 key={key}
                 control={form.control}
                 name={key}
-                render={({ field }) => {
-                  const { ref, ...reset } = field
-                  return (
-                    <FormItem>
-                      <FormLabel>
-                        {key}
-                        {/* @ts-ignore */}
-                        {formSchema.shape[key]?.min && (
-                          <span className="ml-1 text-destructive">*</span>
-                        )}
-                      </FormLabel>
-                      <FormControl>
-                        {key === 'TRUCK_TYPE' ? (
-                          <TruckType {...field} />
-                        ) : key === 'NATION_CD' ? (
-                          <NationCode {...field} />
-                        ) : key === 'USE_YN' ? (
-                          <Select {...field}>
-                            <option value="y">Y</option>
-                            <option value="n">N</option>
-                          </Select>
-                        ) : key === 'USER_LANG' ? (
-                          <Select {...field}>
-                            <option value="en">EN</option>
-                            <option value="ko">KO</option>
-                          </Select>
-                        ) : key === 'GRADE' ? (
-                          <NumericFormat
-                            customInput={Input}
-                            getInputRef={ref}
-                            {...reset}
-                          />
-                        ) : (
-                          <Input {...field} />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )
-                }}
+                render={({ field: { ref, ...field } }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {key}
+                      {/* @ts-ignore */}
+                      {formSchema.shape[key]?.min && (
+                        <span className="ml-1 text-destructive">*</span>
+                      )}
+                    </FormLabel>
+                    <FormControl>
+                      {key === 'TRUCK_TYPE' ? (
+                        <TruckType {...field} />
+                      ) : key === 'NATION_CD' ? (
+                        <NationCode {...field} />
+                      ) : key === 'USE_YN' ? (
+                        <Select {...field}>
+                          <option value="y">Y</option>
+                          <option value="n">N</option>
+                        </Select>
+                      ) : key === 'USER_LANG' ? (
+                        <Select {...field}>
+                          <option value="en">EN</option>
+                          <option value="ko">KO</option>
+                        </Select>
+                      ) : key === 'GRADE' ? (
+                        <NumericFormat
+                          customInput={Input}
+                          getInputRef={ref}
+                          {...field}
+                        />
+                      ) : (
+                        <Input {...field} />
+                      )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             ))}
             {/* <FormField

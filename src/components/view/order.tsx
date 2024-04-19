@@ -3,7 +3,7 @@
 import { Plus } from 'lucide-react'
 import { Button } from '../ui/button'
 
-export default function order() {
+export default function OrderView() {
   return (
     <section>
       <div className="flex-middle h-10 justify-between">

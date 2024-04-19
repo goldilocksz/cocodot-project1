@@ -22,63 +22,24 @@ import { Input } from '../ui/input'
 import { Select } from '../ui/select'
 import ConfirmDialog from '../dialog/ConfirmDialog'
 import request from '@/lib/request'
+import SearchLine from '../form/SearchLine'
+import RouteControl from '../dialog/RouteControl'
 
-interface SearchElement extends HTMLFormControlsCollection {
-  search: HTMLInputElement
-}
-
-interface SearchFormProps extends HTMLFormElement {
-  readonly elements: SearchElement
-}
-
-export default function route({
+export default function RouteView({
   auth,
-  routes,
+  data,
 }: {
   auth: Auth
-  routes: Route[]
+  data: Route[]
 }) {
-  const [routeList, setRouteList] = useState<Route[]>(routes)
-  const [search, setSearch] = useState<string>('')
+  console.log(data)
+
+  const [routeList, setRouteList] = useState<Route[]>(data)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
-  const [detail, setDetail] = useState<Route | null>(null)
+  const [detail, setDetail] = useState<Route | undefined>()
   const [isOpen, setIsOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
-
-  // const {
-  //   data: RouteMst,
-  //   isPending: isGetRouteMst,
-  //   isRefetching: isRouteMstRefetching,
-  //   refetch,
-  // } = useQuery<Route[]>({
-  //   queryKey: ['getRouteMstList'],
-  //   queryFn: async () => {
-  //     const response = await fetch('/api/webCommon/getRouteMstList', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         COMPANY_CODE: auth.COMPANY_CODE,
-  //         licenceKey: 'dfoTg05dkQflgpsVdklub',
-  //       }),
-  //     })
-  //     const data = await response.json()
-
-  //     if (data.length === 0 || data?.error) {
-  //       toast.error(data.error)
-  //       return []
-  //     }
-  //     const routes = data.map((route: Route, index: number) => ({
-  //       ...route,
-  //       id: index + 1,
-  //     }))
-
-  //     setRouteList(routes)
-  //     return routes ?? []
-  //   },
-  // })
 
   const { mutate: deleteRoute, isPending: isDeleteRoute } = useMutation({
     mutationFn: async ({
@@ -117,24 +78,6 @@ export default function route({
     setIsConfirm(false)
   }
 
-  const handleSearch = (event: FormEvent<SearchFormProps>) => {
-    event.preventDefault()
-    setPage(1)
-    if (!search.trim()) {
-      event.currentTarget.search.focus()
-      setSearch('')
-      setRouteList(routes ?? [])
-    } else {
-      if (!routes) return
-      const fuse = new Fuse(routes, {
-        includeScore: true,
-        threshold: 0.3,
-        keys: ['COMPANY_CODE', 'CUSTOMER_CODE', 'ADD_USER_ID', 'ADD_USER_NAME'],
-      })
-      setRouteList(fuse.search(search).map((item) => item.item) as Route[])
-    }
-  }
-
   return (
     <section>
       <div className="flex-middle h-10 justify-between">
@@ -142,59 +85,14 @@ export default function route({
       </div>
 
       <Card className="relative mt-6 p-6">
-        <div className="flex items-center justify-between gap-2">
-          <form
-            className="flex w-80 items-center gap-2"
-            onSubmit={handleSearch}
-          >
-            <div className="relative">
-              <Input
-                placeholder="search..."
-                name="search"
-                autoComplete="off"
-                className="w-auto pr-10"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              ></Input>
-              {search.trim() && (
-                <div
-                  className="absolute right-0 top-0 cursor-pointer p-3"
-                  onClick={() => {
-                    setSearch('')
-                    setRouteList(routes ?? [])
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </div>
-              )}
-            </div>
-            <Button type="submit" disabled={search.trim().length === 0}>
-              <Search className="mr-1 h-4 w-4" />
-              Search
-            </Button>
-          </form>
-          <div className="flex items-center gap-6 whitespace-nowrap">
-            <div>
-              <span className="text-sm text-muted-foreground">Count: </span>
-              {routeList?.length}
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-muted-foreground">Page:</div>
-              <Select
-                defaultValue={pageSize}
-                onChange={(e) => {
-                  setPage(1)
-                  setPageSize(e.target.value)
-                }}
-              >
-                <option value="10">10</option>
-                <option value="30">30</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </Select>
-            </div>
-          </div>
-        </div>
+        <SearchLine
+          setPage={setPage}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          initData={data}
+          list={routeList}
+          setList={setRouteList}
+        />
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader>
@@ -293,6 +191,12 @@ export default function route({
         isOpen={isConfirm}
         setIsOpen={setIsConfirm}
         callback={() => handleDelete()}
+      />
+      <RouteControl
+        auth={auth}
+        detail={detail}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
       />
     </section>
   )

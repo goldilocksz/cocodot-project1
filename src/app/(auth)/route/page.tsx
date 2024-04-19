@@ -9,6 +9,9 @@ export default async function page() {
 
   const data = await request({
     url: '/webCommon/getRouteMstList',
+    body: {
+      S_COMPANY_CODE: user.COMPANY_CODE,
+    },
     server: true,
   })
 
@@ -17,5 +20,5 @@ export default async function page() {
     id: index + 1,
   }))
 
-  return <Route auth={user} routes={routes} />
+  return <Route auth={user} data={routes} />
 }

@@ -23,59 +23,49 @@ import {
 } from '../ui/dialog'
 import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
-import { Auth, Code } from '@/types/data'
+import { Auth, Route } from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/lib/request'
 import { Select } from '../ui/select'
+import NationCode from '../form/NationCode'
 
 type Props = {
   auth: Auth
-  detail: Code | undefined
+  detail: Route | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
 
 const formSchema = z.object({
-  GROUP_CODE: z.string().min(1, {
-    message: 'Group code is required',
+  CUSTOMER_CODE: z.string().min(1, {
+    message: 'Customer code is required',
   }),
-  DT_CODE: z.string().min(1, {
-    message: 'Detail code is required',
+  ROUTE_CODE: z.string().min(1, {
+    message: 'Route code is required',
   }),
-  USE_YN: z.string().optional(),
-  LOC_VALUE: z.string().min(1, {
-    message: 'Local value is required',
+  SEQ: z.string().optional(),
+  NATION_CD: z.string().min(1, {
+    message: 'Nation code is required',
   }),
-  ENG_VALUE: z.string().optional(),
-  ETC1: z.string().optional(),
-  ETC2: z.string().optional(),
-  ETC3: z.string().optional(),
-  ETC4: z.string().optional(),
-  ETC5: z.string().optional(),
-  ETC6: z.string().optional(),
-  ETC7: z.string().optional(),
-  SORT_SEQ_NO: z.number().optional(),
-  REMARKS: z.string().optional(),
+  ROUTE_NAME: z.string().min(1, {
+    message: 'Route name is required',
+  }),
+  SEQ_NAME: z.string().min(1, {
+    message: 'Sequence name is required',
+  }),
 })
 type FormKeys = keyof z.infer<typeof formSchema>
 
-const CommonDefault = {
-  GROUP_CODE: '',
-  DT_CODE: '',
-  USE_YN: 'Y',
-  LOC_VALUE: '',
-  ENG_VALUE: '',
-  ETC1: '',
-  ETC2: '',
-  ETC3: '',
-  ETC4: '',
-  ETC5: '',
-  ETC6: '',
-  ETC7: '',
-  SORT_SEQ_NO: 0,
-  REMARKS: '',
+const RouteDefault = {
+  CUSTOMER_CODE: '',
+  ROUTE_CODE: '',
+  SEQ: '',
+  NATION_CD: '',
+  ROUTE_NAME: '',
+  SEQ_NAME: '',
 }
-export default function CommonControl({
+
+export default function RouteControl({
   auth,
   detail,
   isOpen,
@@ -83,13 +73,13 @@ export default function CommonControl({
 }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: CommonDefault,
+    defaultValues: RouteDefault,
   })
 
-  const { mutate: UpdateCommon, isPending: isUpdateCommon } = useMutation({
+  const { mutate: UpdateRoute, isPending: isUpdateRoute } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
       const response = await request({
-        url: '/webCommon/CommonCodeSave',
+        url: '/webCommon/RouteMstSave',
         body: {
           ...value,
           S_USER_ID: auth.USER_ID,
@@ -98,10 +88,10 @@ export default function CommonControl({
         },
       })
       if (!response) {
-        toast.error('Failed to update common code information')
+        toast.error('Failed to update route code information')
       } else {
         setIsOpen(false)
-        window.location.reload()
+        // window.location.reload()
       }
     },
   })
@@ -110,14 +100,14 @@ export default function CommonControl({
     if (detail) {
       form.reset(detail)
     } else {
-      form.reset(CommonDefault)
+      form.reset(RouteDefault)
     }
   }, [isOpen])
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     console.log(value)
 
-    UpdateCommon(value)
+    UpdateRoute(value)
   }
   const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
 
@@ -125,13 +115,11 @@ export default function CommonControl({
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle>
-            {detail ? 'Edit' : 'Add'} Common Information
-          </DialogTitle>
+          <DialogTitle>{detail ? 'Edit' : 'Add'} Route Information</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
-            id="commonForm"
+            id="routeForm"
             onSubmit={form.handleSubmit(onSubmit)}
             className="relative grid grid-cols-2 gap-4"
           >
@@ -150,19 +138,8 @@ export default function CommonControl({
                       )}
                     </FormLabel>
                     <FormControl>
-                      {key === 'USE_YN' ? (
-                        <Select {...field}>
-                          <option value="Y">Y</option>
-                          <option value="N">N</option>
-                        </Select>
-                      ) : key === 'SORT_SEQ_NO' ? (
-                        <NumericFormat
-                          customInput={Input}
-                          value={field.value}
-                          onValueChange={(values) =>
-                            field.onChange(values.floatValue)
-                          }
-                        />
+                      {key === 'NATION_CD' ? (
+                        <NationCode {...field} />
                       ) : (
                         <Input {...field} />
                       )}
@@ -175,10 +152,8 @@ export default function CommonControl({
           </form>
         </Form>
         <DialogFooter className="sm:justify-center">
-          <Button type="submit" form="commonForm">
-            {isUpdateCommon && (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            )}
+          <Button type="submit" form="routeForm">
+            {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {detail ? 'Update' : 'Add'}
           </Button>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
