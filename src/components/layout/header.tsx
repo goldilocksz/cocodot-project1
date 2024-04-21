@@ -99,7 +99,7 @@ export default function header({ auth }: { auth: Auth }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="ml-auto flex cursor-pointer items-center gap-2">
-            <div>Company Code: {auth.COMPANY_CODE}</div>
+            <div>Customer: {auth.CUSTOMER_CODE}</div>
             <Button variant="secondary" size="icon" className="rounded-full">
               <Avatar className="h-9 w-9 sm:flex">
                 <AvatarImage src="/images/avatars/avatar_17.jpg" alt="Avatar" />

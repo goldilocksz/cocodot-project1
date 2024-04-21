@@ -1,6 +1,6 @@
 'use client'
 
-import AddUserDialog from '@/components/dialog/AddUserDialog'
+import AddUserDialog from '@/components/dialog/UserControl'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
@@ -141,19 +141,18 @@ export default function UsersView({
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader>
             <TableRow>
-              <TableHead>USER_ID</TableHead>
-              <TableHead>USER_NAME</TableHead>
-              <TableHead>COMPANY_CODE</TableHead>
-              <TableHead>TELL_NO.</TableHead>
-              <TableHead>GRADE</TableHead>
-              <TableHead>TRUCK_NO</TableHead>
-              <TableHead>TRUCK_TYPE</TableHead>
-              <TableHead>STATUS</TableHead>
-              <TableHead>NATION_CD</TableHead>
-              <TableHead>REMARK</TableHead>
-              <TableHead>EDIT</TableHead>
-              <TableHead>RESET</TableHead>
-              <TableHead>DELETE</TableHead>
+              <TableHead>User Id</TableHead>
+              <TableHead>User Name</TableHead>
+              <TableHead>Tell No</TableHead>
+              <TableHead>Grade</TableHead>
+              <TableHead>Truck No</TableHead>
+              <TableHead>Truck Type</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Nation Code</TableHead>
+              <TableHead>Remark</TableHead>
+              <TableHead>Edit</TableHead>
+              <TableHead>Rest</TableHead>
+              <TableHead>Delete</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -179,7 +178,6 @@ export default function UsersView({
                 >
                   <TableCell>{user.USER_ID}</TableCell>
                   <TableCell>{user.USER_NAME}</TableCell>
-                  <TableCell>{user.COMPANY_CODE}</TableCell>
                   <TableCell>{user.TEL_NO}</TableCell>
                   <TableCell>{user.GRADE}</TableCell>
                   <TableCell>{user.TRUCK_NO}</TableCell>

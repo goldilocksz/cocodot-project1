@@ -1,4 +1,5 @@
 export type Auth = {
+  CUSTOMER_CODE: string
   COMPANY_CODE: string
   USER_ID: string
   USER_NAME: string

@@ -73,6 +73,7 @@ export default function LoginView() {
             ref={formRef}
             action={fromAction}
             onSubmit={(e) => {
+              e.preventDefault()
               form.handleSubmit(() => {
                 setIsPending(true)
                 formRef.current?.submit()

@@ -46,14 +46,6 @@ const formSchema = z.object({
     .max(20, {
       message: 'UserId must be less than 20 characters',
     }),
-  COMPANY_CODE: z
-    .string()
-    .min(1, {
-      message: 'Company Code is required',
-    })
-    .max(10, {
-      message: 'Company Code must be less than 10 characters',
-    }),
   CUSTOMER_CODE: z
     .string()
     .min(1, {
@@ -140,7 +132,7 @@ type FormKeys = keyof z.infer<typeof formSchema>
 //     message: 'Remarks must be less than 100 characters',
 //   })
 //   .or(z.literal('')),
-export default function AddUserDialog({
+export default function UserControl({
   auth,
   detail,
   isOpen,
@@ -148,7 +140,6 @@ export default function AddUserDialog({
 }: Props) {
   const defaultValues = {
     USER_ID: '',
-    COMPANY_CODE: '',
     CUSTOMER_CODE: '',
     PW: '',
     USER_NAME: '',
