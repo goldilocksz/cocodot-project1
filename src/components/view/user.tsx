@@ -142,15 +142,19 @@ export default function UsersView({
           <TableHeader>
             <TableRow>
               <TableHead>User Id</TableHead>
+              <TableHead>Customer Code</TableHead>
+              <TableHead>Password</TableHead>
               <TableHead>User Name</TableHead>
+              <TableHead>Dept Code</TableHead>
               <TableHead>Tell No</TableHead>
-              <TableHead>Grade</TableHead>
+              <TableHead>Email</TableHead>
               <TableHead>Truck No</TableHead>
               <TableHead>Truck Type</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead>Nation Code</TableHead>
-              <TableHead>Remark</TableHead>
-              <TableHead>Edit</TableHead>
+              <TableHead>use YN</TableHead>
+              <TableHead>User Lang</TableHead>
+              <TableHead>Account Name</TableHead>
+              <TableHead>Grade</TableHead>
               <TableHead>Rest</TableHead>
               <TableHead>Delete</TableHead>
             </TableRow>
@@ -177,14 +181,19 @@ export default function UsersView({
                   }}
                 >
                   <TableCell>{user.USER_ID}</TableCell>
+                  <TableCell>{user.CUSTOMER_CODE}</TableCell>
+                  <TableCell>{user.PW}</TableCell>
                   <TableCell>{user.USER_NAME}</TableCell>
+                  <TableCell>{user.DEPT_CODE}</TableCell>
                   <TableCell>{user.TEL_NO}</TableCell>
-                  <TableCell>{user.GRADE}</TableCell>
+                  <TableCell>{user.EMAIL}</TableCell>
                   <TableCell>{user.TRUCK_NO}</TableCell>
                   <TableCell>{user.TRUCK_TYPE}</TableCell>
-                  <TableCell>{user.STATUS}</TableCell>
                   <TableCell>{user.NATION_CD}</TableCell>
-                  <TableCell>{user.REMARKS}</TableCell>
+                  <TableCell>{user.USE_YN}</TableCell>
+                  <TableCell>{user.USER_LANG}</TableCell>
+                  <TableCell>{user.ACCOUNT_NAME}</TableCell>
+                  <TableCell>{user.GRADE}</TableCell>
                   <TableCell className="py-0">
                     <Button
                       variant="ghost"
