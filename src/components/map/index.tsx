@@ -1,10 +1,16 @@
 import GoogleMapReact from 'google-map-react'
+import { Flag } from 'lucide-react'
 
-export default function GoogleMap() {
+interface Props {
+  lat: number
+  lng: number
+}
+
+export default function GoogleMap({ lat, lng }: Props) {
   const defaultProps = {
     center: {
-      lat: 10.99835602,
-      lng: 77.01502627,
+      lat,
+      lng,
     },
     zoom: 11,
   }
@@ -16,7 +22,7 @@ export default function GoogleMap() {
         defaultCenter={defaultProps.center}
         defaultZoom={defaultProps.zoom}
       >
-        {/* <AnyReactComponent lat={59.955413} lng={30.337844} text="My Marker" /> */}
+        {/* <AnyReactComponent lat={lat} lng={lng} text="My Marker" /> */}
       </GoogleMapReact>
     </div>
   )

@@ -117,7 +117,7 @@ export default function UsersView({
         <h1 className="text-lg font-semibold md:text-2xl">Users</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4" />
-          Add User
+          한국어
         </Button>
       </div>
 
@@ -139,24 +139,24 @@ export default function UsersView({
         />
 
         <Table className="mt-6 min-w-[1280px]">
-          <TableHeader>
+          <TableHeader className="capitalize">
             <TableRow>
-              <TableHead>User Id</TableHead>
-              <TableHead>Customer Code</TableHead>
-              <TableHead>Password</TableHead>
-              <TableHead>User Name</TableHead>
-              <TableHead>Dept Code</TableHead>
-              <TableHead>Tell No</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Truck No</TableHead>
-              <TableHead>Truck Type</TableHead>
-              <TableHead>Nation Code</TableHead>
-              <TableHead>use YN</TableHead>
-              <TableHead>User Lang</TableHead>
-              <TableHead>Account Name</TableHead>
-              <TableHead>Grade</TableHead>
-              <TableHead>Rest</TableHead>
-              <TableHead>Delete</TableHead>
+              <TableHead>user id</TableHead>
+              <TableHead>customer code</TableHead>
+              <TableHead>password</TableHead>
+              <TableHead>user name</TableHead>
+              <TableHead>dept code</TableHead>
+              <TableHead>tell no</TableHead>
+              <TableHead>email</TableHead>
+              <TableHead>truck no</TableHead>
+              <TableHead>truck type</TableHead>
+              <TableHead>nation code</TableHead>
+              <TableHead>use yN</TableHead>
+              <TableHead>user lang</TableHead>
+              <TableHead>account name</TableHead>
+              <TableHead>grade</TableHead>
+              <TableHead>rest</TableHead>
+              <TableHead>delete</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

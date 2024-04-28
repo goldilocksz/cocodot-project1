@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { FormEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { Card } from '../ui/card'
-import { Edit, Search, Trash2, X } from 'lucide-react'
+import { Edit, Plus, Search, Trash2, X } from 'lucide-react'
 import { Route, Auth } from '@/types/data'
 import {
   Table,
@@ -32,8 +32,6 @@ export default function RouteView({
   auth: Auth
   data: Route[]
 }) {
-  console.log(data)
-
   const [routeList, setRouteList] = useState<Route[]>(data)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
@@ -82,6 +80,10 @@ export default function RouteView({
     <section>
       <div className="flex-middle h-10 justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Route Mst</h1>
+        <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+          <Plus className="h-4 w-4" />
+          Add Route
+        </Button>
       </div>
 
       <Card className="relative mt-6 p-6">
@@ -95,21 +97,21 @@ export default function RouteView({
         />
 
         <Table className="mt-6 min-w-[1280px]">
-          <TableHeader>
+          <TableHeader className="capitalize">
             <TableRow>
-              <TableHead>COMPANY_CODE</TableHead>
-              <TableHead>CUSTOMER_CODE</TableHead>
-              <TableHead>ADD_USER_ID</TableHead>
-              <TableHead>ADD_USER_NAME</TableHead>
-              <TableHead>NATION_CD</TableHead>
-              <TableHead>ROUTE_CODE</TableHead>
-              <TableHead>ROUTE_NAME</TableHead>
-              <TableHead>NATION_CD</TableHead>
-              <TableHead>STATUS</TableHead>
-              <TableHead>UPDATE_DATE</TableHead>
-              <TableHead>ADD_DATE</TableHead>
-              <TableHead>EDIT</TableHead>
-              <TableHead>DELETE</TableHead>
+              <TableHead>company code</TableHead>
+              <TableHead>customer code</TableHead>
+              <TableHead>add user id</TableHead>
+              <TableHead>add user name</TableHead>
+              <TableHead>nation cd</TableHead>
+              <TableHead>route code</TableHead>
+              <TableHead>route name</TableHead>
+              <TableHead>nation cd</TableHead>
+              <TableHead>status</TableHead>
+              <TableHead>update date</TableHead>
+              <TableHead>add date</TableHead>
+              <TableHead>edit</TableHead>
+              <TableHead>delete</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

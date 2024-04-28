@@ -28,6 +28,7 @@ import { toast } from 'sonner'
 import request from '@/lib/request'
 import { Select } from '../ui/select'
 import NationCode from '../form/NationCode'
+import GoogleMap from '../map'
 
 type Props = {
   auth: Auth
@@ -105,8 +106,6 @@ export default function RouteControl({
   }, [isOpen])
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    console.log(value)
-
     UpdateRoute(value)
   }
   const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
@@ -130,8 +129,8 @@ export default function RouteControl({
                 name={key}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      {key}
+                    <FormLabel className="capitalize">
+                      {key.replace(/_/g, ' ').toLowerCase()}
                       {/* @ts-ignore */}
                       {formSchema.shape[key]?.min && (
                         <span className="ml-1 text-destructive">*</span>
@@ -151,6 +150,12 @@ export default function RouteControl({
             ))}
           </form>
         </Form>
+        {detail && (
+          <GoogleMap
+            lat={Number(detail.LATITUDE)}
+            lng={Number(detail.LONGITUDE)}
+          />
+        )}
         <DialogFooter className="sm:justify-center">
           <Button type="submit" form="routeForm">
             {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
