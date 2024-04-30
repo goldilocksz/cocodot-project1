@@ -216,8 +216,8 @@ export default function UserControl({
                 name={key}
                 render={({ field: { ref, ...field } }) => (
                   <FormItem>
-                    <FormLabel>
-                      {key}
+                    <FormLabel className="capitalize">
+                      {key.replace(/_/g, ' ').toLowerCase()}
                       {/* @ts-ignore */}
                       {formSchema.shape[key]?.min && (
                         <span className="ml-1 text-destructive">*</span>

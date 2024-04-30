@@ -36,7 +36,7 @@ export const formSchema = z.object({
 })
 
 export default function LoginView() {
-  const [state, fromAction] = useFormState(LoginAction, {
+  const [state, formAction] = useFormState(LoginAction, {
     message: '',
   })
   const formRef = useRef<HTMLFormElement>(null)
@@ -53,8 +53,9 @@ export default function LoginView() {
   useEffect(() => {
     if (state?.message) {
       toast.error(state.message)
+      setIsPending(false)
     }
-  }, [state?.message])
+  }, [state])
 
   return (
     <Card className="mx-auto w-96 max-w-md">
@@ -71,12 +72,12 @@ export default function LoginView() {
         <Form {...form}>
           <form
             ref={formRef}
-            action={fromAction}
+            action={formAction}
             onSubmit={(e) => {
               e.preventDefault()
               form.handleSubmit(() => {
                 setIsPending(true)
-                formRef.current?.submit()
+                formAction(new FormData(formRef.current!))
               })(e)
             }}
             className="flex flex-col gap-4"

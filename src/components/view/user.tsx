@@ -117,7 +117,7 @@ export default function UsersView({
         <h1 className="text-lg font-semibold md:text-2xl">Users</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4" />
-          한국어
+          User
         </Button>
       </div>
 

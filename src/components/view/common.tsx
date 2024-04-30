@@ -87,24 +87,24 @@ export default function CommonView({
         />
 
         <Table className="mt-6 min-w-[1280px]">
-          <TableHeader>
+          <TableHeader className="capitalize">
             <TableRow>
-              <TableHead>GROUP_CODE</TableHead>
-              <TableHead>DT_CODE</TableHead>
-              <TableHead>USE_YN</TableHead>
-              <TableHead>LOC_VALUE</TableHead>
-              <TableHead>ENG_VALUE</TableHead>
-              <TableHead>ETC1</TableHead>
-              <TableHead>ETC2</TableHead>
-              <TableHead>ETC3</TableHead>
-              <TableHead>ETC4</TableHead>
-              <TableHead>ETC5</TableHead>
-              <TableHead>ETC6</TableHead>
-              <TableHead>ETC7</TableHead>
-              <TableHead>SORT_SEQ_NO</TableHead>
-              <TableHead>REMARKS</TableHead>
-              <TableHead>EDIT</TableHead>
-              <TableHead>DELETE</TableHead>
+              <TableHead>group code</TableHead>
+              <TableHead>dt code</TableHead>
+              <TableHead>use yn</TableHead>
+              <TableHead>loc value</TableHead>
+              <TableHead>eng value</TableHead>
+              <TableHead>etc1</TableHead>
+              <TableHead>etc2</TableHead>
+              <TableHead>etc3</TableHead>
+              <TableHead>etc4</TableHead>
+              <TableHead>etc5</TableHead>
+              <TableHead>etc6</TableHead>
+              <TableHead>etc7</TableHead>
+              <TableHead>sort seq no</TableHead>
+              <TableHead>remarks</TableHead>
+              <TableHead>edit</TableHead>
+              <TableHead>delete</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
