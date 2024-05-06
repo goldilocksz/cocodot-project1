@@ -15,6 +15,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
     redirect('/login')
   }
   const auth = JSON.parse(cookieStore.get('user')?.value!) as Auth
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <Side />

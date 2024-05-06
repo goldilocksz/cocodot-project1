@@ -96,3 +96,42 @@ export interface Route {
   UPDATE_USER_ID: string
   UPDATE_USER_NAME: string
 }
+
+export interface TrReport {
+  id: number
+  COMPANY_CODE: string
+  TR_NO: string
+  STATUS: string
+  BL_NO: string
+  LSP_CD: string
+  JOB_DATE: string
+  POL: string
+  SINGLE_OR_CONSOL: string
+  FROM_ROUTE_CODE: string
+  FROM_NATION: string
+  CN_TRUCK_NO: string
+  CN_TRUCK_TYPE: string
+  TO_ROUTE_CODE: string
+  TO_NATION: string
+  VN_TRUCK_NO: string
+  VN_TRUCK_TYPE: string
+  ETD: string
+  PLT_QTY: number
+  ATA_FACTORY_TO_PICK_UP: Date
+  PICK_UP_TIME: Date
+  ATD_FACTORY: Date
+  ETA_BORDER: Date
+  ATA_BORDER: string
+  BORDER_PASS: Date
+  URGENT: string
+  REGION_CODE: string
+  REGION_NAME: string
+  CC_DONE_TIME: Date
+  ARRIVE_VIETAM_YARD_CN: Date
+  ARRIVE_VIETAM_YARD_VN: Date
+  TRANSLOADING: Date
+  DEPART_FROM_VIETNAM_YARD: Date
+  ETA_CNEE_FACTORY: Date
+  ATA_CNEE_FACTORY: string
+  UNLOADING: Date
+}

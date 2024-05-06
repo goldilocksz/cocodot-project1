@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -29,6 +29,7 @@ import request from '@/lib/request'
 import { Select } from '../ui/select'
 import NationCode from '../form/NationCode'
 import GoogleMap from '../map'
+import MyMapComponent from '../map/vnila'
 
 type Props = {
   auth: Auth
@@ -116,6 +117,7 @@ export default function RouteControl({
         <DialogHeader>
           <DialogTitle>{detail ? 'Edit' : 'Add'} Route Information</DialogTitle>
         </DialogHeader>
+
         <Form {...form}>
           <form
             id="routeForm"
@@ -150,12 +152,17 @@ export default function RouteControl({
             ))}
           </form>
         </Form>
+
         {detail && (
-          <GoogleMap
-            lat={Number(detail.LATITUDE)}
-            lng={Number(detail.LONGITUDE)}
-          />
+          <div className="relative h-[300px]">
+            <GoogleMap
+              lat={Number(detail.LATITUDE)}
+              lng={Number(detail.LONGITUDE)}
+            />
+            {/* <MyMapComponent /> */}
+          </div>
         )}
+
         <DialogFooter className="sm:justify-center">
           <Button type="submit" form="routeForm">
             {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -3,26 +3,23 @@ import { Select, SelectProps } from '../ui/select'
 import { forwardRef } from 'react'
 import request from '@/lib/request'
 
-const PolForm = forwardRef<HTMLSelectElement, SelectProps>(
+const CneeSelect = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, type, ...props }, ref) => {
-    const { data: Pol, isPending } = useQuery({
-      queryKey: ['getPol'],
+    const { data: Cnee, isPending } = useQuery({
+      queryKey: ['getCnee'],
       queryFn: async () =>
         await request({
-          url: '/webCommon/getCommonCode',
-          body: {
-            GROUP_CODE: 'POL',
-          },
+          url: '/webCommon/getCnee',
         }),
       staleTime: 1000 * 60 * 60,
     })
 
     return (
-      <Select ref={ref} {...props}>
+      <Select ref={ref} className={className} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Pol?.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
-          <option key={item.DT_CODE} value={item.LOC_VALUE}>
-            {item.LOC_VALUE}
+        {Cnee?.map((item: { CNEE_CODE: string; CNEE_NAME: string }) => (
+          <option key={item.CNEE_CODE} value={item.CNEE_NAME}>
+            {item.CNEE_NAME}
           </option>
         ))}
       </Select>
@@ -30,4 +27,4 @@ const PolForm = forwardRef<HTMLSelectElement, SelectProps>(
   },
 )
 
-export default PolForm
+export default CneeSelect
