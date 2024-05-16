@@ -18,7 +18,6 @@ export const LoginAction = async (
     url: '/webCommon/getLoginInfo',
     body: {
       ...formData,
-      licenceKey: 'dfoTg05dkQflgpsVdklub',
     },
     server: true,
   })

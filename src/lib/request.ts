@@ -16,6 +16,8 @@ export default async function request({ url, body, server }: Props) {
       licenceKey: 'dfoTg05dkQflgpsVdklub',
     }),
   })
+  console.log(response)
+
   const data = await response.json()
   return data
 }

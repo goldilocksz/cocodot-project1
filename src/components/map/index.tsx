@@ -1,46 +1,56 @@
-import { Wrapper, Status } from '@googlemaps/react-wrapper'
-import { Loader2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { Loader } from '@googlemaps/js-api-loader'
+import { Fragment, useEffect, useRef } from 'react'
 
-interface Props {
+export default function VanilaMap({
+  lat,
+  lng,
+  setPosition,
+}: {
   lat: number
   lng: number
-}
+  setPosition: (value: { lat: number; lng: number }) => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
 
-function MyMapComponent() {
-  return <div id="map" />
-}
+  useEffect(() => {
+    const markers: google.maps.Marker[] = []
+    const initMap = async () => {
+      const loader = new Loader({
+        apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY!,
+        version: 'weekly',
+      })
 
-const render = (status: string) => {
-  switch (status) {
-    case Status.LOADING:
-      return (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-          <Loader2 className="h-10 w-10 animate-spin" />
-        </div>
-      )
-    case Status.FAILURE:
-      return (
-        <div className="flex items-center justify-center text-red-600">
-          Error
-        </div>
-      )
-    case Status.SUCCESS:
-      return <MyMapComponent />
-    default:
-      return (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-          <Loader2 className="h-10 w-10 animate-spin" />
-        </div>
-      )
-  }
-}
+      const { Map } = await loader.importLibrary('maps')
+      const { Marker } = await loader.importLibrary('marker')
 
-export default function GoogleMap({ lat, lng }: Props) {
-  return (
-    <Wrapper
-      apiKey="AIzaSyCILoSLSUZUPFqaR13p1XlsusHOej47PUk"
-      render={render}
-    ></Wrapper>
-  )
+      const mapOptions = {
+        center: { lat, lng },
+        zoom: 14,
+      }
+      const map = new Map(ref.current!, mapOptions)
+
+      const defaultMarker = new google.maps.Marker({
+        position: { lat, lng },
+        map: map,
+      })
+      markers.push(defaultMarker)
+
+      map.addListener('click', (event: any) => {
+        markers.forEach((marker) => marker.setMap(null))
+        const newMarker = new Marker({
+          position: event.latLng,
+          map: map,
+        })
+        markers.push(newMarker)
+        setPosition({
+          lat: event.latLng.lat(),
+          lng: event.latLng.lng(),
+        })
+      })
+    }
+
+    initMap()
+  }, [])
+
+  return <div ref={ref} id="map" className="h-[300px]" />
 }

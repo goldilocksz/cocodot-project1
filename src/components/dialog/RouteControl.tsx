@@ -29,7 +29,7 @@ import request from '@/lib/request'
 import { Select } from '../ui/select'
 import NationCode from '../form/NationCode'
 import GoogleMap from '../map'
-import MyMapComponent from '../map/vnila'
+import { omit } from 'radash'
 
 type Props = {
   auth: Auth
@@ -55,6 +55,8 @@ const formSchema = z.object({
   SEQ_NAME: z.string().min(1, {
     message: 'Sequence name is required',
   }),
+  LATITUDE: z.string(),
+  LONGITUDE: z.string(),
 })
 type FormKeys = keyof z.infer<typeof formSchema>
 
@@ -65,6 +67,8 @@ const RouteDefault = {
   NATION_CD: '',
   ROUTE_NAME: '',
   SEQ_NAME: '',
+  LATITUDE: '',
+  LONGITUDE: '',
 }
 
 export default function RouteControl({
@@ -134,15 +138,20 @@ export default function RouteControl({
                     <FormLabel className="capitalize">
                       {key.replace(/_/g, ' ').toLowerCase()}
                       {/* @ts-ignore */}
-                      {formSchema.shape[key]?.min && (
-                        <span className="ml-1 text-destructive">*</span>
-                      )}
+                      {formSchema.shape[key]?.min &&
+                        key !== 'LATITUDE' &&
+                        key !== 'LONGITUDE' && (
+                          <span className="ml-1 text-destructive">*</span>
+                        )}
                     </FormLabel>
                     <FormControl>
                       {key === 'NATION_CD' ? (
                         <NationCode {...field} />
                       ) : (
-                        <Input {...field} />
+                        <Input
+                          {...field}
+                          readOnly={key === 'LATITUDE' || key === 'LONGITUDE'}
+                        />
                       )}
                     </FormControl>
                     <FormMessage />
@@ -158,8 +167,11 @@ export default function RouteControl({
             <GoogleMap
               lat={Number(detail.LATITUDE)}
               lng={Number(detail.LONGITUDE)}
+              setPosition={(value) => {
+                form.setValue('LATITUDE', String(value.lat))
+                form.setValue('LONGITUDE', String(value.lng))
+              }}
             />
-            {/* <MyMapComponent /> */}
           </div>
         )}
 

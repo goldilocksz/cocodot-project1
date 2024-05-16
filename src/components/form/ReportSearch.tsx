@@ -91,6 +91,7 @@ export default function ReportSearch({
           to: watch('TO_DATE'),
         }}
         setDate={(date) => {
+          if (!date.from || !date.to) return
           setValue('FROM_DATE', date.from)
           setValue('TO_DATE', date.to)
         }}

@@ -16,6 +16,7 @@ export type Auth = {
   STATUS: string
   REMARKS: string
   TIME_ZONE: string
+  CUSTOMER_TYPE: string
 }
 
 export interface User {
@@ -117,21 +118,58 @@ export interface TrReport {
   VN_TRUCK_TYPE: string
   ETD: string
   PLT_QTY: number
-  ATA_FACTORY_TO_PICK_UP: Date
-  PICK_UP_TIME: Date
-  ATD_FACTORY: Date
-  ETA_BORDER: Date
+  ATA_FACTORY_TO_PICK_UP: string
+  PICK_UP_TIME: string
+  ATD_FACTORY: string
+  ETA_BORDER: string
   ATA_BORDER: string
-  BORDER_PASS: Date
+  BORDER_PASS: string
   URGENT: string
   REGION_CODE: string
   REGION_NAME: string
-  CC_DONE_TIME: Date
-  ARRIVE_VIETAM_YARD_CN: Date
-  ARRIVE_VIETAM_YARD_VN: Date
-  TRANSLOADING: Date
-  DEPART_FROM_VIETNAM_YARD: Date
-  ETA_CNEE_FACTORY: Date
+  CC_DONE_TIME: string
+  ARRIVE_VIETAM_YARD_CN: string
+  ARRIVE_VIETAM_YARD_VN: string
+  TRANSLOADING: string
+  DEPART_FROM_VIETNAM_YARD: string
+  ETA_CNEE_FACTORY: string
   ATA_CNEE_FACTORY: string
-  UNLOADING: Date
+  UNLOADING: string
+}
+
+export interface Order {
+  COMPANY_CODE: string
+  TR_NO: string
+  CUSTOMER_CODE: string
+  CLIENT_CODE: string
+  LSP_CD: string
+  JOB_DATE: string
+  FROM_ROUTE_CODE: string
+  FROM_TRUCK_NO: string
+  FROM_LATITUDE: string
+  FROM_LONGITUDE: string
+  TO_ROUTE_CODE: string
+  TO_TRUCK_NO: string
+  TO_LATITUDE: string
+  TO_LONGITUDE: string
+  ETD: string
+  POL: string
+  CC_DONE_TIME: Date
+  LEAD_TIME: string
+  REGION_CODE: string
+  REGION_NAME: string
+  URGENT: string
+  IMP_EXP: string
+  STATUS: string
+  REMARKS: string
+  TIME_ZONE: string
+  ADD_DATE: Date
+  ADD_USER_ID: string
+  ADD_USER_NAME: string
+  UPDATE_DATE: Date
+  UPDATE_USER_ID: string
+  UPDATE_USER_NAME: string
+  DT_COUNT: number
+  BL_COUNT: number
+  id: number
 }

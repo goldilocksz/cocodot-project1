@@ -85,7 +85,6 @@ export default function navbar() {
                 !item.subMenu &&
                 'bg-zinc-200 text-black',
             )}
-            onClick={() => setOpen(!open)}
           >
             <item.icon className="h-4 w-4" />
             {item.name}
@@ -97,20 +96,19 @@ export default function navbar() {
               )
             ) : null}
           </Link>
-          {open &&
-            item.subMenu?.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  'ml-2 flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
-                  item.href === pathname && 'bg-zinc-200 text-black',
-                )}
-              >
-                {item.href === pathname && <ChevronRight className="h-4 w-4" />}
-                {item.name}
-              </Link>
-            ))}
+          {item.subMenu?.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={cn(
+                'ml-2 flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
+                item.href === pathname && 'bg-zinc-200 text-black',
+              )}
+            >
+              {item.href === pathname && <ChevronRight className="h-4 w-4" />}
+              {item.name}
+            </Link>
+          ))}
         </Fragment>
       ))}
     </nav>
