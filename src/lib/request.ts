@@ -13,11 +13,10 @@ export default async function request({ url, body, server }: Props) {
     },
     body: JSON.stringify({
       ...(body ?? {}),
-      licenceKey: 'dfoTg05dkQflgpsVdklub',
     }),
   })
-  console.log(response)
+  console.log(response.status, body, await response.text())
 
-  const data = await response.json()
-  return data
+  // const data = await response.json()
+  return response
 }

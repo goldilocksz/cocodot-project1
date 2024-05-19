@@ -30,7 +30,7 @@ export const formSchema = z.object({
   USER_ID: z.string().min(1, {
     message: 'UserId is required',
   }),
-  PW: z.string().min(1, {
+  USER_PW: z.string().min(1, {
     message: 'Password is required',
   }),
 })
@@ -46,7 +46,7 @@ export default function LoginView() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       USER_ID: '',
-      PW: '',
+      USER_PW: '',
     },
   })
 
@@ -97,7 +97,7 @@ export default function LoginView() {
             />
             <FormField
               control={form.control}
-              name="PW"
+              name="USER_PW"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Password</FormLabel>
