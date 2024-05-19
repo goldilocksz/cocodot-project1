@@ -17,6 +17,6 @@ export default async function request({ url, body, server }: Props) {
   })
   console.log(response.status, body, await response.text())
 
-  // const data = await response.json()
-  return response
+  const data = await response.json()
+  return data
 }
