@@ -107,6 +107,7 @@ const formSchema = z.object({
       QTY_OF_PLT: z.number(),
     }),
   ),
+  NATION_CODE: z.string(),
 })
 
 type FormKeys = keyof z.infer<typeof formSchema>
@@ -122,6 +123,7 @@ const OrderDefault = {
   REGION_CODE: '',
   POL: '',
   FROM_TRUCK_NO: '',
+  NATION_CODE: '',
   URGENT: false,
   BLDATA: [
     {
