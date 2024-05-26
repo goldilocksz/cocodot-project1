@@ -173,3 +173,15 @@ export interface Order {
   BL_COUNT: number
   id: number
 }
+
+export interface Monitoring {
+  LSP_CD: string
+  STATUS: string
+  CNEE: string
+  REF_NO: string
+  COMPANY_CODE: string
+  REMARKS: string
+  LAST_UPDATE_DATE: string
+  CHECK_YN: string
+  NOW_STATUS: string
+}

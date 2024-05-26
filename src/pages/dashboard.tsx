@@ -1,5 +1,3 @@
-'use client'
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -26,14 +24,13 @@ import {
   ArrowUpRight,
   ArrowUp,
 } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 import CountUp from 'react-countup'
 import { Input } from '@/components/ui/input'
 import Chart from '@/components/chart'
 import dayjs from 'dayjs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { useEffect, useState } from 'react'
 import { Select } from '@/components/ui/select'
 
 export default function DashboardView() {
@@ -218,7 +215,7 @@ export default function DashboardView() {
               <CardTitle>Chart</CardTitle>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="#">
+              <Link to="#">
                 View All
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
@@ -232,7 +229,7 @@ export default function DashboardView() {
               <CardTitle>Monitoring</CardTitle>
             </div>
             <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="/monitoring">
+              <Link to="/monitoring">
                 View All
                 <ArrowUpRight className="h-4 w-4" />
               </Link>

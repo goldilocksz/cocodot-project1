@@ -10,8 +10,8 @@ import { subMonths, format } from 'date-fns'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
-import request from '@/lib/request'
-import { Auth, TrReport } from '@/types/data'
+import request from '@/utils/request'
+import { TrReport } from '@/types/data'
 
 export const formSchema = z.object({
   TR_NO: z.string(),
@@ -23,20 +23,11 @@ export const formSchema = z.object({
 })
 
 interface Props {
-  auth: Auth
   setIsLoading: (value: boolean) => void
   setList: (value: TrReport[]) => void
 }
 
-export default function ReportSearch({
-  auth,
-  setIsLoading,
-  setList,
-}: {
-  auth: Auth
-  setIsLoading: (value: boolean) => void
-  setList: (value: TrReport[]) => void
-}) {
+export default function ReportSearch({ setIsLoading, setList }: Props) {
   const { watch, setValue, register, handleSubmit } = useForm<
     z.infer<typeof formSchema>
   >({
@@ -54,15 +45,11 @@ export default function ReportSearch({
   const { mutate: search } = useMutation({
     mutationFn: async (value: any) => {
       setIsLoading(true)
-      const response = await request({
-        url: '/report/getTRReport',
-        body: {
-          ...value,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-        },
+      const { data } = await request.post('/report/getTRReport', {
+        ...value,
       })
       setIsLoading(false)
-      setList(response)
+      setList(data)
     },
   })
 

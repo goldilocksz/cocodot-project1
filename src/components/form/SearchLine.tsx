@@ -4,6 +4,7 @@ import { Button } from '../ui/button'
 import { X, Search } from 'lucide-react'
 import { Input } from '../ui/input'
 import { Select } from '../ui/select'
+import { QueryClient, useQueryClient } from '@tanstack/react-query'
 
 interface SearchElement extends HTMLFormControlsCollection {
   search: HTMLInputElement
@@ -17,38 +18,35 @@ interface Props<T> {
   setPage: Dispatch<SetStateAction<number>>
   pageSize: string
   setPageSize: Dispatch<SetStateAction<string>>
-  initData: T[]
-  list: T[]
-  setList: Dispatch<SetStateAction<T[]>>
+  searchData: T[] | undefined
   searchKey?: string[]
+  queryKey: string[]
 }
 
 export default function SearchLine<T>({
   setPage,
   pageSize,
   setPageSize,
-  initData,
-  list,
-  setList,
+  searchData,
   searchKey,
+  queryKey,
 }: Props<T>) {
   const [search, setSearch] = useState('')
+  const queryClient = useQueryClient()
+
   const handleSearch = (event: FormEvent<SearchFormProps>) => {
     event.preventDefault()
     setPage(1)
-    if (!search.trim()) {
-      event.currentTarget.search.focus()
-      setSearch('')
-      setList(initData ?? [])
-    } else {
-      if (!initData) return
-      const fuse = new Fuse(initData, {
-        includeScore: true,
-        threshold: 0.3,
-        keys: searchKey ? searchKey : Object.keys(initData[0]!),
-      })
-      setList(fuse.search(search).map((item) => item.item))
-    }
+    if (!searchData) return
+    const fuse = new Fuse(searchData, {
+      includeScore: true,
+      threshold: 0.3,
+      keys: searchKey ? searchKey : Object.keys(searchData[0]!),
+    })
+    queryClient.setQueryData(
+      queryKey,
+      fuse.search(search).map((item) => item.item),
+    )
   }
 
   return (
@@ -61,14 +59,19 @@ export default function SearchLine<T>({
             autoComplete="off"
             className="w-auto pr-10"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              if (!e.target.value.trim()) {
+                queryClient.setQueryData(queryKey, searchData)
+              }
+            }}
           ></Input>
           {search.trim() && (
             <div
               className="absolute right-0 top-0 cursor-pointer p-3"
               onClick={() => {
                 setSearch('')
-                setList(initData ?? [])
+                queryClient.setQueryData(queryKey, searchData)
               }}
             >
               <X className="h-4 w-4" />
@@ -83,7 +86,7 @@ export default function SearchLine<T>({
       <div className="flex items-center gap-6 whitespace-nowrap">
         <div>
           <span className="text-sm text-muted-foreground">Count: </span>
-          {list?.length}
+          {queryClient.getQueryData<T[]>(queryKey)?.length}
         </div>
         <div className="flex items-center gap-2">
           <div className="text-sm text-muted-foreground">Page:</div>

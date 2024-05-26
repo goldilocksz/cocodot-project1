@@ -1,5 +1,3 @@
-'use client'
-
 import AddUserDialog from '@/components/dialog/UserControl'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -14,24 +12,19 @@ import {
 import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Pagination from '@/components/pagination'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import { Auth, User } from '@/types/data'
-import SearchLine from '../form/SearchLine'
-import request from '@/lib/request'
+import SearchLine from '@/components/form/SearchLine'
+import request from '@/utils/request'
+import Loading from '@/components/ui/loading'
 
-export default function UsersView({
-  auth,
-  users,
-}: {
-  auth: Auth
-  users: User[]
-}) {
+export default function UsersView() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
+  const [searchData, setSearchData] = useState<User[]>([])
   const [isOpen, setIsOpen] = useState(false)
-  const [userList, setUserList] = useState<User[]>(users)
   const [detail, setDetail] = useState<User | undefined>()
   const [isConfirm, setIsConfirm] = useState(false)
   const [isConfirmReset, setIsConfirmReset] = useState(false)
@@ -42,6 +35,20 @@ export default function UsersView({
     }
   }, [isOpen])
 
+  const { data: userList, isPending } = useQuery<User[]>({
+    queryKey: ['getUserList'],
+    queryFn: async () => {
+      const { data } = await request.post('/user/getUserList', {})
+
+      const users = data?.map((user: any, index: number) => ({
+        ...user,
+        id: index + 1,
+      }))
+      setSearchData(users)
+      return users
+    },
+  })
+
   const { mutate: deleteUser, isPending: isDeleteUser } = useMutation({
     mutationFn: async ({
       USER_ID,
@@ -50,14 +57,9 @@ export default function UsersView({
       USER_ID: string
       COMPANY_CODE: string
     }) => {
-      const response = await request({
-        url: '/user/userDelete',
-        body: {
-          S_USER_ID: auth.USER_ID,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-          USER_ID,
-          COMPANY_CODE,
-        },
+      const response = await request.post('/user/userDelete', {
+        USER_ID,
+        COMPANY_CODE,
       })
 
       if (!response) {
@@ -76,21 +78,13 @@ export default function UsersView({
       USER_ID: string
       COMPANY_CODE: string
     }) => {
-      const response = await request({
-        url: '/user/PWRest',
-        body: {
-          S_USER_ID: auth.USER_ID,
-          S_USER_NAME: auth.USER_NAME,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-          USER_ID,
-          COMPANY_CODE,
-        },
+      const response = await request.post('/user/PWRest', {
+        USER_ID,
+        COMPANY_CODE,
       })
 
       if (!response) {
         toast.error('Failed to delete user')
-      } else {
-        // window.location.reload()
       }
     },
   })
@@ -112,8 +106,9 @@ export default function UsersView({
   }
 
   return (
-    <section>
-      <div className="flex-middle h-10 justify-between">
+    <section className="relative grow">
+      <Loading isLoading={isPending} />
+      <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Users</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4" />
@@ -126,9 +121,8 @@ export default function UsersView({
           setPage={setPage}
           pageSize={pageSize}
           setPageSize={setPageSize}
-          initData={users}
-          list={userList}
-          setList={setUserList}
+          searchData={searchData}
+          queryKey={['getUserList']}
           searchKey={[
             'USER_ID',
             'COMPANY_CODE',
@@ -246,12 +240,7 @@ export default function UsersView({
         />
       </Card>
 
-      <AddUserDialog
-        auth={auth}
-        detail={detail}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
+      <AddUserDialog detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
       <ConfirmDialog
         title="Reset Password"
         desc={`Are you sure you want to reset password for user ${detail?.USER_NAME}`}

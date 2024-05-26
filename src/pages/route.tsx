@@ -1,10 +1,8 @@
-'use client'
-
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
-import { Card } from '../ui/card'
-import { Edit, Plus, Search, Trash2, X } from 'lucide-react'
+import { Card } from '@/components/ui/card'
+import { Edit, Plus, Trash2, X } from 'lucide-react'
 import { Route, Auth } from '@/types/data'
 import {
   Table,
@@ -13,31 +11,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table'
-import { Button } from '../ui/button'
-import page from './login'
-import Pagination from '../pagination'
-import Fuse from 'fuse.js'
-import { Input } from '../ui/input'
-import { Select } from '../ui/select'
-import ConfirmDialog from '../dialog/ConfirmDialog'
-import request from '@/lib/request'
-import SearchLine from '../form/SearchLine'
-import RouteControl from '../dialog/RouteControl'
+} from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
+import Pagination from '@/components/pagination'
+import ConfirmDialog from '@/components/dialog/ConfirmDialog'
+import request from '@/utils/request'
+import SearchLine from '@/components/form/SearchLine'
+import RouteControl from '@/components/dialog/RouteControl'
+import Loading from '@/components/ui/loading'
 
-export default function RouteView({
-  auth,
-  data,
-}: {
-  auth: Auth
-  data: Route[]
-}) {
-  const [routeList, setRouteList] = useState<Route[]>(data)
+export default function RouteView() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
+  const [searchData, setSearchData] = useState<Route[]>([])
   const [detail, setDetail] = useState<Route | undefined>()
   const [isOpen, setIsOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
+
+  const {
+    data: routeList,
+    isPending: isGetRouteList,
+    isFetching: isRouteListFetching,
+    refetch,
+  } = useQuery<Route[]>({
+    queryKey: ['getRouteList'],
+    queryFn: async () => {
+      const { data } = await request.post('/webCommon/getRouteMstList', {})
+
+      const routes = data?.map((route: any, index: number) => ({
+        ...route,
+        id: index + 1,
+      }))
+      setSearchData(routes)
+      return routes
+    },
+  })
 
   const { mutate: deleteRoute, isPending: isDeleteRoute } = useMutation({
     mutationFn: async ({
@@ -51,18 +59,15 @@ export default function RouteView({
       ROUTE_CODE: string
       SEQ: string
     }) => {
-      const data = await request({
-        url: '/webCommon/RouteMstDelete',
-        body: {
-          COMPANY_CODE,
-          CUSTOMER_CODE,
-          ROUTE_CODE,
-          SEQ,
-        },
+      const response = await request.post('/webCommon/RouteMstDelete', {
+        COMPANY_CODE,
+        CUSTOMER_CODE,
+        ROUTE_CODE,
+        SEQ,
       })
 
-      if (data.error) {
-        toast.error(data.error)
+      if (response.data) {
+        toast.error(response.data)
       } else {
         toast.success('User deleted successfully')
         window.location.reload()
@@ -77,8 +82,9 @@ export default function RouteView({
   }
 
   return (
-    <section>
-      <div className="flex-middle h-10 justify-between">
+    <section className="relative grow">
+      <Loading isLoading={isGetRouteList || isRouteListFetching} />
+      <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Route Mst</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4" />
@@ -91,9 +97,8 @@ export default function RouteView({
           setPage={setPage}
           pageSize={pageSize}
           setPageSize={setPageSize}
-          initData={data}
-          list={routeList}
-          setList={setRouteList}
+          searchData={searchData}
+          queryKey={['getRouteList']}
         />
 
         <Table className="mt-6 min-w-[1280px]">
@@ -195,10 +200,10 @@ export default function RouteView({
         callback={() => handleDelete()}
       />
       <RouteControl
-        auth={auth}
         detail={detail}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        refetch={refetch}
       />
     </section>
   )

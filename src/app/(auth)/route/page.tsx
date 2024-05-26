@@ -1,5 +1,5 @@
-import Route from '@/components/view/route'
-import request from '@/lib/request'
+import Route from '@/components/pages/route'
+import request from '@/utils/request'
 import { Auth } from '@/types/data'
 import { cookies } from 'next/headers'
 
@@ -12,7 +12,6 @@ export default async function page() {
     body: {
       S_COMPANY_CODE: user.COMPANY_CODE,
     },
-    server: true,
   })
 
   const routes = data.map((route: any, index: number) => ({

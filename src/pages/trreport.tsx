@@ -1,9 +1,7 @@
-'use client'
-
 import { useState } from 'react'
-import { Card } from '../ui/card'
-import { Auth, TrReport } from '@/types/data'
-import ReportSearch from '../form/ReportSearch'
+import { Card } from '@/components/ui/card'
+import { TrReport } from '@/types/data'
+import ReportSearch from '@/components/form/ReportSearch'
 import {
   Table,
   TableBody,
@@ -11,52 +9,68 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table'
-import Pagination from '../pagination'
+} from '@/components/ui/table'
+import Pagination from '@/components/pagination'
 import dayjs from 'dayjs'
-import { Loader2 } from 'lucide-react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import * as XLSX from 'xlsx'
+import request from '@/utils/request'
+import { useQuery } from '@tanstack/react-query'
+import Loading from '@/components/ui/loading'
 
-export default function BlReportView({
-  auth,
-  data,
-}: {
-  auth: Auth
-  data: TrReport[]
-}) {
-  const [list, setList] = useState<TrReport[]>(data)
+export default function TrReportView() {
+  const [list, setList] = useState<TrReport[]>([])
+  const { data: TrReports, isPending } = useQuery<TrReport[]>({
+    queryKey: ['getTrReport'],
+    queryFn: async () => {
+      const { data }: { data: TrReport[] } = await request.post(
+        '/report/getTRReport',
+        {
+          JOB_FRM: dayjs().subtract(1, 'month').format('YYYYMMDD'),
+          JOB_TO: dayjs().format('YYYYMMDD'),
+        },
+      )
+
+      const allKeys = Array.from(
+        new Set(data.flatMap((obj) => Object.keys(obj))),
+      ) as (keyof TrReport)[]
+
+      const filterList = data.map((obj, index: number) => {
+        let newObj: any = {}
+        newObj['id'] = index + 1
+        allKeys.forEach((key) => {
+          newObj[key] = obj[key] ?? ''
+        })
+        return newObj
+      })
+      setList(filterList)
+      return filterList
+    },
+  })
+
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [isLoading, setIsLoading] = useState(false)
 
   function downloadXlsx() {
+    if (!TrReports?.length) return
     const workbook = XLSX.utils.book_new()
-    const worksheet = XLSX.utils?.json_to_sheet(data)
+    const worksheet = XLSX.utils?.json_to_sheet(TrReports)
     XLSX.utils.book_append_sheet(workbook, worksheet, 'test')
 
-    XLSX.writeFile(workbook, `BlReport${dayjs().format('YYYYMMDDHHmmss')}.xlsx`)
+    XLSX.writeFile(workbook, `TrReport${dayjs().format('YYYYMMDDHHmmss')}.xlsx`)
   }
 
   return (
-    <section>
-      <div className="flex-middle h-10 justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Bl Report</h1>
+    <section className="relative grow">
+      <Loading isLoading={isLoading || isPending} />
+      <div className="flex h-10 items-center justify-between">
+        <h1 className="text-lg font-semibold md:text-2xl">Tr Report</h1>
         <Button onClick={() => downloadXlsx()}>Download</Button>
       </div>
 
-      <Card className="relative mt-6 p-6">
-        {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-            <Loader2 className="h-10 w-10 animate-spin" />
-          </div>
-        )}
-
-        <ReportSearch
-          auth={auth}
-          setIsLoading={setIsLoading}
-          setList={setList}
-        />
+      <Card className="mt-6 p-6">
+        <ReportSearch setList={setList} setIsLoading={setIsLoading} />
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
@@ -99,7 +113,7 @@ export default function BlReportView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data
+            {list
               ?.slice(
                 (page - 1) * parseInt(pageSize),
                 page * parseInt(pageSize),
@@ -210,7 +224,7 @@ export default function BlReportView({
 
         <Pagination
           totalPages={
-            data?.length ? Math.ceil(data.length / parseInt(pageSize)) : 1
+            list?.length ? Math.ceil(list.length / parseInt(pageSize)) : 1
           }
           currentPage={page}
           setCurrentPage={setPage}

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 import { Bell } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -9,10 +9,7 @@ export default function side() {
     <div className="hidden border-r bg-muted/40 md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
         <div className="flex h-14 items-center px-4 lg:h-[60px] lg:px-6">
-          <Link
-            href="/"
-            className="flex flex-1 items-center gap-2 font-semibold"
-          >
+          <Link to="/" className="flex flex-1 items-center gap-2 font-semibold">
             <img src="/images/logo.png" alt="" className="h-[30px]" />
           </Link>
           <Button variant="outline" size="icon" className="ml-auto h-8 w-8">

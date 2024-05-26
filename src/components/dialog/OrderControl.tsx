@@ -23,9 +23,9 @@ import {
 } from '../ui/dialog'
 import { NumericFormat } from 'react-number-format'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Auth, Order } from '@/types/data'
+import { Auth, Order, TrReport } from '@/types/data'
 import { toast } from 'sonner'
-import request from '@/lib/request'
+import request from '@/utils/request'
 import { Select } from '../ui/select'
 import NationCode from '../form/NationCode'
 import Cnee from '../form/Cnee'
@@ -37,7 +37,6 @@ import TruckType from '../form/TruckType'
 import { Datepicker } from '../ui/datepicker'
 
 type Props = {
-  auth: Auth
   detail: Order | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
@@ -139,38 +138,25 @@ const OrderDefault = {
   ],
 }
 
-export default function OrderControl({
-  auth,
-  detail,
-  isOpen,
-  setIsOpen,
-}: Props) {
+export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: OrderDefault,
   })
 
-  const { data: BlInfo, isLoading: isGetBlInfo } = useQuery({
-    queryKey: ['BlInfo', detail?.TR_NO],
+  const { data: BlInfo, isLoading: isGetBlInfo } = useQuery<any[]>({
+    queryKey: ['getBlInfo', detail?.TR_NO],
     queryFn: async () =>
-      await request({
-        url: '/order/getOrderBLInfo',
-        body: {
-          TR_NO: detail?.TR_NO,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-        },
+      await request.post('/order/getOrderBLInfo', {
+        TR_NO: detail?.TR_NO,
       }),
   })
 
-  const { data: RouteInfo, isLoading: isGetRouteInfo } = useQuery({
+  const { data: RouteInfo, isLoading: isGetRouteInfo } = useQuery<TrReport[]>({
     queryKey: ['RouteInfo', detail?.TR_NO],
     queryFn: async () =>
-      await request({
-        url: '/order/getOrderDT',
-        body: {
-          TR_NO: detail?.TR_NO,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-        },
+      await request.post('/order/getOrderDT', {
+        TR_NO: detail?.TR_NO,
       }),
   })
 
@@ -195,15 +181,7 @@ export default function OrderControl({
 
   const { mutate: UpdateRoute, isPending: isUpdateRoute } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request({
-        url: '/webCommon/RouteMstSave',
-        body: {
-          ...value,
-          S_USER_ID: auth.USER_ID,
-          S_USER_NAME: auth.USER_NAME,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-        },
-      })
+      const response = await request.post('/webCommon/RouteMstSave', value)
       if (!response) {
         toast.error('Failed to update route code information')
       } else {

@@ -25,11 +25,10 @@ import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
 import { Auth, Code } from '@/types/data'
 import { toast } from 'sonner'
-import request from '@/lib/request'
+import request from '@/utils/request'
 import { Select } from '../ui/select'
 
 type Props = {
-  auth: Auth
   detail: Code | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
@@ -75,12 +74,7 @@ const CommonDefault = {
   SORT_SEQ_NO: 0,
   REMARKS: '',
 }
-export default function CommonControl({
-  auth,
-  detail,
-  isOpen,
-  setIsOpen,
-}: Props) {
+export default function CommonControl({ detail, isOpen, setIsOpen }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: CommonDefault,
@@ -88,15 +82,7 @@ export default function CommonControl({
 
   const { mutate: UpdateCommon, isPending: isUpdateCommon } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request({
-        url: '/webCommon/CommonCodeSave',
-        body: {
-          ...value,
-          S_USER_ID: auth.USER_ID,
-          S_USER_NAME: auth.USER_NAME,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-        },
-      })
+      const response = await request.post('/webCommon/CommonCodeSave', value)
       if (!response) {
         toast.error('Failed to update common code information')
       } else {

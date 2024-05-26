@@ -1,19 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { Select, SelectProps } from '../ui/select'
 import { forwardRef } from 'react'
-import request from '@/lib/request'
+import request from '@/utils/request'
 
 const TruckType = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, type, ...props }, ref) => {
     const { data: TruckTypeCode, isPending } = useQuery({
       queryKey: ['getTruckTypeCode'],
-      queryFn: async () =>
-        await request({
-          url: '/webCommon/getCommonCode',
-          body: {
-            GROUP_CODE: 'TRUCK_TYPE',
-          },
-        }),
+      queryFn: async () => {
+        const { data } = await request.post('/webCommon/getCommonCode', {})
+        return data
+      },
       staleTime: 1000 * 60 * 60,
     })
 

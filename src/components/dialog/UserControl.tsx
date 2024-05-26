@@ -25,13 +25,12 @@ import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
 import TruckType from '../form/TruckType'
 import NationCode from '../form/NationCode'
-import { Auth, User } from '@/types/data'
+import { User } from '@/types/data'
 import { toast } from 'sonner'
-import request from '@/lib/request'
+import request from '@/utils/request'
 import { Select } from '../ui/select'
 
 type Props = {
-  auth: Auth
   detail: User | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
@@ -132,12 +131,7 @@ type FormKeys = keyof z.infer<typeof formSchema>
 //     message: 'Remarks must be less than 100 characters',
 //   })
 //   .or(z.literal('')),
-export default function UserControl({
-  auth,
-  detail,
-  isOpen,
-  setIsOpen,
-}: Props) {
+export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
   const defaultValues = {
     USER_ID: '',
     CUSTOMER_CODE: '',
@@ -162,14 +156,8 @@ export default function UserControl({
 
   const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request({
-        url: '/user/userSave',
-        body: {
-          ...value,
-          S_USER_ID: auth.USER_ID,
-          S_USER_NAME: auth.USER_NAME,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-        },
+      const response = await request.post('/user/userSave', {
+        ...value,
       })
       if (!response) {
         toast.error('Failed to update user information')
@@ -253,220 +241,6 @@ export default function UserControl({
                 )}
               />
             ))}
-            {/* <FormField
-              control={form.control}
-              name="USER_ID"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>USER_ID</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="COMPANY_CODE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>COMPANY_CODE</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="CUSTOMER_CODE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>CUSTOMER_CODE</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="PW"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>PW</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="USER_NAME"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>USER_NAME</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="DEPT_CODE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>DEPT_CODE</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="TEL_NO"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>TEL_NO</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="EMAIL"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>EMAIL</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="TRUCK_NO"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>TRUCK_NO</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="TRUCK_TYPE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>TRUCK_TYPE</FormLabel>
-                  <FormControl>
-                    <TruckType {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="NATION_CD"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>NATION_CD</FormLabel>
-                  <FormControl>
-                    <NationCode {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="USE_YN"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>USE_YN</FormLabel>
-                  <FormControl>
-                    <Select {...field}>
-                      <option value="y">Y</option>
-                      <option value="n">N</option>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="USER_LANG"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>USER_LANG</FormLabel>
-                  <FormControl>
-                    <Select {...field}>
-                      <option value="en">EN</option>
-                      <option value="ko">KO</option>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="ACCOUNT_NAME"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>ACCOUNT_NAME</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="GRADE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>GRADE</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-            {/* <FormField
-              control={form.control}
-              name="REMARKS"
-              render={({ field }) => (
-                <FormItem className="col-span-2">
-                  <FormLabel>REMARKS</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="REMARK" {...field}></Textarea>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
           </form>
         </Form>
         <DialogFooter className="sm:justify-center">

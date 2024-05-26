@@ -1,5 +1,5 @@
-import Order from '@/components/view/order'
-import request from '@/lib/request'
+import Order from '@/components/pages/order'
+import request from '@/utils/request'
 import { Auth } from '@/types/data'
 import { cookies } from 'next/headers'
 import { Order as OrderType } from '@/types/data'
@@ -16,7 +16,6 @@ export default async function page() {
       S_CUSTOMER_CODE: user.CUSTOMER_CODE,
       S_COMPANY_CODE: user.COMPANY_CODE,
     },
-    server: true,
   })
 
   const allKeys = Array.from(new Set(data.flatMap((obj) => Object.keys(obj))))

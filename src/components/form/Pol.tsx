@@ -1,19 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { Select, SelectProps } from '../ui/select'
 import { forwardRef } from 'react'
-import request from '@/lib/request'
+import request from '@/utils/request'
 
 const PolForm = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, type, ...props }, ref) => {
     const { data: Pol, isPending } = useQuery({
       queryKey: ['getPol'],
-      queryFn: async () =>
-        await request({
-          url: '/webCommon/getCommonCode',
-          body: {
-            GROUP_CODE: 'POL',
-          },
-        }),
+      queryFn: async () => {
+        const { data } = await request.post('/webCommon/getCommonCode', {
+          GROUP_CODE: 'POL',
+        })
+        return data
+      },
       staleTime: 1000 * 60 * 60,
     })
 

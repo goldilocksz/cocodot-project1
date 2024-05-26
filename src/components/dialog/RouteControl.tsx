@@ -16,26 +16,23 @@ import { Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog'
-import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
-import { Auth, Route } from '@/types/data'
+import { Route } from '@/types/data'
 import { toast } from 'sonner'
-import request from '@/lib/request'
-import { Select } from '../ui/select'
+import request from '@/utils/request'
 import NationCode from '../form/NationCode'
 import GoogleMap from '../map'
 import { omit } from 'radash'
 
 type Props = {
-  auth: Auth
   detail: Route | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  refetch: () => void
 }
 
 const formSchema = z.object({
@@ -72,10 +69,10 @@ const RouteDefault = {
 }
 
 export default function RouteControl({
-  auth,
   detail,
   isOpen,
   setIsOpen,
+  refetch,
 }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,20 +81,12 @@ export default function RouteControl({
 
   const { mutate: UpdateRoute, isPending: isUpdateRoute } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request({
-        url: '/webCommon/RouteMstSave',
-        body: {
-          ...value,
-          S_USER_ID: auth.USER_ID,
-          S_USER_NAME: auth.USER_NAME,
-          S_COMPANY_CODE: auth.COMPANY_CODE,
-        },
-      })
-      if (!response) {
+      const response = await request.post('/webCommon/RouteMstSave', value)
+      if (!response.data) {
         toast.error('Failed to update route code information')
       } else {
+        refetch()
         setIsOpen(false)
-        // window.location.reload()
       }
     },
   })

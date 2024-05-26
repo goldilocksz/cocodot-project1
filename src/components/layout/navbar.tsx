@@ -1,6 +1,4 @@
-'use client'
-
-import Link from 'next/link'
+import { Link, NavLink } from 'react-router-dom'
 
 import {
   ChevronDown,
@@ -15,8 +13,8 @@ import {
   Users,
 } from 'lucide-react'
 
-import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
+import { useLocation } from 'react-router-dom'
+import { cn } from '@/utils/utils'
 import { Fragment, useState } from 'react'
 
 const Menu = [
@@ -47,11 +45,11 @@ const Menu = [
     subMenu: [
       {
         name: 'Tr Report',
-        href: '/database/trreport',
+        href: '/trreport',
       },
       {
         name: 'Bl Report',
-        href: '/database/blreport',
+        href: '/blreport',
       },
     ],
   },
@@ -68,14 +66,14 @@ const Menu = [
 ]
 
 export default function navbar() {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
 
   return (
     <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
       {Menu.map((item) => (
         <Fragment key={item.name}>
-          <Link
+          <a
             key={item.name}
             href={item.href}
             className={cn(
@@ -88,16 +86,15 @@ export default function navbar() {
           >
             <item.icon className="h-4 w-4" />
             {item.name}
-            {item.subMenu ? (
-              open ? (
+            {item.subMenu &&
+              (open ? (
                 <ChevronUp className="ml-auto h-4 w-4" />
               ) : (
                 <ChevronDown className="ml-auto h-4 w-4" />
-              )
-            ) : null}
-          </Link>
+              ))}
+          </a>
           {item.subMenu?.map((item) => (
-            <Link
+            <a
               key={item.name}
               href={item.href}
               className={cn(
@@ -107,7 +104,7 @@ export default function navbar() {
             >
               {item.href === pathname && <ChevronRight className="h-4 w-4" />}
               {item.name}
-            </Link>
+            </a>
           ))}
         </Fragment>
       ))}

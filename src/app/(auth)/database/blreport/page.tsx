@@ -1,7 +1,7 @@
-import request from '@/lib/request'
+import request from '@/utils/request'
 import { Auth, TrReport } from '@/types/data'
 import { cookies } from 'next/headers'
-import BlReport from '@/components/view/blreport'
+import BlReport from '@/components/pages/blreport'
 import dayjs from 'dayjs'
 
 export default async function BlReportPage() {
@@ -15,7 +15,6 @@ export default async function BlReportPage() {
       JOB_TO: dayjs().format('YYYYMMDD'),
       S_COMPANY_CODE: user.COMPANY_CODE,
     },
-    server: true,
   })
 
   const allKeys = Array.from(new Set(data.flatMap((obj) => Object.keys(obj))))

@@ -1,5 +1,3 @@
-'use client'
-
 import { Auth, Code } from '@/types/data'
 import {
   Table,
@@ -8,30 +6,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table'
+} from '@/components/ui/table'
 import { Edit, Plus, Trash2 } from 'lucide-react'
-import { Button } from '../ui/button'
-import { FormEvent, useEffect, useState } from 'react'
-import { Card } from '../ui/card'
-import Pagination from '../pagination'
-import Fuse from 'fuse.js'
-import SearchLine from '../form/SearchLine'
-import CommonControl from '../dialog/CommonControl'
-import ConfirmDialog from '../dialog/ConfirmDialog'
-import { useMutation } from '@tanstack/react-query'
-import request from '@/lib/request'
+import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
+import { Card } from '@/components/ui/card'
+import Pagination from '@/components/pagination'
+import SearchLine from '@/components/form/SearchLine'
+import CommonControl from '@/components/dialog/CommonControl'
+import ConfirmDialog from '@/components/dialog/ConfirmDialog'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import request from '@/utils/request'
 import { toast } from 'sonner'
+import Loading from '@/components/ui/loading'
 
-export default function CommonView({
-  auth,
-  data,
-}: {
-  auth: Auth
-  data: Code[]
-}) {
+export default function CommonView() {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
-  const [codeList, setCodeList] = useState<Code[]>(data)
+  const [searchData, setSearchData] = useState<Code[]>([])
   const [detail, setDetail] = useState<Code>()
   const [isOpen, setIsOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
@@ -42,6 +34,24 @@ export default function CommonView({
     }
   }, [isOpen])
 
+  const {
+    data: codeList,
+    isPending,
+    refetch,
+  } = useQuery<Code[]>({
+    queryKey: ['getCodeList'],
+    queryFn: async () => {
+      const { data } = await request.post('/webCommon/getCommonCodeList', {})
+
+      const codes = data?.map((user: any, index: number) => ({
+        ...user,
+        id: index + 1,
+      }))
+      setSearchData(codes)
+      return codes
+    },
+  })
+
   const { mutate: deleteCode, isPending: isDeleteCode } = useMutation({
     mutationFn: async ({
       GROUP_CODE,
@@ -50,25 +60,23 @@ export default function CommonView({
       GROUP_CODE: string
       DT_CODE: string
     }) => {
-      const response = await request({
-        url: '/webCommon/CommonCodeDelete',
-        body: {
-          GROUP_CODE,
-          DT_CODE,
-        },
+      const response = await request.post('/webCommon/CommonCodeDelete', {
+        GROUP_CODE,
+        DT_CODE,
       })
 
-      if (!response) {
+      if (!response.data) {
         toast.error('Failed to delete user')
       } else {
-        window.location.reload()
+        refetch()
       }
     },
   })
 
   return (
-    <section>
-      <div className="flex-middle h-10 justify-between">
+    <section className="relative grow">
+      <Loading isLoading={isPending} />
+      <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Common Code</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4" />
@@ -81,9 +89,8 @@ export default function CommonView({
           setPage={setPage}
           pageSize={pageSize}
           setPageSize={setPageSize}
-          initData={data}
-          list={codeList}
-          setList={setCodeList}
+          searchData={searchData}
+          queryKey={['getCodeList']}
         />
 
         <Table className="mt-6 min-w-[1280px]">
@@ -181,12 +188,7 @@ export default function CommonView({
           setCurrentPage={setPage}
         />
       </Card>
-      <CommonControl
-        auth={auth}
-        detail={detail}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
+      <CommonControl detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
       <ConfirmDialog
         title="Delete Code"
         desc={`Are you sure you want to delete code`}

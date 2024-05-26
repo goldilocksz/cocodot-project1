@@ -1,19 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { Select, SelectProps } from '../ui/select'
 import { forwardRef } from 'react'
-import request from '@/lib/request'
+import request from '@/utils/request'
 
 const IncotermsForm = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, type, ...props }, ref) => {
     const { data: Incoterms, isPending } = useQuery({
       queryKey: ['getIncoterms'],
-      queryFn: async () =>
-        await request({
-          url: '/webCommon/getCommonCode',
-          body: {
-            GROUP_CODE: 'INCOTERMS',
-          },
-        }),
+      queryFn: async () => {
+        const { data } = await request.post('/webCommon/getCommonCode', {
+          GROUP_CODE: 'INCOTERMS',
+        })
+        return data
+      },
       staleTime: 1000 * 60 * 60,
     })
 

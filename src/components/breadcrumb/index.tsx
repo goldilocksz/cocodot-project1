@@ -1,6 +1,4 @@
-'use client'
-
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,11 +7,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '../ui/breadcrumb'
-import { usePathname } from 'next/navigation'
+import { useLocation } from 'react-router-dom'
 import { Fragment, useMemo } from 'react'
 
 export default function index() {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
 
   const breadcrumbs = useMemo(
     function generateBreadcrumbs() {
@@ -46,7 +44,7 @@ export default function index() {
                 <BreadcrumbPage>{breadcrumb.text}</BreadcrumbPage>
               ) : (
                 <BreadcrumbLink asChild>
-                  <Link href={breadcrumb.href}>{breadcrumb.text}</Link>
+                  <Link to={breadcrumb.href}>{breadcrumb.text}</Link>
                 </BreadcrumbLink>
               )}
             </BreadcrumbItem>

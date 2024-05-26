@@ -1,9 +1,7 @@
-'use client'
-
 import { Plus } from 'lucide-react'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import { useState } from 'react'
-import { Auth, Order } from '@/types/data'
+import { Order } from '@/types/data'
 import {
   Table,
   TableBody,
@@ -11,28 +9,53 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '../ui/table'
-import page from '@/app/(auth)/page'
+} from '@/components/ui/table'
 import dayjs from 'dayjs'
-import { Card } from '../ui/card'
-import OrderControl from '../dialog/OrderControl'
+import { Card } from '@/components/ui/card'
+import { useQuery } from '@tanstack/react-query'
+import request from '@/utils/request'
+import Loading from '@/components/ui/loading'
+import SearchLine from '@/components/form/SearchLine'
+import OrderControl from '@/components/dialog/OrderControl'
 
-export default function OrderView({
-  auth,
-  data,
-}: {
-  auth: Auth
-  data: Order[]
-}) {
+export default function OrderView() {
+  const [searchData, setSearchData] = useState<Order[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [detail, setDetail] = useState<Order | undefined>()
-  const [isLoading, setIsLoading] = useState(false)
+
+  const { data: orderList, isPending } = useQuery<Order[]>({
+    queryKey: ['getOrderList'],
+    queryFn: async () => {
+      const { data } = await request.post('/order/getOrderList', {})
+
+      const orders: Order[] = data?.map((user: any, index: number) => ({
+        ...user,
+        id: index + 1,
+      }))
+
+      const allKeys = Array.from(
+        new Set(orders.flatMap((obj) => Object.keys(obj))),
+      ) as (keyof Order)[]
+
+      const filterList = orders.map((obj, index: number) => {
+        let newObj: any = {}
+        newObj['id'] = index + 1
+        allKeys.forEach((key) => {
+          newObj[key] = obj[key] ?? ''
+        })
+        return newObj
+      })
+      setSearchData(orders)
+      return filterList
+    },
+  })
 
   return (
-    <section>
-      <div className="flex-middle h-10 justify-between">
+    <section className="relative grow">
+      <Loading isLoading={isPending} />
+      <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Orders</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4" />
@@ -41,11 +64,19 @@ export default function OrderView({
       </div>
 
       <Card className="relative mt-6 p-6">
+        <SearchLine
+          setPage={setPage}
+          pageSize={pageSize}
+          setPageSize={setPageSize}
+          searchData={searchData}
+          queryKey={['getOrderList']}
+        />
+
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
-              {data[0] &&
-                Object.keys(data[0]).map((key) => (
+              {orderList?.[0] &&
+                Object.keys(orderList?.[0]).map((key) => (
                   <TableHead key={key}>
                     {key.toLocaleLowerCase().replaceAll('_', ' ')}
                   </TableHead>
@@ -53,7 +84,7 @@ export default function OrderView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data
+            {orderList
               ?.slice(
                 (page - 1) * parseInt(pageSize),
                 page * parseInt(pageSize),
@@ -89,12 +120,7 @@ export default function OrderView({
         </Table>
       </Card>
 
-      <OrderControl
-        auth={auth}
-        detail={detail}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
+      <OrderControl detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
     </section>
   )
 }

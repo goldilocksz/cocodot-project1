@@ -1,5 +1,5 @@
-import Common from '@/components/view/common'
-import request from '@/lib/request'
+import Common from '@/components/pages/common'
+import request from '@/utils/request'
 import { Auth } from '@/types/data'
 import { cookies } from 'next/headers'
 
@@ -9,7 +9,6 @@ export default async function page() {
 
   const data = await request({
     url: '/webCommon/getCommonCodeList',
-    server: true,
   })
 
   const codes = data.map((route: any, index: number) => ({
