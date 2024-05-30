@@ -29,7 +29,7 @@ export default function ConfirmDialog({
 }: Props) {
   return (
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
-      <DialogContent>
+      <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>

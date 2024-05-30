@@ -1,10 +1,5 @@
 import axios from 'axios'
-
-interface Props {
-  url: string
-  body?: any
-  headers?: any
-}
+import { toast } from 'sonner'
 
 export const request = axios.create({
   baseURL: '/api',
@@ -29,6 +24,13 @@ request.interceptors.response.use(
     return response
   },
   (error) => {
+    if (error.response.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      toast.error('토큰이 만료되어 자동 로그아웃 되였습니다.')
+      window.location.href = '/login'
+    }
+
     return Promise.reject(
       error.code === 'ERR_NETWORK'
         ? '허용되지 않은 네트워크 접근입니다.'

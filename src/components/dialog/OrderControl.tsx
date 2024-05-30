@@ -41,49 +41,27 @@ type Props = {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
-
-// {
-//   COMPANY_CODE: string
-//   TR_NO: string
-//   CUSTOMER_CODE: string
-//   CLIENT_CODE: string
-//   LSP_CD: string
-//   JOB_DATE: string
-//   FROM_ROUTE_CODE: string
-//   FROM_TRUCK_NO: string
-//   FROM_LATITUDE: string
-//   FROM_LONGITUDE: string
-//   TO_ROUTE_CODE: string
-//   TO_TRUCK_NO: string
-//   TO_LATITUDE: string
-//   TO_LONGITUDE: string
-//   ETD: string
-//   POL: string
-//   CC_DONE_TIME: Date
-//   LEAD_TIME: string
-//   REGION_CODE: string
-//   REGION_NAME: string
-//   URGENT: string
-//   IMP_EXP: string
-//   STATUS: string
-//   REMARKS: string
-//   TIME_ZONE: string
-//   ADD_DATE: Date
-//   ADD_USER_ID: string
-//   ADD_USER_NAME: string
-//   UPDATE_DATE: Date
-//   UPDATE_USER_ID: string
-//   UPDATE_USER_NAME: string
-//   DT_COUNT: number
-//   BL_COUNT: number
-//   id: number
-// }
+/*{
+  "TR_NO": null,
+  "JOB_DATE": "20240506",
+  "FROM_ROUTE_CODE": "LS",
+  "FROM_TRUCK_NO": "GDL",
+  "TO_ROUTE_CODE": "PX",
+  "TO_TRUCK_NO": "GDL",
+  "ETD": "20240507",
+  "LEAD_TIME": "7Day 15hour",
+  "REGION_CODE": "NCN",
+  "REGION_NAME": "North CN",
+  "IMP_EXP": "IMP",
+  "ATA_BORDER": "2024-05-14 09:31:17.000",
+  "ATA_CNEE_FACTORY": "2024-05-14 10:31:17.000",
+}*/
 
 const formSchema = z.object({
   CLIENT_CODE: z.string().min(1, {
     message: 'Customer code is required',
   }),
-  LSP_CODE: z.string().min(1, {
+  LSP_CD: z.string().min(1, {
     message: 'LSP code is required',
   }),
   CC_DONE_TIME: z.date(),
@@ -94,26 +72,27 @@ const formSchema = z.object({
   POL: z.string().min(1, {
     message: 'POL is required',
   }),
+  NATION_CODE: z.string(),
   BLDATA: z.array(
     z.object({
+      TR_NO: z.string(),
       BL_NO: z.string(),
       CC_DONE_TIME: z.date(),
-      CNEE: z.string(),
+      CNEE_CODE: z.string(),
+      CNEE_NAME: z.string(),
       VENDOR_NAME: z.string(),
       INCOTERMS: z.string(),
       INVOICE_NO: z.string(),
       ITEM_CODE: z.string(),
-      QTY_OF_PLT: z.number(),
+      REF_INVOICE_NO: z.string(),
+      QTY: z.number(),
     }),
   ),
-  NATION_CODE: z.string(),
 })
-
-type FormKeys = keyof z.infer<typeof formSchema>
 
 const OrderDefault = {
   CLIENT_CODE: '',
-  LSP_CODE: '',
+  LSP_CD: '',
   ETD: '',
   FROM_ROUTE_CODE: '',
   TO_ROUTE_CODE: '',
@@ -126,14 +105,17 @@ const OrderDefault = {
   URGENT: false,
   BLDATA: [
     {
+      TR_NO: '',
       BL_NO: '',
       CC_DONE_TIME: new Date(),
-      CNEE: '',
+      CNEE_CODE: '',
+      CNEE_NAME: '',
       VENDOR_NAME: '',
       INCOTERMS: '',
       INVOICE_NO: '',
       ITEM_CODE: '',
-      QTY_OF_PLT: 0,
+      REF_INVOICE_NO: '',
+      QTY: 0,
     },
   ],
 }
@@ -164,18 +146,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
     if (BlInfo?.length) {
       form.setValue('BLDATA', BlInfo)
     } else {
-      form.setValue('BLDATA', [
-        {
-          BL_NO: '',
-          CC_DONE_TIME: new Date(),
-          CNEE: '',
-          VENDOR_NAME: '',
-          INCOTERMS: '',
-          INVOICE_NO: '',
-          ITEM_CODE: '',
-          QTY_OF_PLT: 0,
-        },
-      ])
+      form.setValue('BLDATA', [OrderDefault.BLDATA[0]])
     }
   }, [BlInfo])
 
@@ -186,7 +157,6 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
         toast.error('Failed to update route code information')
       } else {
         setIsOpen(false)
-        // window.location.reload()
       }
     },
   })
@@ -202,16 +172,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
   const AddNewBldata = () => {
     form.setValue('BLDATA', [
       ...form.getValues('BLDATA'),
-      {
-        BL_NO: '',
-        CC_DONE_TIME: new Date(),
-        CNEE: '',
-        VENDOR_NAME: '',
-        INCOTERMS: '',
-        INVOICE_NO: '',
-        ITEM_CODE: '',
-        QTY_OF_PLT: 0,
-      },
+      OrderDefault.BLDATA[0],
     ])
   }
 
@@ -223,7 +184,14 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
   }
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    UpdateRoute(value)
+    console.log(
+      value.BLDATA.map((item) => ({
+        ...item,
+        CC_DONE_TIME: item.CC_DONE_TIME.toISOString(),
+      })),
+    )
+
+    // UpdateRoute(value)
   }
 
   return (
@@ -245,7 +213,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    {'CLIENT_CODE'.replace(/_/g, ' ').toLowerCase()}
+                    Client Code
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
@@ -257,11 +225,11 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="LSP_CODE"
+              name="LSP_CD"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    {'LSP_CODE'.replace(/_/g, ' ').toLowerCase()}
+                    Lsp Code
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
@@ -284,7 +252,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                     <div className="flex h-10 items-center">
                       <Switch
                         checked={field.value}
-                        onCheckedChange={field.onChange}
+                        onCheckedChange={(check) => field.onChange(check)}
                       />
                     </div>
                   </FormControl>
@@ -312,7 +280,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="LSP_CODE"
               render={({ field }) => (
@@ -343,7 +311,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="CC_DONE_TIME"
@@ -363,7 +331,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="LSP_CODE"
               render={({ field }) => (
@@ -394,7 +362,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                   <FormMessage />
                 </FormItem>
               )}
-            />
+            /> */}
             <FormField
               control={form.control}
               name="NATION_CODE"
@@ -428,152 +396,159 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               )}
             />
             <div className="col-span-4">
-              <div className="font-semibold">Cargo information</div>
-              <Tabs defaultValue="bl" className="mt-2">
-                <TabsList>
-                  <TabsTrigger value="bl">Bl Info</TabsTrigger>
-                  <TabsTrigger value="route">Route Info</TabsTrigger>
-                </TabsList>
-                <TabsContent value="bl" className="relative pb-6">
-                  {isGetBlInfo && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    </div>
-                  )}
-                  {form.watch('BLDATA')?.map((item, index) => (
-                    <div
-                      key={index}
-                      className="relative col-span-4 grid grid-cols-7 gap-4 pr-12"
+              {isGetBlInfo && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+              )}
+              {form.watch('BLDATA')?.map((item, index) => (
+                <div
+                  key={index}
+                  className="relative col-span-4 grid grid-cols-9 gap-2 pr-12"
+                >
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.BL_NO`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">Bl No</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.TR_NO`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">TR No</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.CC_DONE_TIME`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">
+                          CC Done Time
+                        </FormLabel>
+                        <FormControl>
+                          <Datepicker
+                            date={field.value}
+                            setDate={(date) => field.onChange(date)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.CNEE_CODE`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">Cnee</FormLabel>
+                        <FormControl>
+                          <Cnee className="flex-1" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.VENDOR_NAME`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">
+                          Vendor name
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.INCOTERMS`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">Incoterms</FormLabel>
+                        <FormControl>
+                          <Incoterms {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.INVOICE_NO`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">Invoice No</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.ITEM_CODE`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">Item code</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`BLDATA.${index}.QTY`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="capitalize">Q'of PLT</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {index === 0 ? (
+                    <Button
+                      variant="outline"
+                      className="absolute bottom-0 right-0 px-3"
+                      onClick={AddNewBldata}
                     >
-                      <FormField
-                        control={form.control}
-                        name={`BLDATA.${index}.BL_NO` as FormKeys}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="capitalize">Bl No</FormLabel>
-                            <FormControl>
-                              <Input
-                                value={field.value as string}
-                                name={field.name}
-                                onChange={field.onChange}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="CC_DONE_TIME"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="capitalize">Cnee</FormLabel>
-                            <FormControl>
-                              <Cnee className="flex-1" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="CC_DONE_TIME"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="capitalize">
-                              Vendor name
-                            </FormLabel>
-                            <FormControl>
-                              <Input />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="CC_DONE_TIME"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="capitalize">
-                              Incoterms
-                            </FormLabel>
-                            <FormControl>
-                              <Incoterms></Incoterms>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="CC_DONE_TIME"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="capitalize">
-                              Invoice No
-                            </FormLabel>
-                            <FormControl>
-                              <Input />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="CC_DONE_TIME"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="capitalize">
-                              Item code
-                            </FormLabel>
-                            <FormControl>
-                              <Input />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="CC_DONE_TIME"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="capitalize">
-                              Q'of PLT
-                            </FormLabel>
-                            <FormControl>
-                              <Input />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      {index !== form.watch('BLDATA')?.length - 1 ? (
-                        <Button
-                          variant="outline"
-                          className="absolute bottom-0 right-0 px-3"
-                          onClick={AddNewBldata}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          className="absolute bottom-0 right-0 px-3"
-                          onClick={() => RemoveBldata(index)}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </TabsContent>
-                <TabsContent value="route">
-                  Change your password here.
-                </TabsContent>
-              </Tabs>
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="absolute bottom-0 right-0 px-3"
+                      onClick={() => RemoveBldata(index)}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
             </div>
           </form>
         </Form>

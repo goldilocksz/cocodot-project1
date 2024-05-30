@@ -17,6 +17,7 @@ import request from '@/utils/request'
 import Loading from '@/components/ui/loading'
 import SearchLine from '@/components/form/SearchLine'
 import OrderControl from '@/components/dialog/OrderControl'
+import Pagination from '@/components/pagination'
 
 export default function OrderView() {
   const [searchData, setSearchData] = useState<Order[]>([])
@@ -118,6 +119,16 @@ export default function OrderView() {
               ))}
           </TableBody>
         </Table>
+
+        <Pagination
+          totalPages={
+            orderList?.length
+              ? Math.ceil(orderList.length / parseInt(pageSize))
+              : 1
+          }
+          currentPage={page}
+          setCurrentPage={setPage}
+        />
       </Card>
 
       <OrderControl detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />

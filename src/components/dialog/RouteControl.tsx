@@ -102,7 +102,9 @@ export default function RouteControl({
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     UpdateRoute(value)
   }
-  const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
+  const formSchemaMap = Object.keys(
+    omit(formSchema.shape, ['LATITUDE', 'LONGITUDE']),
+  ) as FormKeys[]
 
   return (
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
@@ -127,11 +129,9 @@ export default function RouteControl({
                     <FormLabel className="capitalize">
                       {key.replace(/_/g, ' ').toLowerCase()}
                       {/* @ts-ignore */}
-                      {formSchema.shape[key]?.min &&
-                        key !== 'LATITUDE' &&
-                        key !== 'LONGITUDE' && (
-                          <span className="ml-1 text-destructive">*</span>
-                        )}
+                      {formSchema.shape[key]?.min && (
+                        <span className="ml-1 text-destructive">*</span>
+                      )}
                     </FormLabel>
                     <FormControl>
                       {key === 'NATION_CD' ? (

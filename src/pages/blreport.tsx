@@ -31,7 +31,7 @@ export default function BlReportView() {
       const { data }: { data: TrReport[] } = await request.post(
         '/report/getBLReport',
         {
-          JOB_FRM: dayjs().subtract(1, 'month').format('YYYYMMDD'),
+          JOB_FORM: dayjs().subtract(1, 'month').format('YYYYMMDD'),
           JOB_TO: dayjs().format('YYYYMMDD'),
         },
       )
@@ -73,12 +73,6 @@ export default function BlReportView() {
       </div>
 
       <Card className="relative mt-6 p-6">
-        {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
-            <Loader2 className="h-10 w-10 animate-spin" />
-          </div>
-        )}
-
         <ReportSearch setIsLoading={setIsLoading} setList={setList} />
 
         <Table className="mt-6 min-w-[1280px]">

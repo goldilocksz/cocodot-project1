@@ -26,7 +26,7 @@ export default function TrReportView() {
       const { data }: { data: TrReport[] } = await request.post(
         '/report/getTRReport',
         {
-          JOB_FRM: dayjs().subtract(1, 'month').format('YYYYMMDD'),
+          JOB_FORM: dayjs().subtract(1, 'month').format('YYYYMMDD'),
           JOB_TO: dayjs().format('YYYYMMDD'),
         },
       )
