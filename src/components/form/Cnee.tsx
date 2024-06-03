@@ -17,13 +17,9 @@ const CneeSelect = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <Select ref={ref} className={className} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Cnee?.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
-          <option
-            key={item.DT_CODE}
-            value={item.DT_CODE}
-            data-name={item.LOC_VALUE}
-          >
-            {item.LOC_VALUE}
+        {Cnee?.map((item: { CNEE_CODE: string; CNEE_NAME: string }) => (
+          <option key={item.CNEE_CODE} value={item.CNEE_CODE}>
+            {item.CNEE_NAME}
           </option>
         ))}
       </Select>
