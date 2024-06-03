@@ -3,12 +3,12 @@ import { Select, SelectProps } from '../ui/select'
 import { forwardRef } from 'react'
 import request from '@/utils/request'
 
-const CneeSelect = forwardRef<HTMLSelectElement, SelectProps>(
+const ClientCode = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, type, ...props }, ref) => {
     const { data: Cnee, isPending } = useQuery({
-      queryKey: ['getCnee'],
+      queryKey: ['getClientCode'],
       queryFn: async () => {
-        const { data } = await request.post('/webCommon/getCnee', {})
+        const { data } = await request.post('/webCommon/getClient', {})
         return data
       },
       staleTime: 1000 * 60 * 60,
@@ -17,13 +17,9 @@ const CneeSelect = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <Select ref={ref} className={className} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Cnee?.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
-          <option
-            key={item.DT_CODE}
-            value={item.DT_CODE}
-            data-name={item.LOC_VALUE}
-          >
-            {item.LOC_VALUE}
+        {Cnee?.map((item: { CLIENT_CODE: string; CLIENT_NAME: string }) => (
+          <option key={item.CLIENT_CODE} value={item.CLIENT_NAME}>
+            {item.CLIENT_NAME}
           </option>
         ))}
       </Select>
@@ -31,4 +27,4 @@ const CneeSelect = forwardRef<HTMLSelectElement, SelectProps>(
   },
 )
 
-export default CneeSelect
+export default ClientCode

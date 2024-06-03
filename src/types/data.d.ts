@@ -154,7 +154,7 @@ export interface Order {
   TO_LONGITUDE: string
   ETD: string
   POL: string
-  CC_DONE_TIME: Date
+  CC_DONE_TIME: string
   LEAD_TIME: string
   REGION_CODE: string
   REGION_NAME: string
@@ -163,10 +163,10 @@ export interface Order {
   STATUS: string
   REMARKS: string
   TIME_ZONE: string
-  ADD_DATE: Date
+  ADD_DATE: string
   ADD_USER_ID: string
   ADD_USER_NAME: string
-  UPDATE_DATE: Date
+  UPDATE_DATE: string
   UPDATE_USER_ID: string
   UPDATE_USER_NAME: string
   DT_COUNT: number

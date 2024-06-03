@@ -31,31 +31,20 @@ import NationCode from '../form/NationCode'
 import Cnee from '../form/Cnee'
 import { Switch } from '../ui/switch'
 import Incoterms from '../form/Incoterms'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import Pol from '../form/Pol'
-import TruckType from '../form/TruckType'
 import { Datepicker } from '../ui/datepicker'
+import RegionCode from '../form/RegionCode'
+import RouteMst from '../form/RouteMst'
+import TruckType from '../form/TruckType'
+import ClientCode from '../form/ClientCode'
+import LspCode from '../form/LspCode'
+import { DatepickerTime } from '../ui/datepicker-time'
 
 type Props = {
   detail: Order | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
 }
-/*{
-  "TR_NO": null,
-  "JOB_DATE": "20240506",
-  "FROM_ROUTE_CODE": "LS",
-  "FROM_TRUCK_NO": "GDL",
-  "TO_ROUTE_CODE": "PX",
-  "TO_TRUCK_NO": "GDL",
-  "ETD": "20240507",
-  "LEAD_TIME": "7Day 15hour",
-  "REGION_CODE": "NCN",
-  "REGION_NAME": "North CN",
-  "IMP_EXP": "IMP",
-  "ATA_BORDER": "2024-05-14 09:31:17.000",
-  "ATA_CNEE_FACTORY": "2024-05-14 10:31:17.000",
-}*/
 
 const formSchema = z.object({
   CLIENT_CODE: z.string().min(1, {
@@ -64,28 +53,56 @@ const formSchema = z.object({
   LSP_CD: z.string().min(1, {
     message: 'LSP code is required',
   }),
-  CC_DONE_TIME: z.date(),
+  ETD: z.string().min(1, {
+    message: 'ETD is required',
+  }),
+  TR_NO: z.string(),
+  JOB_DATE: z.string(),
+  FROM_ROUTE_CODE: z.string(),
+  FROM_TRUCK_NO: z.string(),
+  CN_TRUCK_TYPE: z.string().optional(),
+  TO_ROUTE_CODE: z.string(),
+  TO_TRUCK_NO: z.string(),
+  VN_TRUCK_TYPE: z.string().optional(),
+  URGENT: z.string(),
+  CC_DONE_TIME: z.string(),
   REGION_CODE: z.string().min(1, {
     message: 'Region code is required',
   }),
-  URGENT: z.boolean(),
+  REGION_NAME: z.string(),
   POL: z.string().min(1, {
     message: 'POL is required',
   }),
-  NATION_CODE: z.string(),
+  IMP_EXP: z.string(),
+  ATA_BORDER: z.string(),
+  ATA_CNEE_FACTORY: z.string(),
+  FROM_NATION_CD: z.string().optional(),
+  TO_NATION_CD: z.string().optional(),
   BLDATA: z.array(
     z.object({
-      TR_NO: z.string(),
-      BL_NO: z.string(),
-      CC_DONE_TIME: z.date(),
-      CNEE_CODE: z.string(),
-      CNEE_NAME: z.string(),
-      VENDOR_NAME: z.string(),
-      INCOTERMS: z.string(),
+      BL_NO: z.string().min(1, {
+        message: 'BL No is required',
+      }),
+      CNEE_CODE: z.string().min(1, {
+        message: 'Cnee code is required',
+      }),
+      CNEE_NAME: z.string().min(1, {
+        message: 'Cnee name is required',
+      }),
+      VENDOR_NAME: z.string().min(1, {
+        message: 'Vendor name is required',
+      }),
+      INCOTERMS: z.string().min(1, {
+        message: 'Incoterms is required',
+      }),
       INVOICE_NO: z.string(),
-      ITEM_CODE: z.string(),
       REF_INVOICE_NO: z.string(),
-      QTY: z.number(),
+      ITEM_CODE: z.string().min(1, {
+        message: 'Item code is required',
+      }),
+      QTY: z.number().min(1, {
+        message: 'Qty must be greater than 0',
+      }),
     }),
   ),
 })
@@ -95,27 +112,32 @@ const OrderDefault = {
   LSP_CD: '',
   ETD: '',
   FROM_ROUTE_CODE: '',
-  TO_ROUTE_CODE: '',
-  TR_NO: '',
-  CC_DONE_TIME: new Date(),
-  REGION_CODE: '',
-  POL: '',
   FROM_TRUCK_NO: '',
-  NATION_CODE: '',
-  URGENT: false,
+  TO_ROUTE_CODE: '',
+  TO_TRUCK_NO: '',
+  TR_NO: '',
+  JOB_DATE: '',
+  CC_DONE_TIME: '',
+  REGION_CODE: '',
+  REGION_NAME: '',
+  POL: '',
+  IMP_EXP: '',
+  ATA_BORDER: '',
+  ATA_CNEE_FACTORY: '',
+  URGENT: 'N',
+  FROM_NATION_CD: '',
+  TO_NATION_CD: '',
   BLDATA: [
     {
-      TR_NO: '',
       BL_NO: '',
-      CC_DONE_TIME: new Date(),
       CNEE_CODE: '',
       CNEE_NAME: '',
       VENDOR_NAME: '',
       INCOTERMS: '',
       INVOICE_NO: '',
-      ITEM_CODE: '',
       REF_INVOICE_NO: '',
-      QTY: 0,
+      ITEM_CODE: '',
+      QTY: 1,
     },
   ],
 }
@@ -130,14 +152,6 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
     queryKey: ['getBlInfo', detail?.TR_NO],
     queryFn: async () =>
       await request.post('/order/getOrderBLInfo', {
-        TR_NO: detail?.TR_NO,
-      }),
-  })
-
-  const { data: RouteInfo, isLoading: isGetRouteInfo } = useQuery<TrReport[]>({
-    queryKey: ['RouteInfo', detail?.TR_NO],
-    queryFn: async () =>
-      await request.post('/order/getOrderDT', {
         TR_NO: detail?.TR_NO,
       }),
   })
@@ -163,7 +177,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
 
   useEffect(() => {
     if (detail) {
-      form.reset({ ...detail, URGENT: detail.URGENT === 'Y' })
+      form.reset(detail)
     } else {
       form.reset(OrderDefault)
     }
@@ -184,14 +198,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
   }
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    console.log(
-      value.BLDATA.map((item) => ({
-        ...item,
-        CC_DONE_TIME: item.CC_DONE_TIME.toISOString(),
-      })),
-    )
-
-    // UpdateRoute(value)
+    UpdateRoute(value)
   }
 
   return (
@@ -217,7 +224,11 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    {detail ? (
+                      <Input {...field} readOnly className="bg-gray-100" />
+                    ) : (
+                      <ClientCode {...field} />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -229,11 +240,15 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    Lsp Code
+                    LSP
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    {detail ? (
+                      <Input {...field} readOnly className="bg-gray-100" />
+                    ) : (
+                      <LspCode {...field} />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -241,35 +256,23 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="URGENT"
+              name="TR_NO"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    {'Urgent'.replace(/_/g, ' ').toLowerCase()}
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel className="capitalize">TR No</FormLabel>
                   <FormControl>
-                    <div className="flex h-10 items-center">
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(check) => field.onChange(check)}
-                      />
-                    </div>
+                    <Input {...field} readOnly className="bg-gray-100" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="col-span-1"></div>
             <FormField
               control={form.control}
-              name="CC_DONE_TIME"
+              name="JOB_DATE"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    CC_DONE_TIME
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel>Job Date</FormLabel>
                   <FormControl>
                     <Datepicker
                       date={field.value}
@@ -280,17 +283,27 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                 </FormItem>
               )}
             />
-            {/* <FormField
+            <FormField
               control={form.control}
-              name="LSP_CODE"
+              name="FROM_ROUTE_CODE"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel className="capitalize">
-                    {'LSP_CODE'.replace(/_/g, ' ').toLowerCase()}
+                    From
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <TruckType />
+                    <RouteMst
+                      value={field.value}
+                      onChange={(e) => {
+                        field.onChange(e.target.value)
+                        form.setValue(
+                          'FROM_NATION_CD',
+                          e.target.options[e.target.selectedIndex].dataset
+                            .nation || '',
+                        )
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -298,20 +311,31 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
             />
             <FormField
               control={form.control}
-              name="LSP_CODE"
+              name="TO_ROUTE_CODE"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex-1">
                   <FormLabel className="capitalize">
-                    Tr No
+                    To
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <RouteMst
+                      value={field.value}
+                      onChange={(e) => {
+                        field.onChange(e.target.value)
+                        form.setValue(
+                          'TO_NATION_CD',
+                          e.target.options[e.target.selectedIndex].dataset
+                            .nation || '',
+                        )
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            /> */}
+            />
+
             <FormField
               control={form.control}
               name="CC_DONE_TIME"
@@ -331,49 +355,122 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                 </FormItem>
               )}
             />
-            {/* <FormField
+            <FormField
               control={form.control}
-              name="LSP_CODE"
+              name="ETD"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    {'LSP_CODE'.replace(/_/g, ' ').toLowerCase()}
+                    Pick up Date(ETD)
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Datepicker
+                      date={field.value}
+                      setDate={(date) => field.onChange(date)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            <div className="flex items-center gap-1">
+              <FormField
+                control={form.control}
+                name="FROM_TRUCK_NO"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="capitalize">
+                      From Truck No
+                      <span className="ml-1 text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <TruckType
+                        nationCode={form.watch('FROM_NATION_CD')}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.value)
+                          form.setValue(
+                            'CN_TRUCK_TYPE',
+                            e.target.options[e.target.selectedIndex].dataset
+                              .type || '',
+                          )
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="CN_TRUCK_TYPE"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="capitalize">Truck Type</FormLabel>
+                    <FormControl>
+                      <Input {...field} readOnly />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex items-center gap-1">
+              <FormField
+                control={form.control}
+                name="TO_TRUCK_NO"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="capitalize">
+                      To Truck No
+                      <span className="ml-1 text-destructive">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <TruckType
+                        nationCode={form.watch('TO_NATION_CD')}
+                        value={field.value}
+                        onChange={(e) => {
+                          field.onChange(e.target.value)
+                          form.setValue(
+                            'VN_TRUCK_TYPE',
+                            e.target.options[e.target.selectedIndex].dataset
+                              .type || '',
+                          )
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="VN_TRUCK_TYPE"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel className="capitalize">Truck Type</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="LSP_CODE"
+              name="REGION_CODE"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    {'LSP_CODE'.replace(/_/g, ' ').toLowerCase()}
+                    Region
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-            <FormField
-              control={form.control}
-              name="NATION_CODE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">
-                    Nation Code
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <NationCode />
+                    <RegionCode {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -385,170 +482,271 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    Pol
+                    POL
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Pol />
+                    <Pol {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="col-span-4">
+            <FormField
+              control={form.control}
+              name="IMP_EXP"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Imp Exp
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ATA_BORDER"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Ata Border
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <DatepickerTime
+                      date={field.value}
+                      setDate={(date) => field.onChange(date)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ATA_CNEE_FACTORY"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Ata Cnee Factory
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <DatepickerTime
+                      date={field.value}
+                      setDate={(date) => field.onChange(date)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="URGENT"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    {'Urgent'.replace(/_/g, ' ').toLowerCase()}
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <div className="flex h-10 items-center">
+                      <Switch
+                        checked={field.value === 'Y'}
+                        onCheckedChange={(check) => field.onChange(check)}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="relative col-span-4 mt-6 border-t pt-6">
               {isGetBlInfo && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
                   <Loader2 className="h-4 w-4 animate-spin" />
                 </div>
               )}
-              {form.watch('BLDATA')?.map((item, index) => (
-                <div
-                  key={index}
-                  className="relative col-span-4 grid grid-cols-9 gap-2 pr-12"
-                >
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.BL_NO`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">Bl No</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+              <div className="space-y-2">
+                {form.watch('BLDATA')?.map((item, index) => (
+                  <div key={index} className="relative col-span-4 flex gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.BL_NO`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            BL No
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.CNEE_CODE`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            CNEE
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Cnee
+                              className="w-[120px] shrink-0"
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(e.target.value)
+                                form.setValue(
+                                  `BLDATA.${index}.CNEE_NAME`,
+                                  e.target.options[e.target.selectedIndex]
+                                    .dataset.name || '',
+                                )
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.VENDOR_NAME`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Vendor Name
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.INCOTERMS`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Incoterms
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Incoterms
+                              className="w-[120px] shrink-0"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.INVOICE_NO`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Invoice No</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.REF_INVOICE_NO`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Ref Invoice No
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.ITEM_CODE`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Item Code
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`BLDATA.${index}.QTY`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Qty(PLT)
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <NumericFormat
+                              className="w-[80px]"
+                              customInput={Input}
+                              maxLength={2}
+                              isAllowed={(values) =>
+                                !values.formattedValue.includes('-')
+                              }
+                              value={field.value}
+                              onValueChange={(values) =>
+                                field.onChange(values.floatValue)
+                              }
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {index === 0 ? (
+                      <Button
+                        variant="outline"
+                        onClick={AddNewBldata}
+                        className="mt-8 self-start px-3"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        onClick={() => RemoveBldata(index)}
+                        className="mt-8 self-start px-3"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
                     )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.TR_NO`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">TR No</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.CC_DONE_TIME`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">
-                          CC Done Time
-                        </FormLabel>
-                        <FormControl>
-                          <Datepicker
-                            date={field.value}
-                            setDate={(date) => field.onChange(date)}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.CNEE_CODE`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">Cnee</FormLabel>
-                        <FormControl>
-                          <Cnee className="flex-1" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.VENDOR_NAME`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">
-                          Vendor name
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.INCOTERMS`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">Incoterms</FormLabel>
-                        <FormControl>
-                          <Incoterms {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.INVOICE_NO`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">Invoice No</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.ITEM_CODE`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">Item code</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`BLDATA.${index}.QTY`}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="capitalize">Q'of PLT</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {index === 0 ? (
-                    <Button
-                      variant="outline"
-                      className="absolute bottom-0 right-0 px-3"
-                      onClick={AddNewBldata}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="absolute bottom-0 right-0 px-3"
-                      onClick={() => RemoveBldata(index)}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </form>
         </Form>
