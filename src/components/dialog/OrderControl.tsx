@@ -751,8 +751,6 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
           </form>
         </Form>
 
-        <pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>
-
         <DialogFooter className="sm:justify-center">
           <Button type="submit" form="routeForm">
             {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
