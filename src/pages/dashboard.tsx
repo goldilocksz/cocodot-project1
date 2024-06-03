@@ -36,6 +36,8 @@ import { useQuery } from '@tanstack/react-query'
 import request from '@/utils/request'
 import { useState } from 'react'
 import { Monitoring as Monit } from '@/types/data'
+import { group, mapValues } from 'radash'
+import MultiBar from '@/components/chart/MultiBar'
 
 export default function DashboardView() {
   const [fromDate, setFromDate] = useState('20240501')
@@ -113,19 +115,21 @@ export default function DashboardView() {
     queryKey: ['getLeadTime'],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTime', {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate,
+        FROM_DATE: '20240224',
+        TO_DATE: '20240301',
       })
+      const routeGroup = group(response.data, (item: any) => item.ROUTE)
+      const titleGroup = group(response.data, (item: any) => item.TITLE)
 
-      return [
-        {
-          name: 'LeadTime',
-          data: response.data.map((item: any) => item.LEADTIME),
-          date: response.data.map((item: any) =>
-            dayjs(item.JOB_DATE).format('MM-DD'),
-          ),
-        },
-      ]
+      const data = {
+        labels: Object.keys(titleGroup).reverse(),
+        datasets: Object.values(routeGroup).map((item: any) => ({
+          name: item[0].ROUTE,
+          data: item.map((item: any) => item.READTIME),
+        })),
+      }
+
+      return data
     },
   })
 
@@ -245,90 +249,14 @@ export default function DashboardView() {
             <CardTitle>Lead Time(Border Passing)</CardTitle>
           </CardHeader>
           <CardContent>
-            LeadTimeAVG
-            {/* {LeadTimeAVG && <Chart data={LeadTimeAVG}></Chart>} */}
+            {LeadTime && <MultiBar data={LeadTime}></MultiBar>}
           </CardContent>
-          {/* <CardContent className="grid gap-8">
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/images/avatars/avatar_1.jpg" alt="Avatar" />
-                <AvatarFallback>OM</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  Olivia Martin
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  olivia.martin@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">$1,999</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/images/avatars/avatar_2.jpg" alt="Avatar" />
-                <AvatarFallback>JL</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">Jackson Lee</p>
-                <p className="text-sm text-muted-foreground">
-                  jackson.lee@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">$39</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/images/avatars/avatar_3.jpg" alt="Avatar" />
-                <AvatarFallback>IN</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  Isabella Nguyen
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  isabella.nguyen@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">$299</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/images/avatars/avatar_4.jpg" alt="Avatar" />
-                <AvatarFallback>WK</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">William Kim</p>
-                <p className="text-sm text-muted-foreground">will@email.com</p>
-              </div>
-              <div className="ml-auto font-medium">$99</div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/images/avatars/avatar_5.jpg" alt="Avatar" />
-                <AvatarFallback>SD</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">Sofia Davis</p>
-                <p className="text-sm text-muted-foreground">
-                  sofia.davis@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">$39</div>
-            </div>
-          </CardContent> */}
         </Card>
       </div>
       <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader className="flex flex-row items-center">
             <CardTitle>Delivery Leadtime by Regional</CardTitle>
-            <Button asChild size="sm" className="ml-auto gap-1">
-              <Link to="#">
-                View All
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </Button>
           </CardHeader>
           <CardContent>
             <Table>
@@ -386,16 +314,18 @@ export default function DashboardView() {
           </CardHeader>
           <CardContent>
             <Table>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell>DAY1</TableCell>
-                <TableCell>DAY2</TableCell>
-                <TableCell>DAY3</TableCell>
-                <TableCell>DAY4</TableCell>
-                <TableCell>DAY5</TableCell>
-                <TableCell>DAY6</TableCell>
-                <TableCell>DAY7</TableCell>
-              </TableRow>
+              <TableHeader>
+                <TableRow>
+                  <TableHead></TableHead>
+                  <TableHead>DAY1</TableHead>
+                  <TableHead>DAY2</TableHead>
+                  <TableHead>DAY3</TableHead>
+                  <TableHead>DAY4</TableHead>
+                  <TableHead>DAY5</TableHead>
+                  <TableHead>DAY6</TableHead>
+                  <TableHead>DAY7</TableHead>
+                </TableRow>
+              </TableHeader>
               <TableBody>
                 {ListOfProcessing?.map((item: any) => (
                   <TableRow key={item.id}>
@@ -427,7 +357,7 @@ export default function DashboardView() {
           </CardHeader>
           <CardContent className="flex flex-col gap-1">
             {Monitoring?.map((item) => (
-              <div key={item.id} className="border-b py-1">
+              <div key={item.id} className="border-b py-1 last:border-0">
                 <div className="flex items-start gap-1">
                   <div className="whitespace-nowrap">LSP:</div>
                   <div>{item.LSP_CD}</div>

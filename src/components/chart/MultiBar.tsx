@@ -1,20 +1,10 @@
 import Chart from 'react-apexcharts'
 
-type Data = {
-  name: string
-  data: number[]
-  date: string
-}
-interface Props {
-  data: Data[]
-}
-
-export default function ChartUI({ data }: Props) {
+export default function ChartUI({ data }: any) {
   return (
     <Chart
       options={{
         chart: {
-          stacked: true,
           toolbar: {
             show: false,
           },
@@ -30,6 +20,7 @@ export default function ChartUI({ data }: Props) {
         },
         colors: ['#2563eb', '#52525b', '#020617'],
         stroke: {
+          width: 1,
           lineCap: 'round',
           curve: 'smooth',
         },
@@ -51,7 +42,7 @@ export default function ChartUI({ data }: Props) {
               fontWeight: 400,
             },
           },
-          categories: data[0].date,
+          categories: data.labels,
         },
         yaxis: {
           labels: {
@@ -63,16 +54,6 @@ export default function ChartUI({ data }: Props) {
             },
           },
         },
-        grid: {
-          show: true,
-          borderColor: '#dddddd',
-          strokeDashArray: 3,
-          xaxis: {
-            lines: {
-              show: false,
-            },
-          },
-        },
         fill: {
           opacity: 0.8,
         },
@@ -80,7 +61,7 @@ export default function ChartUI({ data }: Props) {
           theme: 'dark',
         },
       }}
-      series={data}
+      series={data.datasets}
       type="bar"
       width="100%"
       height={350}

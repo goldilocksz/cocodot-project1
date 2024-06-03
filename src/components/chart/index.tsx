@@ -25,9 +25,6 @@ export default function ChartUI({ data }: Props) {
             speed: 1000,
           },
         },
-        dataLabels: {
-          enabled: false,
-        },
         colors: ['#2563eb', '#52525b', '#020617'],
         stroke: {
           lineCap: 'round',
