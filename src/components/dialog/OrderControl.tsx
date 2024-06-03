@@ -387,7 +387,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                     </FormLabel>
                     <FormControl>
                       <TruckType
-                        nationCode={form.watch('FROM_NATION_CD')}
+                        nationcode={form.watch('FROM_NATION_CD')}
                         value={field.value}
                         onChange={(e) => {
                           field.onChange(e.target.value)
@@ -429,7 +429,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                     </FormLabel>
                     <FormControl>
                       <TruckType
-                        nationCode={form.watch('TO_NATION_CD')}
+                        nationcode={form.watch('TO_NATION_CD')}
                         value={field.value}
                         onChange={(e) => {
                           field.onChange(e.target.value)
@@ -730,7 +730,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                     {index === 0 ? (
                       <Button
                         variant="outline"
-                        onClick={AddNewBldata}
+                        onClick={() => AddNewBldata()}
                         className="mt-8 self-start px-3"
                       >
                         <Plus className="h-4 w-4" />
@@ -750,6 +750,8 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
             </div>
           </form>
         </Form>
+
+        <pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>
 
         <DialogFooter className="sm:justify-center">
           <Button type="submit" form="routeForm">

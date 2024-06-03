@@ -6,21 +6,21 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  nationCode: string | undefined
+  nationcode: string | undefined
 }
 
 const TruckType = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, ...props }, ref) => {
     const { data: TruckTypeCode, isLoading } = useQuery({
-      queryKey: ['getTruckTypeCode', props.nationCode],
+      queryKey: ['getTruckTypeCode', props.nationcode],
       queryFn: async () => {
         const { data } = await request.post('/webCommon/getTrcuk', {
-          NATION_CD: props.nationCode,
+          NATION_CD: props.nationcode,
         })
         return data
       },
       staleTime: 1000 * 60 * 60,
-      enabled: !!props.nationCode,
+      enabled: !!props.nationcode,
     })
 
     return (
