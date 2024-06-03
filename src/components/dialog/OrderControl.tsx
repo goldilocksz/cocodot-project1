@@ -39,6 +39,7 @@ import TruckType from '../form/TruckType'
 import ClientCode from '../form/ClientCode'
 import LspCode from '../form/LspCode'
 import { DatepickerTime } from '../ui/datepicker-time'
+import { Label } from '../ui/label'
 
 type Props = {
   detail: Order | undefined
@@ -346,7 +347,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Datepicker
+                    <DatepickerTime
                       date={field.value}
                       setDate={(date) => field.onChange(date)}
                     />
@@ -403,19 +404,12 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="CN_TRUCK_TYPE"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="capitalize">Truck Type</FormLabel>
-                    <FormControl>
-                      <Input {...field} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="w-[90px]">
+                <Label>Truck Type</Label>
+                <div className="mt-2 h-10 rounded border px-3 py-2 text-sm">
+                  {form.watch('CN_TRUCK_TYPE')}
+                </div>
+              </div>
             </div>
             <div className="flex items-center gap-1">
               <FormField
@@ -445,21 +439,13 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="VN_TRUCK_TYPE"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel className="capitalize">Truck Type</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="w-[90px]">
+                <Label>Truck Type</Label>
+                <div className="mt-2 h-10 rounded border px-3 py-2 text-sm">
+                  {form.watch('VN_TRUCK_TYPE')}
+                </div>
+              </div>
             </div>
-
             <FormField
               control={form.control}
               name="REGION_CODE"

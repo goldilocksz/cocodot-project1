@@ -35,6 +35,7 @@ import { Select } from '@/components/ui/select'
 import { useQuery } from '@tanstack/react-query'
 import request from '@/utils/request'
 import { useState } from 'react'
+import { Monitoring as Monit } from '@/types/data'
 
 export default function DashboardView() {
   const [fromDate, setFromDate] = useState('20240501')
@@ -136,6 +137,17 @@ export default function DashboardView() {
         TO_DATE: toDate,
       })
 
+      return response.data.map((item: any, index: number) => ({
+        ...item,
+        id: index + 1,
+      }))
+    },
+  })
+
+  const { data: Monitoring } = useQuery<Monit[]>({
+    queryKey: ['getMonitoring'],
+    queryFn: async () => {
+      const response = await request.post('/monitoring/getMonitoring', {})
       return response.data.map((item: any, index: number) => ({
         ...item,
         id: index + 1,
@@ -413,7 +425,24 @@ export default function DashboardView() {
               </Link>
             </Button>
           </CardHeader>
-          <CardContent></CardContent>
+          <CardContent className="flex flex-col gap-1">
+            {Monitoring?.map((item) => (
+              <div key={item.id} className="border-b py-1">
+                <div className="flex items-start gap-1">
+                  <div className="whitespace-nowrap">LSP:</div>
+                  <div>{item.LSP_CD}</div>
+                </div>
+                <div className="flex items-start gap-1">
+                  <div className="whitespace-nowrap">Remarks:</div>
+                  <div>{item.REF_NO}</div>
+                </div>
+                <div className="flex items-start gap-1">
+                  <div className="whitespace-nowrap">Now Status:</div>
+                  <div>{item.NOW_STATUS}</div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
         </Card>
       </div>
     </>

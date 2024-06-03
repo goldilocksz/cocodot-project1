@@ -18,14 +18,14 @@ interface Props {
 
 export function DatepickerTime({ date, setDate }: Props) {
   const [time, setTime] = React.useState<string | undefined>(
-    date ? dayjs(date).format('HH:mm:ss') : '00:00',
+    date ? dayjs(date).format('HH:mm') : '00:00',
   )
   const [open, setOpen] = React.useState(false)
 
   return (
     <div className="grid gap-2">
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button
             id="date"
             variant={'outline'}
@@ -47,7 +47,7 @@ export function DatepickerTime({ date, setDate }: Props) {
           <Calendar
             initialFocus
             mode="single"
-            selected={date ? new Date(date) : undefined}
+            selected={date ? dayjs(date).toDate() : undefined}
             onSelect={(e) => setDate(dayjs(e).format('YYYY-MM-DD'))}
           />
           <div className="flex items-center gap-2 p-2">

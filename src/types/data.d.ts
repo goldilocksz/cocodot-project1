@@ -175,6 +175,7 @@ export interface Order {
 }
 
 export interface Monitoring {
+  id: number
   LSP_CD: string
   STATUS: string
   CNEE: string

@@ -21,7 +21,7 @@ export function Datepicker({ date, setDate }: Props) {
   return (
     <div className="grid gap-2">
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger>
+        <PopoverTrigger asChild>
           <Button
             id="date"
             variant={'outline'}
@@ -29,7 +29,6 @@ export function Datepicker({ date, setDate }: Props) {
               'w-full justify-start text-left font-normal',
               !date && 'text-muted-foreground',
             )}
-            onClick={() => setOpen(true)}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {!date ? (
@@ -43,10 +42,10 @@ export function Datepicker({ date, setDate }: Props) {
           <Calendar
             initialFocus
             mode="single"
-            selected={date ? new Date(date) : undefined}
+            selected={date ? dayjs(date, 'YYYYMMDD').toDate() : undefined}
             onSelect={(e) => {
               if (e) {
-                setDate(dayjs(e).format('YYYY-MM-DD'))
+                setDate(dayjs(e).format('YYYYMMDD'))
               }
               setOpen(false)
             }}
