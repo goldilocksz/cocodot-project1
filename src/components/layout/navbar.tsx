@@ -6,11 +6,12 @@ import {
   ChevronUp,
   Code,
   Database,
-  Home,
+  LayoutDashboard,
   Monitor,
   Route,
   ShoppingCart,
   Users,
+  Contact,
 } from 'lucide-react'
 
 import { useLocation } from 'react-router-dom'
@@ -20,7 +21,7 @@ import { Fragment, useState } from 'react'
 const Menu = [
   {
     name: 'Dashboard',
-    icon: Home,
+    icon: LayoutDashboard,
     href: '/',
   },
   {
@@ -32,6 +33,11 @@ const Menu = [
     name: 'Users',
     icon: Users,
     href: '/users',
+  },
+  {
+    name: 'Customer',
+    icon: Contact,
+    href: '/customer',
   },
   {
     name: 'Orders',

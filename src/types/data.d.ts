@@ -186,3 +186,22 @@ export interface Monitoring {
   CHECK_YN: string
   NOW_STATUS: string
 }
+
+export interface Customer {
+  id: string
+  UPDATE_USER_ID: string
+  CUSTOMER_NAME_ENG: string
+  TEL_NO: string
+  UPDATE_DATE: string
+  ADD_USER_ID: string
+  CUSTOMER_TYPE: string
+  ADD_USER_NAME: string
+  REMARKS: string
+  STATUS: string
+  FAX_NO: string
+  TIME_ZONE: string
+  CUSTOMER_NAME: string
+  ADD_DATE: string
+  CUSTOMER_CODE: string
+  UPDATE_USER_NAME: string
+}

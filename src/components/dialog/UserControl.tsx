@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { ReactNode, useEffect } from 'react'
+import { Control, FieldValues, Path, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -21,14 +21,48 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog'
-import { NumericFormat } from 'react-number-format'
 import { useMutation } from '@tanstack/react-query'
-import TruckType from '../form/TruckType'
 import NationCode from '../form/NationCode'
 import { User } from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/utils/request'
-import { Select } from '../ui/select'
+import { Switch } from '../ui/switch'
+import Customer from '../form/Customer'
+import DeptCodeSelect from '../form/DeptCode'
+import CommonTruckType from '../form/CommonTruckType'
+import UserLang from '../form/UserLang'
+
+interface FormFieldItemProps<T extends FieldValues> {
+  name: Path<T>
+  isRequired?: boolean
+  children: ReactNode
+  form: { control: Control<T> }
+}
+
+const FormFieldItem = <T extends FieldValues>({
+  name,
+  isRequired,
+  children,
+  form,
+}: FormFieldItemProps<T>) => {
+  return (
+    <FormField
+      key={name}
+      control={form.control}
+      name={name}
+      render={(_) => (
+        <FormItem>
+          <FormLabel className="capitalize">
+            {name.replace(/_/g, ' ').toLowerCase()}
+            {isRequired && <span className="ml-1 text-destructive">*</span>}
+          </FormLabel>
+          <FormControl>{children}</FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  )
+}
 
 type Props = {
   detail: User | undefined
@@ -113,9 +147,6 @@ const formSchema = z.object({
       message: 'Account Name must be less than 50 characters',
     })
     .optional(),
-  GRADE: z.string().min(1, {
-    message: 'Grade is required',
-  }),
 })
 type FormKeys = keyof z.infer<typeof formSchema>
 
@@ -131,24 +162,23 @@ type FormKeys = keyof z.infer<typeof formSchema>
 //     message: 'Remarks must be less than 100 characters',
 //   })
 //   .or(z.literal('')),
-export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
-  const defaultValues = {
-    USER_ID: '',
-    CUSTOMER_CODE: '',
-    PW: '',
-    USER_NAME: '',
-    DEPT_CODE: '',
-    TEL_NO: '',
-    EMAIL: '',
-    TRUCK_NO: '',
-    TRUCK_TYPE: '',
-    NATION_CD: '',
-    USE_YN: 'Y',
-    USER_LANG: 'EN',
-    ACCOUNT_NAME: '',
-    GRADE: '',
-  }
+const defaultValues = {
+  USER_ID: '',
+  CUSTOMER_CODE: '',
+  PW: '',
+  USER_NAME: '',
+  DEPT_CODE: '',
+  TEL_NO: '',
+  EMAIL: '',
+  TRUCK_NO: '',
+  TRUCK_TYPE: '',
+  NATION_CD: '',
+  USE_YN: 'Y',
+  USER_LANG: '',
+  ACCOUNT_NAME: '',
+}
 
+export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -163,7 +193,6 @@ export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
         toast.error('Failed to update user information')
       } else {
         setIsOpen(false)
-        window.location.reload()
       }
     },
   })
@@ -177,19 +206,16 @@ export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
   }, [isOpen, detail])
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
+    console.log(value)
+
     UpdateUser(value)
   }
-  const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
-
   return (
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>{detail ? 'Edit' : 'Add'} User Information</DialogTitle>
           <DialogDescription>Shipping information</DialogDescription>
-          {/* <div>
-            <pre>{JSON.stringify(form.formState.errors, null, 2)}</pre>
-          </div> */}
         </DialogHeader>
         <Form {...form}>
           <form
@@ -197,50 +223,54 @@ export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
             onSubmit={form.handleSubmit(onSubmit)}
             className="relative grid grid-cols-2 gap-4"
           >
-            {formSchemaMap.map((key: FormKeys) => (
-              <FormField
-                key={key}
-                control={form.control}
-                name={key}
-                render={({ field: { ref, ...field } }) => (
-                  <FormItem>
-                    <FormLabel className="capitalize">
-                      {key.replace(/_/g, ' ').toLowerCase()}
-                      {/* @ts-ignore */}
-                      {formSchema.shape[key]?.min && (
-                        <span className="ml-1 text-destructive">*</span>
-                      )}
-                    </FormLabel>
-                    <FormControl>
-                      {key === 'TRUCK_TYPE' ? (
-                        <TruckType {...field} />
-                      ) : key === 'NATION_CD' ? (
-                        <NationCode {...field} />
-                      ) : key === 'USE_YN' ? (
-                        <Select {...field}>
-                          <option value="y">Y</option>
-                          <option value="n">N</option>
-                        </Select>
-                      ) : key === 'USER_LANG' ? (
-                        <Select {...field}>
-                          <option value="en">EN</option>
-                          <option value="ko">KO</option>
-                        </Select>
-                      ) : key === 'GRADE' ? (
-                        <NumericFormat
-                          customInput={Input}
-                          getInputRef={ref}
-                          {...field}
-                        />
-                      ) : (
-                        <Input {...field} />
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <FormFieldItem form={form} name="USER_ID" isRequired>
+              <Input {...form.register('USER_ID')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="PW">
+              <Input {...form.register('PW')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="CUSTOMER_CODE" isRequired>
+              <Customer {...form.register('CUSTOMER_CODE')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="DEPT_CODE" isRequired>
+              <DeptCodeSelect
+                CUSTOMER_CODE={form.watch('CUSTOMER_CODE')}
+                {...form.register('DEPT_CODE')}
               />
-            ))}
+            </FormFieldItem>
+            <FormFieldItem form={form} name="USER_NAME" isRequired>
+              <Input {...form.register('USER_NAME')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="ACCOUNT_NAME">
+              <Input {...form.register('ACCOUNT_NAME')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="TEL_NO" isRequired>
+              <Input {...form.register('TEL_NO')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="EMAIL" isRequired>
+              <Input {...form.register('EMAIL')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="NATION_CD" isRequired>
+              <NationCode {...form.register('NATION_CD')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="TRUCK_NO" isRequired>
+              <Input {...form.register('TRUCK_NO')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="TRUCK_TYPE">
+              <CommonTruckType {...form.register('TRUCK_TYPE')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="USER_LANG" isRequired>
+              <UserLang {...form.register('USER_LANG')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="USE_YN">
+              <Switch
+                checked={form.watch('USE_YN') === 'Y'}
+                onCheckedChange={(check) =>
+                  form.setValue('USE_YN', check ? 'Y' : 'N')
+                }
+                className="!mt-4 block"
+              />
+            </FormFieldItem>
           </form>
         </Form>
         <DialogFooter className="sm:justify-center">

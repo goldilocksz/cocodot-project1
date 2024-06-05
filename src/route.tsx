@@ -11,6 +11,7 @@ import TrReport from '@/pages/trreport'
 import BlReport from '@/pages/blreport'
 import Common from '@/pages/common'
 import RouteCom from '@/pages/route'
+import Customer from '@/pages/customer'
 
 import NotFound from '@/pages/not-found'
 
@@ -28,6 +29,7 @@ export default function AppRoute() {
           <Route path="/blreport" element={<BlReport />}></Route>
           <Route path="/common" element={<Common />}></Route>
           <Route path="/route" element={<RouteCom />}></Route>
+          <Route path="/customer" element={<Customer />}></Route>
         </Route>
       </Route>
       <Route path="*" element={<NotFound />}></Route>
