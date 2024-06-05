@@ -63,9 +63,9 @@ const formSchema = z.object({
   FROM_TRUCK_NO: z.string(),
   CN_TRUCK_TYPE: z.string().optional(),
   TO_ROUTE_CODE: z.string(),
-  TO_TRUCK_NO: z.string(),
+  TO_TRUCK_NO: z.string().optional(),
   VN_TRUCK_TYPE: z.string().optional(),
-  URGENT: z.string(),
+  URGENT: z.string().optional(),
   CC_DONE_TIME: z.string().optional(),
   REGION_CODE: z.string().min(1, {
     message: 'Region code is required',
@@ -413,10 +413,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                 name="TO_TRUCK_NO"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="capitalize">
-                      To Truck No
-                      <span className="ml-1 text-destructive">*</span>
-                    </FormLabel>
+                    <FormLabel className="capitalize">To Truck No</FormLabel>
                     <FormControl>
                       <TruckType
                         nationcode={form.watch('TO_NATION_CD')}
@@ -532,7 +529,6 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                 <FormItem>
                   <FormLabel className="capitalize">
                     {'Urgent'.replace(/_/g, ' ').toLowerCase()}
-                    <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
                     <div className="flex h-10 items-center">
