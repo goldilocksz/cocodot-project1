@@ -66,7 +66,7 @@ const formSchema = z.object({
   TO_TRUCK_NO: z.string(),
   VN_TRUCK_TYPE: z.string().optional(),
   URGENT: z.string(),
-  CC_DONE_TIME: z.string(),
+  CC_DONE_TIME: z.string().optional(),
   REGION_CODE: z.string().min(1, {
     message: 'Region code is required',
   }),
@@ -74,9 +74,9 @@ const formSchema = z.object({
   POL: z.string().min(1, {
     message: 'POL is required',
   }),
-  IMP_EXP: z.string(),
-  ATA_BORDER: z.string(),
-  ATA_CNEE_FACTORY: z.string(),
+  IMP_EXP: z.string().optional(),
+  ATA_BORDER: z.string().optional(),
+  ATA_CNEE_FACTORY: z.string().optional(),
   FROM_NATION_CD: z.string().optional(),
   TO_NATION_CD: z.string().optional(),
   BLDATA: z.array(
@@ -122,7 +122,7 @@ const OrderDefault = {
   REGION_CODE: '',
   REGION_NAME: '',
   POL: '',
-  IMP_EXP: '',
+  IMP_EXP: 'IMP',
   ATA_BORDER: '',
   ATA_CNEE_FACTORY: '',
   URGENT: 'N',
@@ -226,7 +226,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                   </FormLabel>
                   <FormControl>
                     {detail ? (
-                      <Input {...field} readOnly className="bg-gray-100" />
+                      <Input {...field} className="bg-gray-100" />
                     ) : (
                       <ClientCode {...field} />
                     )}
@@ -246,7 +246,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                   </FormLabel>
                   <FormControl>
                     {detail ? (
-                      <Input {...field} readOnly className="bg-gray-100" />
+                      <Input {...field} className="bg-gray-100" />
                     ) : (
                       <LspCode {...field} />
                     )}
@@ -342,13 +342,10 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               name="CC_DONE_TIME"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    Cc done time
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel className="capitalize">Cc done time</FormLabel>
                   <FormControl>
                     <DatepickerTime
-                      date={field.value}
+                      date={field.value || ''}
                       setDate={(date) => field.onChange(date)}
                     />
                   </FormControl>
@@ -363,7 +360,6 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                 <FormItem>
                   <FormLabel className="capitalize">
                     Pick up Date(ETD)
-                    <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
                     <Datepicker
@@ -484,11 +480,14 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">
-                    Imp Exp
+                    IMP EXP
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Select className="justify-self-end" {...field}>
+                      <option value="IMP">IMP</option>
+                      <option value="EXP">EXP</option>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -499,13 +498,10 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               name="ATA_BORDER"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    Ata Border
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel className="capitalize">Ata Border</FormLabel>
                   <FormControl>
                     <DatepickerTime
-                      date={field.value}
+                      date={field.value || ''}
                       setDate={(date) => field.onChange(date)}
                     />
                   </FormControl>
@@ -518,13 +514,10 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               name="ATA_CNEE_FACTORY"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    Ata Cnee Factory
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel className="capitalize">Ata Cnee Factory</FormLabel>
                   <FormControl>
                     <DatepickerTime
-                      date={field.value}
+                      date={field.value || ''}
                       setDate={(date) => field.onChange(date)}
                     />
                   </FormControl>

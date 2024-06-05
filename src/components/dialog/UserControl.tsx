@@ -53,7 +53,7 @@ const FormFieldItem = <T extends FieldValues>({
       render={(_) => (
         <FormItem>
           <FormLabel className="capitalize">
-            {name.replace(/_/g, ' ').toLowerCase()}
+            {name.includes('_') ? name.replace(/_/g, ' ').toLowerCase() : name}
             {isRequired && <span className="ml-1 text-destructive">*</span>}
           </FormLabel>
           <FormControl>{children}</FormControl>
@@ -68,6 +68,7 @@ type Props = {
   detail: User | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  refetch: () => void
 }
 
 const formSchema = z.object({
@@ -112,17 +113,7 @@ const formSchema = z.object({
     .max(20, {
       message: 'Tel No must be less than 20 characters',
     }),
-  EMAIL: z
-    .string()
-    .min(1, {
-      message: 'Email is required',
-    })
-    .max(50, {
-      message: 'Email must be less than 50 characters',
-    })
-    .email({
-      message: 'Invalid email',
-    }),
+  EMAIL: z.string().optional(),
   TRUCK_NO: z
     .string()
     .max(10, {
@@ -148,20 +139,7 @@ const formSchema = z.object({
     })
     .optional(),
 })
-type FormKeys = keyof z.infer<typeof formSchema>
 
-// STATUS: z.string().min(1, {
-//   message: 'Status is required',
-// }),
-// REMARKS: z
-//   .string()
-//   .min(1, {
-//     message: 'Remarks is required',
-//   })
-//   .max(100, {
-//     message: 'Remarks must be less than 100 characters',
-//   })
-//   .or(z.literal('')),
 const defaultValues = {
   USER_ID: '',
   CUSTOMER_CODE: '',
@@ -178,7 +156,12 @@ const defaultValues = {
   ACCOUNT_NAME: '',
 }
 
-export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
+export default function UserControl({
+  detail,
+  isOpen,
+  setIsOpen,
+  refetch,
+}: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -193,6 +176,7 @@ export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
         toast.error('Failed to update user information')
       } else {
         setIsOpen(false)
+        refetch()
       }
     },
   })
@@ -247,7 +231,7 @@ export default function UserControl({ detail, isOpen, setIsOpen }: Props) {
             <FormFieldItem form={form} name="TEL_NO" isRequired>
               <Input {...form.register('TEL_NO')} />
             </FormFieldItem>
-            <FormFieldItem form={form} name="EMAIL" isRequired>
+            <FormFieldItem form={form} name="EMAIL">
               <Input {...form.register('EMAIL')} />
             </FormFieldItem>
             <FormFieldItem form={form} name="NATION_CD" isRequired>

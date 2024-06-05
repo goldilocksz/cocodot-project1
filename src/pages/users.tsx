@@ -35,7 +35,12 @@ export default function UsersView() {
     }
   }, [isOpen])
 
-  const { data: userList, isPending } = useQuery<User[]>({
+  const {
+    data: userList,
+    isPending,
+    refetch,
+    isRefetching,
+  } = useQuery<User[]>({
     queryKey: ['getUserList'],
     queryFn: async () => {
       const { data } = await request.post('/user/getUserList', {})
@@ -107,7 +112,7 @@ export default function UsersView() {
 
   return (
     <section className="relative grow">
-      <Loading isLoading={isPending} />
+      <Loading isLoading={isPending || isRefetching} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Users</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
@@ -240,7 +245,12 @@ export default function UsersView() {
         />
       </Card>
 
-      <AddUserDialog detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <AddUserDialog
+        detail={detail}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        refetch={refetch}
+      />
       <ConfirmDialog
         title="Reset Password"
         desc={`Are you sure you want to reset password for user ${detail?.USER_NAME}`}

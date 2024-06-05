@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Order } from '@/types/data'
 import {
   Table,
@@ -52,6 +52,12 @@ export default function OrderView() {
       return filterList
     },
   })
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDetail(undefined)
+    }
+  }, [isOpen])
 
   return (
     <section className="relative grow">

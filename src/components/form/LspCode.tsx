@@ -17,9 +17,9 @@ const LspCode = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <Select ref={ref} className={className} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Cnee?.map((item: { CLIENT_CODE: string; CLIENT_NAME: string }) => (
-          <option key={item.CLIENT_CODE} value={item.CLIENT_NAME}>
-            {item.CLIENT_NAME}
+        {Cnee?.map((item: { LSP_CODE: string; LSP_NAME: string }) => (
+          <option key={item.LSP_CODE} value={item.LSP_NAME}>
+            {item.LSP_NAME}
           </option>
         ))}
       </Select>
