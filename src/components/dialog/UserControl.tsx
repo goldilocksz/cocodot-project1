@@ -34,6 +34,7 @@ import UserLang from '../form/UserLang'
 
 interface FormFieldItemProps<T extends FieldValues> {
   name: Path<T>
+  label?: string
   isRequired?: boolean
   children: ReactNode
   form: { control: Control<T> }
@@ -41,6 +42,7 @@ interface FormFieldItemProps<T extends FieldValues> {
 
 const FormFieldItem = <T extends FieldValues>({
   name,
+  label,
   isRequired,
   children,
   form,
@@ -53,7 +55,11 @@ const FormFieldItem = <T extends FieldValues>({
       render={(_) => (
         <FormItem>
           <FormLabel className="capitalize">
-            {name.includes('_') ? name.replace(/_/g, ' ').toLowerCase() : name}
+            {label
+              ? label
+              : name.includes('_')
+                ? name.replace(/_/g, ' ').toLowerCase()
+                : name}
             {isRequired && <span className="ml-1 text-destructive">*</span>}
           </FormLabel>
           <FormControl>{children}</FormControl>
@@ -246,7 +252,7 @@ export default function UserControl({
             <FormFieldItem form={form} name="USER_LANG" isRequired>
               <UserLang {...form.register('USER_LANG')} />
             </FormFieldItem>
-            <FormFieldItem form={form} name="USE_YN">
+            <FormFieldItem form={form} label="Use Y/N" name="USE_YN">
               <Switch
                 checked={form.watch('USE_YN') === 'Y'}
                 onCheckedChange={(check) =>
