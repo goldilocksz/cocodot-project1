@@ -27,6 +27,7 @@ export default function ChartUI({ data }: Props) {
         },
         colors: ['#2563eb', '#52525b', '#020617'],
         stroke: {
+          width: 1,
           lineCap: 'round',
           curve: 'smooth',
         },

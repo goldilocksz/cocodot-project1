@@ -495,7 +495,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               name="ATA_BORDER"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">Ata Border</FormLabel>
+                  <FormLabel className="capitalize">ETA Border</FormLabel>
                   <FormControl>
                     <DatepickerTime
                       date={field.value || ''}
@@ -511,7 +511,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               name="ATA_CNEE_FACTORY"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">Ata Cnee Factory</FormLabel>
+                  <FormLabel className="capitalize">ETA Cnee Factory</FormLabel>
                   <FormControl>
                     <DatepickerTime
                       date={field.value || ''}

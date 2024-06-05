@@ -66,16 +66,12 @@ export default function DashboardView() {
         {
           name: 'ATA_CNT',
           data: response.data.map((item: any) => item.ATA_CNT),
-          date: response.data.map((item: any) =>
-            dayjs(item.JOB_DATE).format('MM-DD'),
-          ),
+          date: response.data.map((item: any) => item.VIEW_DATE),
         },
         {
           name: 'ETD_CNT',
           data: response.data.map((item: any) => item.ETD_CNT),
-          date: response.data.map((item: any) =>
-            dayjs(item.JOB_DATE).format('MM-DD'),
-          ),
+          date: response.data.map((item: any) => item.VIEW_DATE),
         },
       ]
     },

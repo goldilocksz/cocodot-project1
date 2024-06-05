@@ -18,7 +18,7 @@ const RegionCode = forwardRef<HTMLSelectElement, SelectProps>(
 
     return (
       <Select ref={ref} {...props}>
-        {isPending && <option>Loading...</option>}
+        {isPending ? <option>Loading...</option> : <option>Select</option>}
         {NationCode?.map(
           (item: {
             DT_CODE: string
