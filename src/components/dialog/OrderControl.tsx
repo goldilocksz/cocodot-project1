@@ -202,7 +202,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
       <DialogContent className="max-w-6xl">
         <DialogHeader>
-          <DialogTitle>{detail ? 'Edit' : 'Add'} Route Information</DialogTitle>
+          <DialogTitle>{detail ? 'Edit' : 'Add'} Order Information</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
