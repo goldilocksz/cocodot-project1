@@ -97,13 +97,9 @@ const formSchema = z.object({
         message: 'Incoterms is required',
       }),
       INVOICE_NO: z.string(),
-      REF_INVOICE_NO: z.string(),
-      ITEM_CODE: z.string().min(1, {
-        message: 'Item code is required',
-      }),
-      QTY: z.number().min(1, {
-        message: 'Qty must be greater than 0',
-      }),
+      REF_INVOICE_NO: z.string().optional(),
+      ITEM_CODE: z.string().optional(),
+      QTY: z.number().optional(),
     }),
   ),
 })
@@ -648,10 +644,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                       name={`BLDATA.${index}.REF_INVOICE_NO`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            Ref Invoice No
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
+                          <FormLabel>Ref Invoice No</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -664,10 +657,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                       name={`BLDATA.${index}.ITEM_CODE`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            Item Code
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
+                          <FormLabel>Item Code</FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -680,10 +670,7 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                       name={`BLDATA.${index}.QTY`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>
-                            Qty(PLT)
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
+                          <FormLabel>Qty(PLT)</FormLabel>
                           <FormControl>
                             <NumericFormat
                               className="w-[80px]"
