@@ -11,6 +11,7 @@ request.interceptors.request.use(
     const jwt = localStorage.getItem('token')
     if (jwt) {
       config.headers.Authorization = `Bearer ${jwt}`
+      config.headers.async
     }
     return config
   },

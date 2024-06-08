@@ -38,29 +38,56 @@ import { useState } from 'react'
 import { Monitoring as Monit } from '@/types/data'
 import { group, mapValues } from 'radash'
 import MultiBar from '@/components/chart/MultiBar'
+import Cnee from '@/components/form/Cnee'
+import { DatepickerRange } from '@/components/ui/datepicker-range'
+import { endOfWeek, format, startOfWeek } from 'date-fns'
+import Loading from '@/components/ui/loading'
 
 export default function DashboardView() {
   const [fromDate, setFromDate] = useState('20240501')
   const [toDate, setToDate] = useState('20240507')
+  const [progressRangeDate, setProgressRangeDate] = useState<
+    | {
+        from: Date
+        to: Date
+      }
+    | undefined
+  >({
+    from: startOfWeek(new Date()),
+    to: endOfWeek(new Date()),
+  })
 
-  const { data: Count } = useQuery({
-    queryKey: ['getMainCount'],
+  const {
+    data: Count,
+    isLoading: isGetCount,
+    isRefetching: isRefetchingCount,
+  } = useQuery({
+    queryKey: ['getMainCount', progressRangeDate],
     queryFn: async () => {
       const response = await request.post('/monitoring/getMainCount', {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate,
+        FROM_DATE:
+          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+        TO_DATE:
+          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
       })
 
       return response.data[0]
     },
+    enabled: !!progressRangeDate,
   })
 
-  const { data: Progress } = useQuery({
-    queryKey: ['getRateOfProgress'],
+  const {
+    data: Progress,
+    isLoading: isGetProgress,
+    isRefetching: isRefetchProgress,
+  } = useQuery({
+    queryKey: ['getRateOfProgress', progressRangeDate],
     queryFn: async () => {
       const response = await request.post('/monitoring/getRateOfProgress', {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate,
+        FROM_DATE:
+          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+        TO_DATE:
+          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
       })
       return [
         {
@@ -75,14 +102,21 @@ export default function DashboardView() {
         },
       ]
     },
+    enabled: !!progressRangeDate,
   })
 
-  const { data: Delivery } = useQuery({
-    queryKey: ['getDelivery'],
+  const {
+    data: Delivery,
+    isLoading: isGetDelivery,
+    isRefetching: isRefetchDelivery,
+  } = useQuery({
+    queryKey: ['getDelivery', progressRangeDate],
     queryFn: async () => {
       const response = await request.post('/monitoring/getDelivery', {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate,
+        FROM_DATE:
+          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+        TO_DATE:
+          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
       })
 
       return response.data.map((item: any, index: number) => ({
@@ -90,14 +124,21 @@ export default function DashboardView() {
         id: index + 1,
       }))
     },
+    enabled: !!progressRangeDate,
   })
 
-  const { data: LeadTimeAVG } = useQuery({
-    queryKey: ['getLeadTimeAVG'],
+  const {
+    data: LeadTimeAVG,
+    isLoading: isGetLeadTime,
+    isRefetching: isRefetchLeadTime,
+  } = useQuery({
+    queryKey: ['getLeadTimeAVG', progressRangeDate],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTimeAVG', {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate,
+        FROM_DATE:
+          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+        TO_DATE:
+          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
       })
 
       return response.data.map((item: any, index: number) => ({
@@ -105,14 +146,17 @@ export default function DashboardView() {
         id: index + 1,
       }))
     },
+    enabled: !!progressRangeDate,
   })
 
   const { data: LeadTime } = useQuery({
-    queryKey: ['getLeadTime'],
+    queryKey: ['getLeadTime', progressRangeDate],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTime', {
-        FROM_DATE: '20240224',
-        TO_DATE: '20240301',
+        FROM_DATE:
+          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+        TO_DATE:
+          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
       })
       const routeGroup = group(response.data, (item: any) => item.ROUTE)
       const titleGroup = group(response.data, (item: any) => item.TITLE)
@@ -127,14 +171,21 @@ export default function DashboardView() {
 
       return data
     },
+    enabled: !!progressRangeDate,
   })
 
-  const { data: ListOfProcessing } = useQuery({
-    queryKey: ['getListOfProcessing'],
+  const {
+    data: ListOfProcessing,
+    isLoading: isGetListOfProcessing,
+    isRefetching: isRefetchingListOfProcessing,
+  } = useQuery({
+    queryKey: ['getListOfProcessing', progressRangeDate],
     queryFn: async () => {
       const response = await request.post('/monitoring/getListOfProcessing', {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate,
+        FROM_DATE:
+          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+        TO_DATE:
+          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
       })
 
       return response.data.map((item: any, index: number) => ({
@@ -142,9 +193,14 @@ export default function DashboardView() {
         id: index + 1,
       }))
     },
+    enabled: !!progressRangeDate,
   })
 
-  const { data: Monitoring } = useQuery<Monit[]>({
+  const {
+    data: Monitoring,
+    isLoading: isGetMonitoring,
+    isRefetching: isRefetchMonitoring,
+  } = useQuery<Monit[]>({
     queryKey: ['getMonitoring'],
     queryFn: async () => {
       const response = await request.post('/monitoring/getMonitoring', {})
@@ -157,27 +213,26 @@ export default function DashboardView() {
 
   return (
     <>
-      <div className="grid grid-cols-2 items-center justify-start gap-2 lg:flex lg:justify-end lg:gap-6">
+      <div className="grid grid-cols-2 items-center justify-start gap-2 lg:flex lg:justify-end lg:gap-4">
         <div className="flex items-center gap-2">
           <Label htmlFor="airplane-mode" className="cursor-pointer">
             Auto Refetch
           </Label>
           <Switch id="airplane-mode" checked={true} />
         </div>
-        <Select className="w-[120px] justify-self-end">
-          <option value="10">10 minutes</option>
-        </Select>
-        <div className="col-span-2">
-          <span className="text-sm text-muted-foreground">Last UpdatedAt:</span>{' '}
-          <span>{dayjs(new Date()).format('YYYY-MM-DD hh:mm:ss')}</span>
-        </div>
+        <Cnee className="w-[100px]" />
+        <DatepickerRange
+          date={progressRangeDate}
+          setDate={setProgressRangeDate}
+        ></DatepickerRange>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Processing</CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="relative text-center">
+            <Loading isLoading={isGetCount || isRefetchingCount}></Loading>
             <div className="h-8 text-2xl font-bold">
               {Count && <CountUp duration={1} end={Count.PROCESSING} />}
             </div>
@@ -189,7 +244,8 @@ export default function DashboardView() {
               Ratio of ata border
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="relative text-center">
+            <Loading isLoading={isGetCount || isRefetchingCount}></Loading>
             <div className="h-8 text-2xl font-bold">
               {Count && <CountUp duration={1} end={Count.ATA_BORDER_CNT} />}
             </div>
@@ -204,7 +260,8 @@ export default function DashboardView() {
               Ratio of pass border
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="relative text-center">
+            <Loading isLoading={isGetCount || isRefetchingCount}></Loading>
             <div className="h-8 text-2xl font-bold">
               {Count && (
                 <CountUp duration={1} end={Count.PASS_BORDER_CNT}></CountUp>
@@ -221,7 +278,8 @@ export default function DashboardView() {
               Ratio of ata factory
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-center">
+          <CardContent className="relative text-center">
+            <Loading isLoading={isGetCount || isRefetchingCount}></Loading>
             <div className="h-8 text-2xl font-bold">
               {Count && <CountUp duration={1} end={Count.ATA_FACTORY_CNT} />}
             </div>
@@ -236,7 +294,8 @@ export default function DashboardView() {
           <CardHeader>
             <CardTitle>A Rate Of Progress</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative min-h-[400px]">
+            <Loading isLoading={isGetProgress || isRefetchProgress}></Loading>
             {Progress && <Chart data={Progress}></Chart>}
           </CardContent>
         </Card>
@@ -244,7 +303,8 @@ export default function DashboardView() {
           <CardHeader>
             <CardTitle>Lead Time(Border Passing)</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative min-h-[400px]">
+            <Loading isLoading={isGetDelivery || isRefetchDelivery}></Loading>
             {LeadTime && <MultiBar data={LeadTime}></MultiBar>}
           </CardContent>
         </Card>
@@ -254,7 +314,8 @@ export default function DashboardView() {
           <CardHeader className="flex flex-row items-center">
             <CardTitle>Delivery Leadtime by Regional</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
+            <Loading isLoading={isGetDelivery || isRefetchDelivery}></Loading>
             <Table>
               <TableHeader>
                 <TableRow className="whitespace-pre-line text-xs">
@@ -287,7 +348,8 @@ export default function DashboardView() {
           <CardHeader className="flex flex-row items-center">
             <CardTitle>ESTIMATED L/T(Border Passing)</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative">
+            <Loading isLoading={isGetLeadTime || isRefetchLeadTime}></Loading>
             {LeadTimeAVG?.map((item: any) => (
               <div
                 key={item.id}
@@ -308,10 +370,13 @@ export default function DashboardView() {
           <CardHeader className="flex flex-row items-center">
             <CardTitle>A list of progress</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Table>
+          <CardContent className="relative min-h-[300px]">
+            <Loading
+              isLoading={isGetListOfProcessing || isRefetchingListOfProcessing}
+            ></Loading>
+            <Table className="mt-2">
               <TableHeader>
-                <TableRow>
+                <TableRow className="[&>th]:text-center">
                   <TableHead></TableHead>
                   <TableHead>DAY1</TableHead>
                   <TableHead>DAY2</TableHead>
@@ -324,15 +389,60 @@ export default function DashboardView() {
               </TableHeader>
               <TableBody>
                 {ListOfProcessing?.map((item: any) => (
-                  <TableRow key={item.id}>
+                  <TableRow
+                    key={item.id}
+                    className="[&>td]:relative [&>td]:p-2 [&>td]:text-center"
+                  >
                     <TableCell>{item.LOC}</TableCell>
-                    <TableCell>{item.DAY1}</TableCell>
-                    <TableCell>{item.DAY2}</TableCell>
-                    <TableCell>{item.DAY3}</TableCell>
-                    <TableCell>{item.DAY4}</TableCell>
-                    <TableCell>{item.DAY5}</TableCell>
-                    <TableCell>{item.DAY6}</TableCell>
-                    <TableCell>{item.DAY7}</TableCell>
+                    <TableCell>
+                      <div
+                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                        style={{ width: `${item.DAY1}%` }}
+                      ></div>
+                      <div className="relative z-10">{item.DAY1}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div
+                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                        style={{ width: `${item.DAY2}%` }}
+                      ></div>
+                      <div className="relative z-10">{item.DAY2}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div
+                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                        style={{ width: `${item.DAY3}%` }}
+                      ></div>
+                      <div className="relative z-10">{item.DAY3}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div
+                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                        style={{ width: `${item.DAY4}%` }}
+                      ></div>
+                      <div className="relative z-10">{item.DAY4}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div
+                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                        style={{ width: `${item.DAY5}%` }}
+                      ></div>
+                      <div className="relative z-10">{item.DAY5}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div
+                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                        style={{ width: `${item.DAY6}%` }}
+                      ></div>
+                      <div className="relative z-10">{item.DAY6}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div
+                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                        style={{ width: `${item.DAY7}%` }}
+                      ></div>
+                      <div className="relative z-10">{item.DAY7}</div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -351,7 +461,10 @@ export default function DashboardView() {
               </Link>
             </Button>
           </CardHeader>
-          <CardContent className="flex flex-col gap-1">
+          <CardContent className="relative flex flex-col gap-1">
+            <Loading
+              isLoading={isGetMonitoring || isRefetchMonitoring}
+            ></Loading>
             {Monitoring?.map((item) => (
               <div key={item.id} className="border-b py-1 last:border-0">
                 <div className="flex items-start gap-1">

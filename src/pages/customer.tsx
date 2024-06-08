@@ -58,7 +58,7 @@ export default function customer() {
         <h1 className="text-lg font-semibold md:text-2xl">Customer</h1>
         <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
           <Plus className="h-4 w-4" />
-          Add Route
+          Add Customer
         </Button>
       </div>
 

@@ -1,5 +1,5 @@
-import * as React from 'react'
-import { subMonths, format } from 'date-fns'
+import { Dispatch, SetStateAction } from 'react'
+import { subMonths, format, startOfWeek, endOfWeek, isSameWeek } from 'date-fns'
 import { DateRange } from 'react-day-picker'
 
 import { cn } from '@/utils/utils'
@@ -11,10 +11,19 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { CalendarIcon } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Props {
-  date: DateRange
-  setDate?: (date: DateRange) => void
+  date?: DateRange
+  setDate: Dispatch<
+    SetStateAction<
+      | {
+          from: Date
+          to: Date
+        }
+      | undefined
+    >
+  >
 }
 
 export function DatepickerRange({ date, setDate }: Props) {
@@ -49,10 +58,31 @@ export function DatepickerRange({ date, setDate }: Props) {
           <Calendar
             initialFocus
             mode="range"
+            modifiers={{
+              selected: date as any,
+            }}
+            onDayClick={(day, modifiers) => {
+              if (modifiers.selected) {
+                setDate(undefined)
+                return
+              }
+              setDate({
+                from: startOfWeek(day),
+                to: endOfWeek(day),
+              })
+            }}
+            onWeekNumberClick={(weekNumber, dates) => {
+              if (date?.from && isSameWeek(dates[0], date.from)) {
+                setDate(undefined)
+                return
+              }
+              setDate({
+                from: startOfWeek(dates[0]),
+                to: endOfWeek(dates[dates.length - 1]),
+              })
+            }}
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate as any}
-            numberOfMonths={2}
           />
         </PopoverContent>
       </Popover>
