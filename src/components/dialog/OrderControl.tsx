@@ -147,13 +147,17 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
 
   const { data: BlInfo, isLoading: isGetBlInfo } = useQuery<any[]>({
     queryKey: ['getBlInfo', detail?.TR_NO],
-    queryFn: async () =>
-      await request.post('/order/getOrderBLInfo', {
+    queryFn: async () => {
+      const response = await request.post('/order/getOrderBLInfo', {
         TR_NO: detail?.TR_NO,
-      }),
+      })
+      return response.data
+    },
+    enabled: isOpen,
   })
 
   useEffect(() => {
+    console.log(BlInfo)
     if (BlInfo?.length) {
       form.setValue('BLDATA', BlInfo)
     } else {
@@ -530,7 +534,9 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                     <div className="flex h-10 items-center">
                       <Switch
                         checked={field.value === 'Y'}
-                        onCheckedChange={(check) => field.onChange(check)}
+                        onCheckedChange={(check) =>
+                          field.onChange(check ? 'Y' : 'N')
+                        }
                       />
                     </div>
                   </FormControl>
