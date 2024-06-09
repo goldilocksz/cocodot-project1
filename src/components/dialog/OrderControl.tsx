@@ -54,9 +54,7 @@ const formSchema = z.object({
   LSP_CD: z.string().min(1, {
     message: 'LSP code is required',
   }),
-  ETD: z.string().min(1, {
-    message: 'ETD is required',
-  }),
+  ETD: z.string().optional(),
   TR_NO: z.string(),
   JOB_DATE: z.string(),
   FROM_ROUTE_CODE: z.string(),
