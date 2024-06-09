@@ -1,13 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -16,45 +8,28 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  DollarSign,
-  Users,
-  CreditCard,
-  Activity,
-  ArrowUpRight,
-  ArrowUp,
-} from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CountUp from 'react-countup'
-import { Input } from '@/components/ui/input'
 import Chart from '@/components/chart'
 import dayjs from 'dayjs'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { Select } from '@/components/ui/select'
 import { useQuery } from '@tanstack/react-query'
 import request from '@/utils/request'
 import { useState } from 'react'
 import { Monitoring as Monit } from '@/types/data'
-import { group, mapValues } from 'radash'
+import { group } from 'radash'
 import MultiBar from '@/components/chart/MultiBar'
 import Cnee from '@/components/form/Cnee'
 import { DatepickerRange } from '@/components/ui/datepicker-range'
-import { endOfWeek, format, startOfWeek } from 'date-fns'
 import Loading from '@/components/ui/loading'
+import { DateRange } from 'react-day-picker'
 
 export default function DashboardView() {
-  const [fromDate, setFromDate] = useState('20240501')
-  const [toDate, setToDate] = useState('20240507')
-  const [progressRangeDate, setProgressRangeDate] = useState<
-    | {
-        from: Date
-        to: Date
-      }
-    | undefined
-  >({
-    from: startOfWeek(new Date()),
-    to: endOfWeek(new Date()),
+  const [progressRangeDate, setProgressRangeDate] = useState<DateRange>({
+    from: dayjs().subtract(6, 'day').toDate(),
+    to: new Date(),
   })
 
   const {
@@ -66,9 +41,11 @@ export default function DashboardView() {
     queryFn: async () => {
       const response = await request.post('/monitoring/getMainCount', {
         FROM_DATE:
-          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+          progressRangeDate?.from &&
+          dayjs(progressRangeDate.from).format('YYYYMMDD'),
         TO_DATE:
-          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
+          progressRangeDate?.to &&
+          dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
 
       return response.data[0]
@@ -85,9 +62,11 @@ export default function DashboardView() {
     queryFn: async () => {
       const response = await request.post('/monitoring/getRateOfProgress', {
         FROM_DATE:
-          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+          progressRangeDate?.from &&
+          dayjs(progressRangeDate.from).format('YYYYMMDD'),
         TO_DATE:
-          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
+          progressRangeDate?.to &&
+          dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
       return [
         {
@@ -114,9 +93,11 @@ export default function DashboardView() {
     queryFn: async () => {
       const response = await request.post('/monitoring/getDelivery', {
         FROM_DATE:
-          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+          progressRangeDate?.from &&
+          dayjs(progressRangeDate.from).format('YYYYMMDD'),
         TO_DATE:
-          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
+          progressRangeDate?.to &&
+          dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
 
       return response.data.map((item: any, index: number) => ({
@@ -136,9 +117,11 @@ export default function DashboardView() {
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTimeAVG', {
         FROM_DATE:
-          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+          progressRangeDate?.from &&
+          dayjs(progressRangeDate.from).format('YYYYMMDD'),
         TO_DATE:
-          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
+          progressRangeDate?.to &&
+          dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
 
       return response.data.map((item: any, index: number) => ({
@@ -154,9 +137,11 @@ export default function DashboardView() {
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTime', {
         FROM_DATE:
-          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+          progressRangeDate?.from &&
+          dayjs(progressRangeDate.from).format('YYYYMMDD'),
         TO_DATE:
-          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
+          progressRangeDate?.to &&
+          dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
       const routeGroup = group(response.data, (item: any) => item.ROUTE)
       const titleGroup = group(response.data, (item: any) => item.TITLE)
@@ -183,9 +168,11 @@ export default function DashboardView() {
     queryFn: async () => {
       const response = await request.post('/monitoring/getListOfProcessing', {
         FROM_DATE:
-          progressRangeDate?.from && format(progressRangeDate.from, 'yyyyMMdd'),
+          progressRangeDate?.from &&
+          dayjs(progressRangeDate.from).format('YYYYMMDD'),
         TO_DATE:
-          progressRangeDate?.to && format(progressRangeDate.to, 'yyyyMMdd'),
+          progressRangeDate?.to &&
+          dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
 
       return response.data.map((item: any, index: number) => ({

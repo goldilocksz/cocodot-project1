@@ -50,11 +50,11 @@ const Menu = [
     href: '#',
     subMenu: [
       {
-        name: 'Tr Report',
+        name: 'TR Report',
         href: '/trreport',
       },
       {
-        name: 'Bl Report',
+        name: 'B/L Report',
         href: '/blreport',
       },
     ],

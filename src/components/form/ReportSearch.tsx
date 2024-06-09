@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { Search as SearchIcon } from 'lucide-react'
 import { DatepickerRange } from '../ui/datepicker-range'
 import { Input } from '../ui/input'
 import { Switch } from '../ui/switch'
@@ -6,61 +6,44 @@ import { Label } from '../ui/label'
 import { Button } from '../ui/button'
 import CneeSelect from './Cnee'
 import { useForm } from 'react-hook-form'
-import { subMonths, format } from 'date-fns'
+import dayjs from 'dayjs'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useMutation } from '@tanstack/react-query'
 import request from '@/utils/request'
 import { TrReport } from '@/types/data'
+import { Search } from '@/pages/trreport'
+import { Dispatch } from 'react'
 
 export const formSchema = z.object({
+  JOB_FROM: z.string().optional(),
+  JOB_TO: z.string().optional(),
   TR_NO: z.string(),
   BL_NO: z.string(),
   CNEE_CODE: z.string(),
-  FROM_DATE: z.date().optional(),
-  TO_DATE: z.date().optional(),
-  URGENT: z.boolean(),
+  URGENT: z.string(),
 })
 
 interface Props {
-  setIsLoading: (value: boolean) => void
-  setList: (value: TrReport[]) => void
+  search: Search
+  setSearch: Dispatch<Partial<Search>>
 }
 
-export default function ReportSearch({ setIsLoading, setList }: Props) {
+export default function ReportSearch({ search, setSearch }: Props) {
   const { watch, setValue, register, handleSubmit } = useForm<
     z.infer<typeof formSchema>
   >({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      TR_NO: '',
-      BL_NO: '',
-      CNEE_CODE: '',
-      FROM_DATE: subMonths(new Date(), 1),
-      TO_DATE: new Date(),
-      URGENT: false,
-    },
-  })
-
-  const { mutate: search } = useMutation({
-    mutationFn: async (value: any) => {
-      setIsLoading(true)
-      const { data } = await request.post('/report/getTRReport', {
-        ...value,
-      })
-      setIsLoading(false)
-      setList(data)
-    },
+    defaultValues: search,
   })
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    search({
-      TR_NO: data.TR_NO,
-      BL_NO: data.BL_NO,
-      CNEE_CODE: data.CNEE_CODE,
-      JOB_FRM: data.FROM_DATE ? format(data.FROM_DATE, 'yyyyMMdd') : '',
-      JOB_TO: data.TO_DATE ? format(data.TO_DATE, 'yyyyMMdd') : '',
-      Urgent: data.URGENT ? 'Y' : 'N',
+    setSearch({
+      ...(data.JOB_FROM
+        ? { JOB_FROM: dayjs(data.JOB_FROM).format('YYYYMMDD') }
+        : {}),
+      ...(data.JOB_TO ? { JOB_TO: dayjs(data.JOB_TO).format('YYYYMMDD') } : {}),
+      ...data,
     })
   }
 
@@ -69,28 +52,27 @@ export default function ReportSearch({ setIsLoading, setList }: Props) {
       className="flex flex-wrap items-center gap-2"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Input className="w-[200px]" placeholder="TR_NO" {...register('TR_NO')} />
-      <Input className="w-[200px]" placeholder="BL_NO" {...register('BL_NO')} />
-      <CneeSelect className="w-[200px]" {...register('CNEE_CODE')} />
       <DatepickerRange
         date={{
-          from: watch('FROM_DATE'),
-          to: watch('TO_DATE'),
+          from: dayjs(watch('JOB_FROM')).toDate(),
+          to: dayjs(watch('JOB_TO')).toDate(),
         }}
         setDate={(date) => {
-          if (!date.from || !date.to) return
-          setValue('FROM_DATE', date.from)
-          setValue('TO_DATE', date.to)
+          setValue('JOB_FROM', dayjs(date.from).format('YYYYMMDD'))
+          setValue('JOB_TO', dayjs(date.to).format('YYYYMMDD'))
         }}
       />
+      <CneeSelect className="w-[200px]" {...register('CNEE_CODE')} />
+      <Input className="w-[200px]" placeholder="TR_NO" {...register('TR_NO')} />
+      <Input className="w-[200px]" placeholder="BL_NO" {...register('BL_NO')} />
       <Switch
         id="urgent"
-        checked={watch('URGENT')}
-        onCheckedChange={(value) => setValue('URGENT', value)}
+        checked={watch('URGENT') === 'Y'}
+        onCheckedChange={(value) => setValue('URGENT', value ? 'Y' : 'N')}
       ></Switch>
       <Label htmlFor="urgent">Urgent</Label>
       <Button type="submit">
-        <Search className="mr-1 h-4 w-4" />
+        <SearchIcon className="mr-1 h-4 w-4" />
         Search
       </Button>
     </form>

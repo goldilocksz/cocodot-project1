@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { TrReport } from '@/types/data'
 import ReportSearch from '@/components/form/ReportSearch'
@@ -18,16 +18,41 @@ import request from '@/utils/request'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '@/components/ui/loading'
 
+export interface Search {
+  JOB_FROM: string
+  JOB_TO: string
+  TR_NO: string
+  BL_NO: string
+  CNEE_CODE: string | undefined
+  URGENT: string
+}
+
 export default function TrReportView() {
   const [list, setList] = useState<TrReport[]>([])
-  const { data: TrReports, isPending } = useQuery<TrReport[]>({
-    queryKey: ['getTrReport'],
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState('10')
+  const [search, setSearch] = useReducer(
+    (state: Search, newState: Partial<Search>) => ({ ...state, ...newState }),
+    {
+      JOB_FROM: dayjs().subtract(6, 'day').format('YYYYMMDD'),
+      JOB_TO: dayjs().format('YYYYMMDD'),
+      TR_NO: '',
+      BL_NO: '',
+      CNEE_CODE: undefined,
+      URGENT: 'N',
+    },
+  )
+  const {
+    data: TrReports,
+    isLoading: isGetTrReports,
+    isRefetching: isRefetchTrReports,
+  } = useQuery<TrReport[]>({
+    queryKey: ['getTrReport', search],
     queryFn: async () => {
       const { data }: { data: TrReport[] } = await request.post(
         '/report/getTRReport',
         {
-          JOB_FORM: dayjs().subtract(1, 'month').format('YYYYMMDD'),
-          JOB_TO: dayjs().format('YYYYMMDD'),
+          ...search,
         },
       )
 
@@ -48,10 +73,6 @@ export default function TrReportView() {
     },
   })
 
-  const [page, setPage] = useState(1)
-  const [pageSize, setPageSize] = useState('10')
-  const [isLoading, setIsLoading] = useState(false)
-
   function downloadXlsx() {
     if (!TrReports?.length) return
     const workbook = XLSX.utils.book_new()
@@ -63,14 +84,14 @@ export default function TrReportView() {
 
   return (
     <section className="relative grow">
-      <Loading isLoading={isLoading || isPending} />
+      <Loading isLoading={isGetTrReports || isRefetchTrReports} />
       <div className="flex h-10 items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Tr Report</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">TR Report</h1>
         <Button onClick={() => downloadXlsx()}>Download</Button>
       </div>
 
       <Card className="mt-6 p-6">
-        <ReportSearch setList={setList} setIsLoading={setIsLoading} />
+        <ReportSearch search={search} setSearch={setSearch} />
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Auth, TrReport } from '@/types/data'
 import ReportSearch from '@/components/form/ReportSearch'
@@ -19,20 +19,42 @@ import request from '@/utils/request'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '@/components/ui/loading'
 
+export interface Search {
+  JOB_FROM: string
+  JOB_TO: string
+  TR_NO: string
+  BL_NO: string
+  CNEE_CODE: string | undefined
+  URGENT: string
+}
+
 export default function BlReportView() {
   const [list, setList] = useState<TrReport[]>()
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
-  const [isLoading, setIsLoading] = useState(false)
+  const [search, setSearch] = useReducer(
+    (state: Search, newState: Partial<Search>) => ({ ...state, ...newState }),
+    {
+      JOB_FROM: dayjs().subtract(6, 'day').format('YYYYMMDD'),
+      JOB_TO: dayjs().format('YYYYMMDD'),
+      TR_NO: '',
+      BL_NO: '',
+      CNEE_CODE: undefined,
+      URGENT: 'N',
+    },
+  )
 
-  const { data: BlReports, isPending } = useQuery<TrReport[]>({
-    queryKey: ['getBlReport', page, pageSize],
+  const {
+    data: BlReports,
+    isLoading: isGetBlReports,
+    isRefetching: isRefetchBlReports,
+  } = useQuery<TrReport[]>({
+    queryKey: ['getBlReport', page, pageSize, search],
     queryFn: async () => {
       const { data }: { data: TrReport[] } = await request.post(
         '/report/getBLReport',
         {
-          JOB_FORM: dayjs().subtract(1, 'month').format('YYYYMMDD'),
-          JOB_TO: dayjs().format('YYYYMMDD'),
+          ...search,
         },
       )
 
@@ -66,14 +88,14 @@ export default function BlReportView() {
 
   return (
     <section className="relative grow">
-      <Loading isLoading={isLoading || isPending} />
+      <Loading isLoading={isGetBlReports || isRefetchBlReports} />
       <div className="flex h-10 items-center justify-between">
-        <h1 className="text-lg font-semibold md:text-2xl">Bl Report</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">B/L Report</h1>
         <Button onClick={() => downloadXlsx()}>Download</Button>
       </div>
 
       <Card className="relative mt-6 p-6">
-        <ReportSearch setIsLoading={setIsLoading} setList={setList} />
+        <ReportSearch search={search} setSearch={setSearch} />
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
