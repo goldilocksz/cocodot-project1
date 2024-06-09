@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,18 +16,16 @@ import { Loader2, Minus, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog'
 import { NumericFormat } from 'react-number-format'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Auth, Order, TrReport } from '@/types/data'
+import { Order } from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/utils/request'
 import { Select } from '../ui/select'
-import NationCode from '../form/NationCode'
 import Cnee from '../form/Cnee'
 import { Switch } from '../ui/switch'
 import Incoterms from '../form/Incoterms'
@@ -40,6 +38,7 @@ import ClientCode from '../form/ClientCode'
 import LspCode from '../form/LspCode'
 import { DatepickerTime } from '../ui/datepicker-time'
 import { Label } from '../ui/label'
+import dayjs from 'dayjs'
 
 type Props = {
   detail: Order | undefined
@@ -54,13 +53,19 @@ const formSchema = z.object({
   LSP_CD: z.string().min(1, {
     message: 'LSP code is required',
   }),
-  ETD: z.string().optional(),
+  ETD: z.string(),
   TR_NO: z.string(),
-  JOB_DATE: z.string(),
-  FROM_ROUTE_CODE: z.string(),
+  JOB_DATE: z.string().min(1, {
+    message: 'Job date is required',
+  }),
+  FROM_ROUTE_CODE: z.string().min(1, {
+    message: 'From route code is required',
+  }),
   FROM_TRUCK_NO: z.string(),
   CN_TRUCK_TYPE: z.string().optional(),
-  TO_ROUTE_CODE: z.string(),
+  TO_ROUTE_CODE: z.string().min(1, {
+    message: 'To route code is required',
+  }),
   TO_TRUCK_NO: z.string().optional(),
   VN_TRUCK_TYPE: z.string().optional(),
   URGENT: z.string().optional(),
@@ -111,7 +116,7 @@ const OrderDefault = {
   TO_ROUTE_CODE: '',
   TO_TRUCK_NO: '',
   TR_NO: '',
-  JOB_DATE: '',
+  JOB_DATE: dayjs().format('YYYYMMDD'),
   CC_DONE_TIME: '',
   REGION_CODE: '',
   REGION_NAME: '',
@@ -271,7 +276,10 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
               name="JOB_DATE"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Job Date</FormLabel>
+                  <FormLabel>
+                    Job Date
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Datepicker
                       date={field.value}

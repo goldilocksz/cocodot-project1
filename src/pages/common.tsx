@@ -60,16 +60,12 @@ export default function CommonView() {
       GROUP_CODE: string
       DT_CODE: string
     }) => {
-      const response = await request.post('/webCommon/CommonCodeDelete', {
+      await request.post('/webCommon/CommonCodeDelete', {
         GROUP_CODE,
         DT_CODE,
       })
-
-      if (!response.data) {
-        toast.error('Failed to delete user')
-      } else {
-        refetch()
-      }
+      refetch()
+      setIsConfirm(false)
     },
   })
 
