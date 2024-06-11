@@ -44,6 +44,7 @@ type Props = {
   detail: Order | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  setIsConfirm: (isConfirm: boolean) => void
   refetch: () => void
 }
 
@@ -147,6 +148,7 @@ export default function OrderControl({
   detail,
   isOpen,
   setIsOpen,
+  setIsConfirm,
   refetch,
 }: Props) {
   const [isLoading, setIsLoading] = useState(false)
@@ -211,16 +213,6 @@ export default function OrderControl({
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     UpdateOrder(value)
-  }
-
-  const handleDelete = async () => {
-    setIsLoading(true)
-    await request.post('/order/OrderDelete', {
-      TR_NO: form.getValues('TR_NO'),
-    })
-    setIsLoading(false)
-    setIsOpen(false)
-    refetch()
   }
 
   return (
@@ -751,7 +743,11 @@ export default function OrderControl({
             {isUpdateOrder && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {detail ? 'Update' : 'Add'}
           </Button>
-          <Button form="routeForm" variant="destructive" onClick={handleDelete}>
+          <Button
+            form="routeForm"
+            variant="destructive"
+            onClick={() => setIsConfirm(true)}
+          >
             {isUpdateOrder && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Delete
           </Button>
