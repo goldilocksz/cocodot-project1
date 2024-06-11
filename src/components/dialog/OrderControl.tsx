@@ -64,12 +64,12 @@ const formSchema = z.object({
     message: 'From route code is required',
   }),
   FROM_TRUCK_NO: z.string(),
-  CN_TRUCK_TYPE: z.string().optional(),
+  FROM_TRUCK_TYPE: z.string().optional(),
   TO_ROUTE_CODE: z.string().min(1, {
     message: 'To route code is required',
   }),
   TO_TRUCK_NO: z.string().optional(),
-  VN_TRUCK_TYPE: z.string().optional(),
+  TO_TRUCK_TYPE: z.string().optional(),
   URGENT: z.string().optional(),
   CC_DONE_TIME: z.string().optional(),
   REGION_CODE: z.string().min(1, {
@@ -405,7 +405,7 @@ export default function OrderControl({
                         onChange={(e) => {
                           field.onChange(e.target.value)
                           form.setValue(
-                            'CN_TRUCK_TYPE',
+                            'FROM_TRUCK_TYPE',
                             e.target.options[e.target.selectedIndex].dataset
                               .type || '',
                           )
@@ -419,7 +419,7 @@ export default function OrderControl({
               <div className="w-[90px]">
                 <Label>Truck Type</Label>
                 <div className="mt-2 h-10 rounded border px-3 py-2 text-sm">
-                  {form.watch('CN_TRUCK_TYPE')}
+                  {form.watch('FROM_TRUCK_TYPE')}
                 </div>
               </div>
             </div>
@@ -437,7 +437,7 @@ export default function OrderControl({
                         onChange={(e) => {
                           field.onChange(e.target.value)
                           form.setValue(
-                            'VN_TRUCK_TYPE',
+                            'TO_TRUCK_TYPE',
                             e.target.options[e.target.selectedIndex].dataset
                               .type || '',
                           )
@@ -451,7 +451,7 @@ export default function OrderControl({
               <div className="w-[90px]">
                 <Label>Truck Type</Label>
                 <div className="mt-2 h-10 rounded border px-3 py-2 text-sm">
-                  {form.watch('VN_TRUCK_TYPE')}
+                  {form.watch('TO_TRUCK_TYPE')}
                 </div>
               </div>
             </div>
