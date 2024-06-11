@@ -154,8 +154,14 @@ export default function RouteControl({
         {detail && (
           <div className="relative h-[300px]">
             <GoogleMap
-              lat={Number(detail.LATITUDE)}
-              lng={Number(detail.LONGITUDE)}
+              lat={
+                detail.LATITUDE === 'NULL' ? 13.7563 : Number(detail.LATITUDE)
+              }
+              lng={
+                detail.LONGITUDE === 'NULL'
+                  ? 100.5018
+                  : Number(detail.LONGITUDE)
+              }
               setPosition={(value) => {
                 form.setValue('LATITUDE', String(value.lat))
                 form.setValue('LONGITUDE', String(value.lng))
