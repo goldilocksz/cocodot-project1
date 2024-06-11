@@ -12,21 +12,27 @@ import {
 } from '@/components/ui/table'
 import dayjs from 'dayjs'
 import { Card } from '@/components/ui/card'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import request from '@/utils/request'
 import Loading from '@/components/ui/loading'
 import SearchLine from '@/components/form/SearchLine'
 import OrderControl from '@/components/dialog/OrderControl'
 import Pagination from '@/components/pagination'
+import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 
 export default function OrderView() {
   const [searchData, setSearchData] = useState<Order[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [isConfirm, setIsConfirm] = useState(false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
   const [detail, setDetail] = useState<Order | undefined>()
 
-  const { data: orderList, isPending } = useQuery<Order[]>({
+  const {
+    data: orderList,
+    isPending,
+    refetch,
+  } = useQuery<Order[]>({
     queryKey: ['getOrderList'],
     queryFn: async () => {
       const { data } = await request.post('/order/getOrderList', {})
@@ -50,6 +56,16 @@ export default function OrderView() {
       })
       setSearchData(orders)
       return filterList
+    },
+  })
+
+  const { mutate: handleDelete } = useMutation({
+    mutationKey: ['deleteOrder'],
+    mutationFn: async () => {
+      const { data } = await request.post('/order/deleteOrder', {
+        ORDER_ID: detail?.ORDER_ID,
+      })
+      return data
     },
   })
 
@@ -137,7 +153,22 @@ export default function OrderView() {
         />
       </Card>
 
-      <OrderControl detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <OrderControl
+        detail={detail}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        refetch={refetch}
+      />
+
+      <ConfirmDialog
+        title="Delete Order"
+        desc="Are you sure you want to delete order"
+        btnText="Delete"
+        loading={isDeleteUser}
+        isOpen={isConfirm}
+        setIsOpen={setIsConfirm}
+        callback={() => handleDelete()}
+      />
     </section>
   )
 }

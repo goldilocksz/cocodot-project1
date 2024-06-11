@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -44,6 +44,7 @@ type Props = {
   detail: Order | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  refetch: () => void
 }
 
 const formSchema = z.object({
@@ -142,7 +143,13 @@ const OrderDefault = {
   ],
 }
 
-export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
+export default function OrderControl({
+  detail,
+  isOpen,
+  setIsOpen,
+  refetch,
+}: Props) {
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: OrderDefault,
@@ -203,6 +210,16 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     UpdateRoute(value)
+  }
+
+  const handleDelete = async () => {
+    setIsLoading(true)
+    await request.post('/order/OrderDelete', {
+      TR_NO: form.getValues('TR_NO'),
+    })
+    setIsLoading(false)
+    setIsOpen(false)
+    refetch()
   }
 
   return (
@@ -643,7 +660,10 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
                       name={`BLDATA.${index}.INVOICE_NO`}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Invoice No</FormLabel>
+                          <FormLabel>
+                            Invoice No
+                            <span className="ml-1 text-destructive">*</span>
+                          </FormLabel>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -729,6 +749,10 @@ export default function OrderControl({ detail, isOpen, setIsOpen }: Props) {
           <Button type="submit" form="routeForm">
             {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {detail ? 'Update' : 'Add'}
+          </Button>
+          <Button form="routeForm" variant="destructive" onClick={handleDelete}>
+            {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Delete
           </Button>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
