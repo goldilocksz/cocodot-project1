@@ -59,15 +59,15 @@ export default function OrderView() {
     },
   })
 
-  const { mutate: handleDelete } = useMutation({
-    mutationKey: ['deleteOrder'],
-    mutationFn: async () => {
-      const { data } = await request.post('/order/deleteOrder', {
-        ORDER_ID: detail?.ORDER_ID,
-      })
-      return data
-    },
-  })
+  // const { mutate: handleDelete } = useMutation({
+  //   mutationKey: ['deleteOrder'],
+  //   mutationFn: async () => {
+  //     const { data } = await request.post('/order/deleteOrder', {
+  //       ORDER_ID: detail?.ORDER_ID,
+  //     })
+  //     return data
+  //   },
+  // })
 
   useEffect(() => {
     if (!isOpen) {
@@ -160,7 +160,7 @@ export default function OrderView() {
         refetch={refetch}
       />
 
-      <ConfirmDialog
+      {/* <ConfirmDialog
         title="Delete Order"
         desc="Are you sure you want to delete order"
         btnText="Delete"
@@ -168,7 +168,7 @@ export default function OrderView() {
         isOpen={isConfirm}
         setIsOpen={setIsConfirm}
         callback={() => handleDelete()}
-      />
+      /> */}
     </section>
   )
 }

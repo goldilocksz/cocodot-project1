@@ -175,13 +175,14 @@ export default function OrderControl({
     }
   }, [BlInfo])
 
-  const { mutate: UpdateRoute, isPending: isUpdateRoute } = useMutation({
+  const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request.post('/webCommon/RouteMstSave', value)
+      const response = await request.post('/order/OrderSave', value)
       if (!response) {
         toast.error('Failed to update route code information')
       } else {
         setIsOpen(false)
+        refetch()
       }
     },
   })
@@ -209,7 +210,7 @@ export default function OrderControl({
   }
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    UpdateRoute(value)
+    UpdateOrder(value)
   }
 
   const handleDelete = async () => {
@@ -747,11 +748,11 @@ export default function OrderControl({
 
         <DialogFooter className="sm:justify-center">
           <Button type="submit" form="routeForm">
-            {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isUpdateOrder && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {detail ? 'Update' : 'Add'}
           </Button>
           <Button form="routeForm" variant="destructive" onClick={handleDelete}>
-            {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isUpdateOrder && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Delete
           </Button>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
