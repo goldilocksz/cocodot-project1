@@ -151,23 +151,25 @@ export default function OrderControl({
   setIsConfirm,
   refetch,
 }: Props) {
+  const [isGetBlInfo, setIsGetBlInfo] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: OrderDefault,
   })
 
-  const { data: BlInfo, isLoading: isGetBlInfo } = useQuery<any[]>({
-    queryKey: ['getBlInfo', detail?.TR_NO],
-    queryFn: async () => {
+  useEffect(() => {
+    const fetchBlInfo = async () => {
+      setIsGetBlInfo(true)
       const response = await request.post('/order/getOrderBLInfo', {
         TR_NO: detail?.TR_NO,
       })
-      console.log(response.data)
 
       form.setValue('BLDATA', response.data)
+      setIsGetBlInfo(false)
       return response.data
-    },
-  })
+    }
+    fetchBlInfo()
+  }, [detail?.TR_NO])
 
   const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
