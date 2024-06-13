@@ -19,6 +19,7 @@ import request from '@/utils/request'
 import SearchLine from '@/components/form/SearchLine'
 import RouteControl from '@/components/dialog/RouteControl'
 import Loading from '@/components/ui/loading'
+import dayjs from 'dayjs'
 
 export default function RouteView() {
   const [page, setPage] = useState(1)
@@ -110,16 +111,18 @@ export default function RouteView() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
-              <TableHead>company code</TableHead>
               <TableHead>customer code</TableHead>
-              <TableHead>add user id</TableHead>
-              <TableHead>add user name</TableHead>
-              <TableHead>nation cd</TableHead>
               <TableHead>route code</TableHead>
               <TableHead>route name</TableHead>
               <TableHead>nation cd</TableHead>
+              <TableHead>Seq</TableHead>
+              <TableHead>Seq name</TableHead>
               <TableHead>status</TableHead>
+              <TableHead>add user id</TableHead>
+              <TableHead>add user name</TableHead>
               <TableHead>update date</TableHead>
+              <TableHead>update date user name</TableHead>
+              <TableHead>company code</TableHead>
               <TableHead>add date</TableHead>
               <TableHead>edit</TableHead>
               <TableHead>delete</TableHead>
@@ -146,17 +149,23 @@ export default function RouteView() {
                     setIsOpen(true)
                   }}
                 >
-                  <TableCell>{item.COMPANY_CODE}</TableCell>
                   <TableCell>{item.CUSTOMER_CODE}</TableCell>
-                  <TableCell>{item.ADD_USER_ID}</TableCell>
-                  <TableCell>{item.ADD_USER_NAME}</TableCell>
-                  <TableCell>{item.NATION_CD}</TableCell>
                   <TableCell>{item.ROUTE_CODE}</TableCell>
                   <TableCell>{item.ROUTE_NAME}</TableCell>
                   <TableCell>{item.NATION_CD}</TableCell>
+                  <TableCell>{item.SEQ}</TableCell>
+                  <TableCell>{item.SEQ_NAME}</TableCell>
                   <TableCell>{item.STATUS}</TableCell>
-                  <TableCell>{item.UPDATE_DATE}</TableCell>
-                  <TableCell>{item.ADD_DATE}</TableCell>
+                  <TableCell>{item.ADD_USER_ID}</TableCell>
+                  <TableCell>{item.ADD_USER_NAME}</TableCell>
+                  <TableCell>
+                    {dayjs(item.UPDATE_DATE).format('YYYY-MM-DD')}
+                  </TableCell>
+                  <TableCell>{item.UPDATE_USER_NAME}</TableCell>
+                  <TableCell>{item.COMPANY_CODE}</TableCell>
+                  <TableCell>
+                    {dayjs(item.ADD_DATE).format('YYYY-MM-DD')}
+                  </TableCell>
                   <TableCell className="py-0">
                     <Button
                       variant="ghost"
