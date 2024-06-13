@@ -12,7 +12,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 const TruckType = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, ...props }, ref) => {
     const { data: TruckTypeCode, isLoading } = useQuery({
-      queryKey: ['getTruckTypeCode', props.nationcode],
+      queryKey: ['getTruckCode', props.nationcode],
       queryFn: async () => {
         const { data } = await request.post('/webCommon/getTrcuk', {
           NATION_CD: props.nationcode,

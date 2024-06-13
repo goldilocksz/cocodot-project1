@@ -12,10 +12,6 @@ export default function side() {
           <Link to="/" className="flex flex-1 items-center gap-2 font-semibold">
             <img src="/images/logo.png" alt="" className="h-[30px]" />
           </Link>
-          <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
-            <Bell className="h-4 w-4" />
-            <span className="sr-only">Toggle notifications</span>
-          </Button>
         </div>
         <div className="flex-1">
           <Navbar />

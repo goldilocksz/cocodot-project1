@@ -25,6 +25,7 @@ import { AuthContext } from './authProvider'
 import { useContext } from 'react'
 
 export default function header() {
+  const navigate = useNavigate()
   const context = useContext(AuthContext)
   const user = context?.user as Auth
   const isAuthenticated = context?.isAuthenticated as () => boolean
@@ -119,10 +120,9 @@ export default function header() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>Support</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/my')}>
+              My page
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="p-0">
               <Button

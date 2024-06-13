@@ -9,9 +9,10 @@ import {
   LayoutDashboard,
   Monitor,
   Route,
-  ShoppingCart,
+  Truck,
   Users,
   Contact,
+  UserRoundCog,
 } from 'lucide-react'
 
 import { useLocation } from 'react-router-dom'
@@ -41,7 +42,7 @@ const Menu = [
   },
   {
     name: 'Orders',
-    icon: ShoppingCart,
+    icon: Truck,
     href: '/orders',
   },
   {
@@ -69,6 +70,11 @@ const Menu = [
     icon: Route,
     href: '/route',
   },
+  {
+    name: 'My page',
+    icon: UserRoundCog,
+    href: '/my',
+  },
 ]
 
 export default function navbar() {
@@ -79,9 +85,9 @@ export default function navbar() {
     <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
       {Menu.map((item) => (
         <Fragment key={item.name}>
-          <a
+          <NavLink
             key={item.name}
-            href={item.href}
+            to={item.href}
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
               item.href.split('/')[1] ===
@@ -98,11 +104,11 @@ export default function navbar() {
               ) : (
                 <ChevronDown className="ml-auto h-4 w-4" />
               ))}
-          </a>
+          </NavLink>
           {item.subMenu?.map((item) => (
-            <a
+            <NavLink
               key={item.name}
-              href={item.href}
+              to={item.href}
               className={cn(
                 'ml-2 flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
                 item.href === pathname && 'bg-zinc-200 text-black',
@@ -110,7 +116,7 @@ export default function navbar() {
             >
               {item.href === pathname && <ChevronRight className="h-4 w-4" />}
               {item.name}
-            </a>
+            </NavLink>
           ))}
         </Fragment>
       ))}

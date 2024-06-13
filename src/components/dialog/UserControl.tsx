@@ -126,9 +126,7 @@ const formSchema = z.object({
       message: 'Truck No must be less than 10 characters',
     })
     .optional(),
-  TRUCK_TYPE: z.string().min(1, {
-    message: 'Customer Code is required',
-  }),
+  TRUCK_TYPE: z.string().optional(),
   NATION_CD: z.string().min(1, {
     message: 'Customer Code is required',
   }),

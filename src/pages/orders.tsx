@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { Plus, Route } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { Order } from '@/types/data'
@@ -106,6 +106,7 @@ export default function OrderView() {
                     {key.toLocaleLowerCase().replaceAll('_', ' ')}
                   </TableHead>
                 ))}
+              <TableHead>Route</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -139,6 +140,15 @@ export default function OrderView() {
                       </TableCell>
                     ),
                   )}
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      className="h-10 w-10 rounded-full p-0"
+                      onClick={() => console.log('asd')}
+                    >
+                      <Route className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>
