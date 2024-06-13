@@ -1,4 +1,4 @@
-import { Plus, Route } from 'lucide-react'
+import { Plus, RefreshCcw, Route } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { Order } from '@/types/data'
@@ -31,6 +31,7 @@ export default function OrderView() {
   const {
     data: orderList,
     isPending,
+    isRefetching,
     refetch,
   } = useQuery<Order[]>({
     queryKey: ['getOrderList'],
@@ -79,13 +80,19 @@ export default function OrderView() {
 
   return (
     <section className="relative grow">
-      <Loading isLoading={isPending} />
+      <Loading isLoading={isPending || isRefetching} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Orders</h1>
-        <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Add Order
-        </Button>
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add Order
+          </Button>
+        </div>
       </div>
 
       <Card className="relative mt-6 p-6">

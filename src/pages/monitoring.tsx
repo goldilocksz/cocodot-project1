@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/utils/utils'
-import { Loader2, Plus, Trash2 } from 'lucide-react'
+import { Loader2, Plus, RefreshCcw, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import {
   Dialog,
@@ -99,6 +99,7 @@ export default function MonitoringView() {
     refetch: RefetchMonitoring,
     isLoading,
     isRefetching,
+    refetch,
   } = useQuery<Monitoring[]>({
     queryKey: ['getMonitoring'],
     queryFn: async () => {
@@ -125,7 +126,13 @@ export default function MonitoringView() {
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Monitoring</h1>
 
-        <AddDiaglog refetch={RefetchMonitoring} />
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <AddDiaglog refetch={RefetchMonitoring} />
+        </div>
       </div>
       <div className="relative mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {Monitoring?.map((item, index) => (

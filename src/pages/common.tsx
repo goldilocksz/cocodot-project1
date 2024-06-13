@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Edit, Plus, Trash2 } from 'lucide-react'
+import { Edit, Plus, RefreshCcw, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/card'
@@ -37,6 +37,7 @@ export default function CommonView() {
   const {
     data: codeList,
     isPending,
+    isRefetching,
     refetch,
   } = useQuery<Code[]>({
     queryKey: ['getCodeList'],
@@ -71,13 +72,19 @@ export default function CommonView() {
 
   return (
     <section className="relative grow">
-      <Loading isLoading={isPending} />
+      <Loading isLoading={isPending || isRefetching} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Common Code</h1>
-        <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Add Code
-        </Button>
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add Code
+          </Button>
+        </div>
       </div>
 
       <Card className="mt-6 p-6">

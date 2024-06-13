@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Edit, Plus, RotateCcw, Trash2 } from 'lucide-react'
+import { Edit, Plus, RefreshCcw, RotateCcw, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import Pagination from '@/components/pagination'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -115,10 +115,16 @@ export default function UsersView() {
       <Loading isLoading={isPending || isRefetching} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Users</h1>
-        <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
-          <Plus className="h-4 w-4" />
-          User
-        </Button>
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+            <Plus className="h-4 w-4" />
+            User
+          </Button>
+        </div>
       </div>
 
       <Card className="relative mt-6 p-6">

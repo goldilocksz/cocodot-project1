@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table'
 import Pagination from '@/components/pagination'
 import dayjs from 'dayjs'
-import { Loader2 } from 'lucide-react'
+import { Loader2, RefreshCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import * as XLSX from 'xlsx'
 import request from '@/utils/request'
@@ -48,6 +48,7 @@ export default function BlReportView() {
     data: BlReports,
     isLoading: isGetBlReports,
     isRefetching: isRefetchBlReports,
+    refetch,
   } = useQuery<TrReport[]>({
     queryKey: ['getBlReport', page, pageSize, search],
     queryFn: async () => {
@@ -78,9 +79,9 @@ export default function BlReportView() {
   })
 
   function downloadXlsx() {
-    if (!list?.length) return
+    if (!BlReports?.length) return
     const workbook = XLSX.utils.book_new()
-    const worksheet = XLSX.utils?.json_to_sheet(list)
+    const worksheet = XLSX.utils?.json_to_sheet(BlReports)
     XLSX.utils.book_append_sheet(workbook, worksheet, 'test')
 
     XLSX.writeFile(workbook, `BlReport${dayjs().format('YYYYMMDDHHmmss')}.xlsx`)
@@ -91,7 +92,13 @@ export default function BlReportView() {
       <Loading isLoading={isGetBlReports || isRefetchBlReports} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">B/L Report</h1>
-        <Button onClick={() => downloadXlsx()}>Download</Button>
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <Button onClick={() => downloadXlsx()}>Download</Button>
+        </div>
       </div>
 
       <Card className="relative mt-6 p-6">

@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Card } from '@/components/ui/card'
-import { Edit, Plus, Trash2, X } from 'lucide-react'
+import { Edit, Plus, RefreshCcw, Trash2, X } from 'lucide-react'
 import { Route, Auth } from '@/types/data'
 import {
   Table,
@@ -86,10 +86,16 @@ export default function RouteView() {
       <Loading isLoading={isGetRouteList || isRouteListFetching} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Route Mst</h1>
-        <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Add Route
-        </Button>
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add Route
+          </Button>
+        </div>
       </div>
 
       <Card className="relative mt-6 p-6">

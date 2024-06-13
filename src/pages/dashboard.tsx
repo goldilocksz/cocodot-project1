@@ -365,13 +365,13 @@ export default function DashboardView() {
               <TableHeader>
                 <TableRow className="[&>th]:text-center">
                   <TableHead></TableHead>
-                  <TableHead>DAY1</TableHead>
-                  <TableHead>DAY2</TableHead>
-                  <TableHead>DAY3</TableHead>
-                  <TableHead>DAY4</TableHead>
-                  <TableHead>DAY5</TableHead>
-                  <TableHead>DAY6</TableHead>
-                  <TableHead>DAY7</TableHead>
+                  <TableHead>{ListOfProcessing?.[0].DAY1_DATE}</TableHead>
+                  <TableHead>{ListOfProcessing?.[0].DAY2_DATE}</TableHead>
+                  <TableHead>{ListOfProcessing?.[0].DAY3_DATE}</TableHead>
+                  <TableHead>{ListOfProcessing?.[0].DAY4_DATE}</TableHead>
+                  <TableHead>{ListOfProcessing?.[0].DAY5_DATE}</TableHead>
+                  <TableHead>{ListOfProcessing?.[0].DAY6_DATE}</TableHead>
+                  <TableHead>{ListOfProcessing?.[0].DAY7_DATE}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -382,52 +382,80 @@ export default function DashboardView() {
                   >
                     <TableCell>{item.LOC}</TableCell>
                     <TableCell>
-                      <div
-                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                        style={{ width: `${item.DAY1}%` }}
-                      ></div>
+                      <div className="absolute inset-1">
+                        <div
+                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                          style={{
+                            width: `${(item.DAY1 / ListOfProcessing?.[0].DAY1) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
                       <div className="relative z-10">{item.DAY1}</div>
                     </TableCell>
                     <TableCell>
-                      <div
-                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                        style={{ width: `${item.DAY2}%` }}
-                      ></div>
+                      <div className="absolute inset-1">
+                        <div
+                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                          style={{
+                            width: `${(item.DAY2 / ListOfProcessing?.[0].DAY2) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
                       <div className="relative z-10">{item.DAY2}</div>
                     </TableCell>
                     <TableCell>
-                      <div
-                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                        style={{ width: `${item.DAY3}%` }}
-                      ></div>
+                      <div className="absolute inset-1">
+                        <div
+                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                          style={{
+                            width: `${(item.DAY3 / ListOfProcessing?.[0].DAY3) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
                       <div className="relative z-10">{item.DAY3}</div>
                     </TableCell>
                     <TableCell>
-                      <div
-                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                        style={{ width: `${item.DAY4}%` }}
-                      ></div>
+                      <div className="absolute inset-1">
+                        <div
+                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                          style={{
+                            width: `${(item.DAY4 / ListOfProcessing?.[0].DAY4) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
                       <div className="relative z-10">{item.DAY4}</div>
                     </TableCell>
                     <TableCell>
-                      <div
-                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                        style={{ width: `${item.DAY5}%` }}
-                      ></div>
+                      <div className="absolute inset-1">
+                        <div
+                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                          style={{
+                            width: `${(item.DAY5 / ListOfProcessing?.[0].DAY5) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
                       <div className="relative z-10">{item.DAY5}</div>
                     </TableCell>
                     <TableCell>
-                      <div
-                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                        style={{ width: `${item.DAY6}%` }}
-                      ></div>
+                      <div className="absolute inset-1">
+                        <div
+                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                          style={{
+                            width: `${(item.DAY6 / ListOfProcessing?.[0].DAY6) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
                       <div className="relative z-10">{item.DAY6}</div>
                     </TableCell>
                     <TableCell>
-                      <div
-                        className="absolute bottom-1 left-0 right-0 top-1 flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                        style={{ width: `${item.DAY7}%` }}
-                      ></div>
+                      <div className="absolute inset-1">
+                        <div
+                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                          style={{
+                            width: `${(item.DAY7 / ListOfProcessing?.[0].DAY7) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
                       <div className="relative z-10">{item.DAY7}</div>
                     </TableCell>
                   </TableRow>

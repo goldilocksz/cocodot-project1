@@ -151,7 +151,6 @@ export default function OrderControl({
   setIsConfirm,
   refetch,
 }: Props) {
-  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: OrderDefault,
@@ -163,19 +162,12 @@ export default function OrderControl({
       const response = await request.post('/order/getOrderBLInfo', {
         TR_NO: detail?.TR_NO,
       })
+      console.log(response.data)
+
+      form.setValue('BLDATA', response.data)
       return response.data
     },
-    enabled: isOpen,
   })
-
-  useEffect(() => {
-    console.log(BlInfo)
-    if (BlInfo?.length) {
-      form.setValue('BLDATA', BlInfo)
-    } else {
-      form.setValue('BLDATA', [OrderDefault.BLDATA[0]])
-    }
-  }, [BlInfo])
 
   const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {

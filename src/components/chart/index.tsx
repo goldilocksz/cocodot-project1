@@ -14,7 +14,6 @@ export default function ChartUI({ data }: Props) {
     <Chart
       options={{
         chart: {
-          stacked: true,
           toolbar: {
             show: false,
           },
@@ -24,6 +23,9 @@ export default function ChartUI({ data }: Props) {
           animations: {
             speed: 1000,
           },
+        },
+        dataLabels: {
+          enabled: true,
         },
         colors: ['#2563eb', '#52525b', '#020617'],
         stroke: {

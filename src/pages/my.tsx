@@ -16,6 +16,7 @@ import { omit } from 'radash'
 import { useMutation } from '@tanstack/react-query'
 import request from '@/utils/request'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 
 interface FormFieldItemProps<T extends FieldValues> {
   name: Path<T>
@@ -84,12 +85,13 @@ export default function my() {
         toast.error('Failed to update user information')
       } else {
         toast.success('User information updated successfully')
+        localStorage.setItem('user', JSON.stringify(value))
       }
     },
   })
 
   const onSubmit = () => {
-    console.log('asd')
+    UpdateUser(form.getValues())
   }
   return (
     <div>
@@ -123,7 +125,13 @@ export default function my() {
               <Input {...form.register('EMAIL')} />
             </FormFieldItem>
             <div className="col-span-2 mt-4 flex items-center justify-center">
-              <Button type="submit">Update</Button>
+              <Button type="submit" disabled={isUpdateUser}>
+                {isUpdateUser ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  'Update'
+                )}
+              </Button>
             </div>
           </form>
         </Form>

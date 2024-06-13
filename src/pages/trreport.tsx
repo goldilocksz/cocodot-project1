@@ -17,6 +17,7 @@ import * as XLSX from 'xlsx'
 import request from '@/utils/request'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '@/components/ui/loading'
+import { RefreshCcw } from 'lucide-react'
 
 export interface Search {
   JOB_FROM: string
@@ -46,6 +47,7 @@ export default function TrReportView() {
     data: TrReports,
     isLoading: isGetTrReports,
     isRefetching: isRefetchTrReports,
+    refetch,
   } = useQuery<TrReport[]>({
     queryKey: ['getTrReport', search],
     queryFn: async () => {
@@ -87,7 +89,13 @@ export default function TrReportView() {
       <Loading isLoading={isGetTrReports || isRefetchTrReports} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">TR Report</h1>
-        <Button onClick={() => downloadXlsx()}>Download</Button>
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <Button onClick={() => downloadXlsx()}>Download</Button>
+        </div>
       </div>
 
       <Card className="mt-6 p-6">
