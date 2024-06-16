@@ -205,3 +205,24 @@ export interface Customer {
   CUSTOMER_CODE: string
   UPDATE_USER_NAME: string
 }
+
+export interface TrakingInfo {
+  TRUCK_NO: string
+  TR_NO: string
+  CHECK_DATE: string
+  BTN_STATUS: string
+  LONGITUDE: string
+  SEQ_NAME: string
+  JOB_DATE: string
+  TO_LONGITUDE: string
+  ROUTE_CODE: string
+  ROUTE_NAME: string
+  STATUS: string
+  COMPANY_CODE: string
+  NATION_CD: string
+  FROM_LONGITUDE: string
+  FROM_LATITUDE: string
+  TO_LATITUDE: string
+  LATITUDE: string
+  SEQ: string
+}

@@ -23,7 +23,6 @@ import { toast } from 'sonner'
 import { useMutation } from '@tanstack/react-query'
 import request from '@/utils/request'
 import { useNavigate } from 'react-router-dom'
-import { User } from '@/types/data'
 
 export const formSchema = z.object({
   USER_ID: z.string().min(1, {

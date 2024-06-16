@@ -19,10 +19,12 @@ import SearchLine from '@/components/form/SearchLine'
 import OrderControl from '@/components/dialog/OrderControl'
 import Pagination from '@/components/pagination'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
+import RouteInfoControl from '@/components/dialog/RouteInfoControl'
 
 export default function OrderView() {
   const [searchData, setSearchData] = useState<Order[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [open, setOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
@@ -151,7 +153,10 @@ export default function OrderView() {
                     <Button
                       variant="ghost"
                       className="h-10 w-10 rounded-full p-0"
-                      onClick={() => console.log('asd')}
+                      onClick={() => {
+                        setDetail(item)
+                        setOpen(true)
+                      }}
                     >
                       <Route className="h-4 w-4" />
                     </Button>
@@ -179,6 +184,12 @@ export default function OrderView() {
         setIsConfirm={setIsConfirm}
         refetch={refetch}
       />
+
+      <RouteInfoControl
+        open={open}
+        setOpen={setOpen}
+        detail={detail}
+      ></RouteInfoControl>
 
       <ConfirmDialog
         title="Delete Order"
