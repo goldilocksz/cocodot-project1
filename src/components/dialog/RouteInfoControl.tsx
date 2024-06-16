@@ -73,6 +73,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
       })
       return data
     },
+    enabled: !!detail?.TR_NO && open,
   })
 
   const { mutate: UpdateRoute, isPending: isUpdateRoute } = useMutation({

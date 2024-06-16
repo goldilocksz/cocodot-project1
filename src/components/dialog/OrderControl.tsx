@@ -168,8 +168,10 @@ export default function OrderControl({
       setIsGetBlInfo(false)
       return response.data
     }
-    fetchBlInfo()
-  }, [detail?.TR_NO])
+    if (isOpen) {
+      fetchBlInfo()
+    }
+  }, [detail?.TR_NO, isOpen])
 
   const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {

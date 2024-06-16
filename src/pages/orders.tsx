@@ -42,7 +42,6 @@ export default function OrderView() {
 
       const orders: Order[] = data?.map((user: any, index: number) => ({
         ...user,
-        id: index + 1,
       }))
 
       const allKeys = Array.from(
@@ -51,7 +50,6 @@ export default function OrderView() {
 
       const filterList = orders.map((obj, index: number) => {
         let newObj: any = {}
-        newObj['id'] = index + 1
         allKeys.forEach((key) => {
           newObj[key] = obj[key] ?? ''
         })
@@ -126,7 +124,7 @@ export default function OrderView() {
               )
               .map((item) => (
                 <TableRow
-                  key={item.id}
+                  key={item.TR_NO}
                   onDoubleClick={() => {
                     setDetail(item)
                     setIsOpen(true)
