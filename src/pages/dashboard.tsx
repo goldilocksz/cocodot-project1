@@ -384,13 +384,27 @@ export default function DashboardView() {
               <TableHeader>
                 <TableRow className="[&>th]:text-center">
                   <TableHead></TableHead>
-                  <TableHead>{ListOfProcessing?.[0].DAY1_DATE}</TableHead>
-                  <TableHead>{ListOfProcessing?.[0].DAY2_DATE}</TableHead>
-                  <TableHead>{ListOfProcessing?.[0].DAY3_DATE}</TableHead>
-                  <TableHead>{ListOfProcessing?.[0].DAY4_DATE}</TableHead>
-                  <TableHead>{ListOfProcessing?.[0].DAY5_DATE}</TableHead>
-                  <TableHead>{ListOfProcessing?.[0].DAY6_DATE}</TableHead>
-                  <TableHead>{ListOfProcessing?.[0].DAY7_DATE}</TableHead>
+                  <TableHead>
+                    {dayjs(ListOfProcessing?.[0].DAY1_DATE).format('DD-MMMM')}
+                  </TableHead>
+                  <TableHead>
+                    {dayjs(ListOfProcessing?.[0].DAY2_DATE).format('DD-MMMM')}
+                  </TableHead>
+                  <TableHead>
+                    {dayjs(ListOfProcessing?.[0].DAY3_DATE).format('DD-MMMM')}
+                  </TableHead>
+                  <TableHead>
+                    {dayjs(ListOfProcessing?.[0].DAY4_DATE).format('DD-MMMM')}
+                  </TableHead>
+                  <TableHead>
+                    {dayjs(ListOfProcessing?.[0].DAY5_DATE).format('DD-MMMM')}
+                  </TableHead>
+                  <TableHead>
+                    {dayjs(ListOfProcessing?.[0].DAY6_DATE).format('DD-MMMM')}
+                  </TableHead>
+                  <TableHead>
+                    {dayjs(ListOfProcessing?.[0].DAY7_DATE).format('DD-MMMM')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
