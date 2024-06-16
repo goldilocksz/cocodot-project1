@@ -27,6 +27,7 @@ import Loading from '@/components/ui/loading'
 import { DateRange } from 'react-day-picker'
 
 export default function DashboardView() {
+  const [CNEE, setCNEE] = useState<string>('')
   const [progressRangeDate, setProgressRangeDate] = useState<DateRange>({
     from: dayjs().subtract(6, 'day').toDate(),
     to: new Date(),
@@ -37,9 +38,10 @@ export default function DashboardView() {
     isLoading: isGetCount,
     isRefetching: isRefetchingCount,
   } = useQuery({
-    queryKey: ['getMainCount', progressRangeDate],
+    queryKey: ['getMainCount', progressRangeDate, CNEE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getMainCount', {
+        CNEE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -58,9 +60,10 @@ export default function DashboardView() {
     isLoading: isGetProgress,
     isRefetching: isRefetchProgress,
   } = useQuery({
-    queryKey: ['getRateOfProgress', progressRangeDate],
+    queryKey: ['getRateOfProgress', progressRangeDate, CNEE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getRateOfProgress', {
+        CNEE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -89,9 +92,10 @@ export default function DashboardView() {
     isLoading: isGetDelivery,
     isRefetching: isRefetchDelivery,
   } = useQuery({
-    queryKey: ['getDelivery', progressRangeDate],
+    queryKey: ['getDelivery', progressRangeDate, CNEE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getDelivery', {
+        CNEE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -113,9 +117,10 @@ export default function DashboardView() {
     isLoading: isGetLeadTime,
     isRefetching: isRefetchLeadTime,
   } = useQuery({
-    queryKey: ['getLeadTimeAVG', progressRangeDate],
+    queryKey: ['getLeadTimeAVG', progressRangeDate, CNEE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTimeAVG', {
+        CNEE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -133,9 +138,10 @@ export default function DashboardView() {
   })
 
   const { data: LeadTime } = useQuery({
-    queryKey: ['getLeadTime', progressRangeDate],
+    queryKey: ['getLeadTime', progressRangeDate, CNEE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTime', {
+        CNEE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -164,9 +170,10 @@ export default function DashboardView() {
     isLoading: isGetListOfProcessing,
     isRefetching: isRefetchingListOfProcessing,
   } = useQuery({
-    queryKey: ['getListOfProcessing', progressRangeDate],
+    queryKey: ['getListOfProcessing', progressRangeDate, CNEE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getListOfProcessing', {
+        CNEE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -188,9 +195,17 @@ export default function DashboardView() {
     isLoading: isGetMonitoring,
     isRefetching: isRefetchMonitoring,
   } = useQuery<Monit[]>({
-    queryKey: ['getMonitoring'],
+    queryKey: ['getMonitoring', progressRangeDate, CNEE],
     queryFn: async () => {
-      const response = await request.post('/monitoring/getMonitoring', {})
+      const response = await request.post('/monitoring/getMonitoring', {
+        CNEE,
+        FROM_DATE:
+          progressRangeDate?.from &&
+          dayjs(progressRangeDate.from).format('YYYYMMDD'),
+        TO_DATE:
+          progressRangeDate?.to &&
+          dayjs(progressRangeDate.to).format('YYYYMMDD'),
+      })
       return response.data.map((item: any, index: number) => ({
         ...item,
         id: index + 1,
@@ -207,7 +222,11 @@ export default function DashboardView() {
           </Label>
           <Switch id="airplane-mode" checked={true} />
         </div>
-        <Cnee className="w-[100px]" />
+        <Cnee
+          className="w-[100px]"
+          value={CNEE}
+          onChange={(e) => setCNEE(e.target.value)}
+        />
         <DatepickerRange
           date={progressRangeDate}
           setDate={setProgressRangeDate}
