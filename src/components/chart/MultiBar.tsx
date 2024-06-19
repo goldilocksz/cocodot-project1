@@ -59,6 +59,7 @@ export default function ChartUI({ data }: any) {
         },
         tooltip: {
           theme: 'dark',
+          intersect: false,
         },
       }}
       series={data.datasets}

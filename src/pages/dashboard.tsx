@@ -117,18 +117,33 @@ export default function DashboardView() {
           progressRangeDate?.to &&
           dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
-      return [
-        {
-          name: 'ATD FACTORY',
-          data: response.data.map((item: any) => item['ATD FACTORY']),
-          date: response.data.map((item: any) => item['ETD FACTORY']),
-        },
-        {
-          name: 'ETD FACTORY',
-          data: response.data.map((item: any) => item['ATD FACTORY']),
-          date: response.data.map((item: any) => item['ETD FACTORY']),
-        },
-      ]
+
+      const titleGroup = group(response.data, (item: any) => item.VIEW_DATE)
+
+      console.log(Object.keys(titleGroup).reverse())
+
+      const data = {
+        labels: Object.keys(titleGroup).reverse(),
+        datasets: [
+          {
+            name: 'ATD FACTORY',
+            data: response.data.map((item: any) => ({
+              x: item.VIEW_DATE,
+              y: item['ATD FACTORY'],
+              goals: [
+                {
+                  name: 'ETD FACTORY',
+                  value: item['ETD FACTORY'],
+                  style: {
+                    strokeColor: '#52525b',
+                  },
+                },
+              ],
+            })),
+          },
+        ],
+      }
+      return data
     },
     enabled: !!progressRangeDate,
   })

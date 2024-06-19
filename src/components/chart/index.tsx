@@ -1,15 +1,6 @@
 import Chart from 'react-apexcharts'
 
-type Data = {
-  name: string
-  data: number[]
-  date: string
-}
-interface Props {
-  data: Data[]
-}
-
-export default function ChartUI({ data }: Props) {
+export default function ChartUI({ data }: any) {
   return (
     <Chart
       options={{
@@ -52,7 +43,7 @@ export default function ChartUI({ data }: Props) {
               fontWeight: 400,
             },
           },
-          categories: data[0].date,
+          categories: data.labels,
         },
         yaxis: {
           tickAmount: 3,
@@ -64,6 +55,11 @@ export default function ChartUI({ data }: Props) {
               fontWeight: 400,
             },
           },
+        },
+        legend: {
+          show: true,
+          showForSingleSeries: true,
+          customLegendItems: ['ATD FACTORY', 'ETD FACTORY'],
         },
         grid: {
           show: true,
@@ -80,9 +76,10 @@ export default function ChartUI({ data }: Props) {
         },
         tooltip: {
           theme: 'dark',
+          intersect: false,
         },
       }}
-      series={data}
+      series={data.datasets}
       type="bar"
       width="100%"
       height={350}
