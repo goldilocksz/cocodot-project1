@@ -157,21 +157,41 @@ export default function OrderControl({
     defaultValues: OrderDefault,
   })
 
-  useEffect(() => {
-    const fetchBlInfo = async () => {
-      setIsGetBlInfo(true)
+  const { data: blInfo, refetch: refetchBlInfo } = useQuery({
+    queryKey: ['getOrderBLInfo', detail?.TR_NO],
+    queryFn: async () => {
       const response = await request.post('/order/getOrderBLInfo', {
         TR_NO: detail?.TR_NO,
       })
 
-      form.setValue('BLDATA', response.data)
-      setIsGetBlInfo(false)
+      if (response.data.length === 0) {
+        form.setValue('BLDATA', OrderDefault.BLDATA)
+      } else {
+        form.setValue('BLDATA', response.data)
+      }
       return response.data
-    }
-    if (isOpen) {
-      fetchBlInfo()
-    }
-  }, [detail?.TR_NO, isOpen])
+    },
+    enabled: !!detail?.TR_NO && isOpen,
+    gcTime: 0,
+  })
+
+  // useEffect(() => {
+  //   if (!detail?.TR_NO) return
+
+  //   const fetchBlInfo = async () => {
+  //     setIsGetBlInfo(true)
+  //     const response = await request.post('/order/getOrderBLInfo', {
+  //       TR_NO: detail?.TR_NO,
+  //     })
+
+  //     form.setValue('BLDATA', response.data || [])
+  //     setIsGetBlInfo(false)
+  //     return response.data
+  //   }
+  //   if (isOpen) {
+  //     fetchBlInfo()
+  //   }
+  // }, [detail?.TR_NO, isOpen])
 
   const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
@@ -461,7 +481,16 @@ export default function OrderControl({
                     <span className="ml-1 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
-                    <RegionCode {...field} />
+                    <RegionCode
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e.target.value)
+                        form.setValue(
+                          'REGION_NAME',
+                          e.target.options[e.target.selectedIndex].text,
+                        )
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

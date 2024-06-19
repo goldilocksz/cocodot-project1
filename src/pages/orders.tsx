@@ -50,6 +50,7 @@ export default function OrderView() {
 
       const filterList = orders.map((obj, index: number) => {
         let newObj: any = {}
+        newObj['id'] = index + 1
         allKeys.forEach((key) => {
           newObj[key] = obj[key] ?? ''
         })
@@ -107,12 +108,26 @@ export default function OrderView() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
-              {orderList?.[0] &&
-                Object.keys(orderList?.[0]).map((key) => (
-                  <TableHead key={key}>
-                    {key.toLocaleLowerCase().replaceAll('_', ' ')}
-                  </TableHead>
-                ))}
+              <TableHead>ID</TableHead>
+              <TableHead>Cc Done Time</TableHead>
+              <TableHead>Update Date</TableHead>
+              <TableHead>Add User Id</TableHead>
+              <TableHead>Add User Name</TableHead>
+              <TableHead>Remarks</TableHead>
+              <TableHead>Job Date</TableHead>
+              <TableHead>Dt Count</TableHead>
+              <TableHead>Lsp Cd</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Time Zone</TableHead>
+              <TableHead>Add Date</TableHead>
+              <TableHead>Client Code</TableHead>
+              <TableHead>Company Code</TableHead>
+              <TableHead>To Truck No</TableHead>
+              <TableHead>Update User Id</TableHead>
+              <TableHead>Bl Count</TableHead>
+              <TableHead>Tr No</TableHead>
+              <TableHead>Region Code</TableHead>
+              <TableHead>Form Route</TableHead>
               <TableHead>Route</TableHead>
             </TableRow>
           </TableHeader>
@@ -130,23 +145,32 @@ export default function OrderView() {
                     setIsOpen(true)
                   }}
                 >
-                  {Object.values(item).map((value, index) =>
-                    dayjs(value).isValid() ? (
-                      <TableCell
-                        key={index}
-                        onDoubleClick={() => {
-                          setDetail(item)
-                          setIsOpen(true)
-                        }}
-                      >
-                        {dayjs(value).format('YYYY-MM-DD HH:mm:ss')}
-                      </TableCell>
-                    ) : (
-                      <TableCell key={index}>
-                        {value !== 'NULL' && value}
-                      </TableCell>
-                    ),
-                  )}
+                  <TableCell>{item.id}</TableCell>
+                  <TableCell>
+                    {dayjs(item.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss')}
+                  </TableCell>
+                  <TableCell>
+                    {dayjs(item.UPDATE_DATE).format('YYYY-MM-DD HH:mm:ss')}
+                  </TableCell>
+                  <TableCell>{item.ADD_USER_ID}</TableCell>
+                  <TableCell>{item.ADD_USER_NAME}</TableCell>
+                  <TableCell>{item.REMARKS}</TableCell>
+                  <TableCell>{item.JOB_DATE}</TableCell>
+                  <TableCell>{item.DT_COUNT}</TableCell>
+                  <TableCell>{item.LSP_CD}</TableCell>
+                  <TableCell>{item.STATUS}</TableCell>
+                  <TableCell>{item.TIME_ZONE}</TableCell>
+                  <TableCell>
+                    {dayjs(item.ADD_DATE).format('YYYY-MM-DD HH:mm:ss')}
+                  </TableCell>
+                  <TableCell>{item.CLIENT_CODE}</TableCell>
+                  <TableCell>{item.COMPANY_CODE}</TableCell>
+                  <TableCell>{item.TO_TRUCK_NO}</TableCell>
+                  <TableCell>{item.UPDATE_USER_ID}</TableCell>
+                  <TableCell>{item.BL_COUNT}</TableCell>
+                  <TableCell>{item.TR_NO}</TableCell>
+                  <TableCell>{item.REGION_CODE}</TableCell>
+                  <TableCell>{item.FROM_ROUTE_CODE}</TableCell>
                   <TableCell>
                     <Button
                       variant="ghost"

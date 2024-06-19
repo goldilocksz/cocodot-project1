@@ -4,6 +4,7 @@ import SearchLine from '@/components/form/SearchLine'
 import Pagination from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import Loading from '@/components/ui/loading'
 import {
   Table,
   TableBody,
@@ -16,7 +17,7 @@ import { Customer } from '@/types/data'
 import request from '@/utils/request'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { Plus } from 'lucide-react'
+import { Plus, RefreshCcw } from 'lucide-react'
 import { useState } from 'react'
 
 export default function customer() {
@@ -27,7 +28,12 @@ export default function customer() {
   const [pageSize, setPageSize] = useState('10')
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: customerList, isPending } = useQuery<Customer[]>({
+  const {
+    data: customerList,
+    isLoading: isGetCustomerList,
+    isRefetching: isRefetching,
+    refetch,
+  } = useQuery<Customer[]>({
     queryKey: ['getCustomer'],
     queryFn: async () => {
       const { data }: { data: Customer[] } = await request.post(
@@ -54,12 +60,19 @@ export default function customer() {
 
   return (
     <section className="relative grow">
+      <Loading isLoading={isGetCustomerList || isRefetching} />
       <div className="flex h-10 items-center justify-between">
         <h1 className="text-lg font-semibold md:text-2xl">Customer</h1>
-        <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
-          <Plus className="h-4 w-4" />
-          Add Customer
-        </Button>
+        <div className="flex gap-2">
+          <Button className="flex gap-1" onClick={() => refetch()}>
+            <RefreshCcw className="h-4 w-4" />
+            Data Refresh
+          </Button>
+          <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+            <Plus className="h-4 w-4" />
+            Add Customer
+          </Button>
+        </div>
       </div>
 
       <Card className="mt-6 p-6">

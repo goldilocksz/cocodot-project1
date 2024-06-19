@@ -88,10 +88,18 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
   })
 
   const { mutate: SaveRoute, isPending: isSaveRoute } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({
+      LATITUDE,
+      LONGITUDE,
+    }: {
+      LATITUDE: number
+      LONGITUDE: number
+    }) => {
       const response = await request.post('/order/updateTrackingInfo', {
         TR_NO: detail?.TR_NO,
         SEQ: seq,
+        LATITUDE,
+        LONGITUDE,
       })
       if (!response.data) {
         toast.error('Failed to save route code information')
@@ -102,10 +110,18 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
   })
 
   const { mutate: DeleteRoute, isPending: isDeleteRoute } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({
+      LATITUDE,
+      LONGITUDE,
+    }: {
+      LATITUDE: number
+      LONGITUDE: number
+    }) => {
       const response = await request.post('/order/deleteTrackingInfo', {
         TR_NO: detail?.TR_NO,
         SEQ: seq,
+        LATITUDE,
+        LONGITUDE,
       })
       if (!response.data) {
         toast.error('Failed to delete route code information')
@@ -209,7 +225,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
                   <div className="h-2 w-2 overflow-hidden rounded-full border border-black"></div>
                 </div>
                 <div>{item.SEQ_NAME}</div>
-                <div className="text-muted-foreground">{item.JOB_DATE}</div>
+                <div className="text-muted-foreground">{item.CHECK_DATE}</div>
               </div>
               <div>
                 {item.BTN_STATUS === 'D' ? (
@@ -230,7 +246,10 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
                       className="h-auto rounded-full border-0 px-2"
                       onClick={() => {
                         setSeq(item.SEQ)
-                        SaveRoute()
+                        SaveRoute({
+                          LATITUDE: form.watch('LATITUDE') as number,
+                          LONGITUDE: form.watch('LONGITUDE') as number,
+                        })
                       }}
                       disabled={isSaveRoute}
                     >
@@ -254,18 +273,13 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
           loading={isDeleteRoute}
           isOpen={isConfirm}
           setIsOpen={setIsConfirm}
-          callback={() => DeleteRoute()}
+          callback={() =>
+            DeleteRoute({
+              LATITUDE: form.watch('LATITUDE') as number,
+              LONGITUDE: form.watch('LONGITUDE') as number,
+            })
+          }
         />
-
-        <DialogFooter className="sm:justify-center">
-          <Button type="submit" form="routeForm">
-            {isUpdateRoute && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {detail ? 'Update' : 'Add'}
-          </Button>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

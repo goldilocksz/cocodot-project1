@@ -27,7 +27,7 @@ import Loading from '@/components/ui/loading'
 import { DateRange } from 'react-day-picker'
 
 export default function DashboardView() {
-  const [CNEE, setCNEE] = useState<string>('')
+  const [CNEE_CODE, setCNEECODE] = useState<string>('')
   const [progressRangeDate, setProgressRangeDate] = useState<DateRange>({
     from: dayjs().subtract(6, 'day').toDate(),
     to: new Date(),
@@ -38,10 +38,10 @@ export default function DashboardView() {
     isLoading: isGetCount,
     isRefetching: isRefetchingCount,
   } = useQuery({
-    queryKey: ['getMainCount', progressRangeDate, CNEE],
+    queryKey: ['getMainCount', progressRangeDate, CNEE_CODE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getMainCount', {
-        CNEE,
+        CNEE_CODE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -60,10 +60,10 @@ export default function DashboardView() {
     isLoading: isGetProgress,
     isRefetching: isRefetchProgress,
   } = useQuery({
-    queryKey: ['getRateOfProgress', progressRangeDate, CNEE],
+    queryKey: ['getRateOfProgress', progressRangeDate, CNEE_CODE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getRateOfProgress', {
-        CNEE,
+        CNEE_CODE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -73,14 +73,14 @@ export default function DashboardView() {
       })
       return [
         {
-          name: 'ATA_CNT',
-          data: response.data.map((item: any) => item.ATA_CNT),
-          date: response.data.map((item: any) => item.VIEW_DATE),
+          name: 'ATD FACTORY',
+          data: response.data.map((item: any) => item['ATD FACTORY']),
+          date: response.data.map((item: any) => item['ETD FACTORY']),
         },
         {
-          name: 'ETD_CNT',
-          data: response.data.map((item: any) => item.ETD_CNT),
-          date: response.data.map((item: any) => item.VIEW_DATE),
+          name: 'ETD FACTORY',
+          data: response.data.map((item: any) => item['ATD FACTORY']),
+          date: response.data.map((item: any) => item['ETD FACTORY']),
         },
       ]
     },
@@ -92,10 +92,10 @@ export default function DashboardView() {
     isLoading: isGetDelivery,
     isRefetching: isRefetchDelivery,
   } = useQuery({
-    queryKey: ['getDelivery', progressRangeDate, CNEE],
+    queryKey: ['getDelivery', progressRangeDate, CNEE_CODE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getDelivery', {
-        CNEE,
+        CNEE_CODE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -117,10 +117,10 @@ export default function DashboardView() {
     isLoading: isGetLeadTime,
     isRefetching: isRefetchLeadTime,
   } = useQuery({
-    queryKey: ['getLeadTimeAVG', progressRangeDate, CNEE],
+    queryKey: ['getLeadTimeAVG', progressRangeDate, CNEE_CODE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTimeAVG', {
-        CNEE,
+        CNEE_CODE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -138,10 +138,10 @@ export default function DashboardView() {
   })
 
   const { data: LeadTime } = useQuery({
-    queryKey: ['getLeadTime', progressRangeDate, CNEE],
+    queryKey: ['getLeadTime', progressRangeDate, CNEE_CODE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTime', {
-        CNEE,
+        CNEE_CODE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -170,10 +170,10 @@ export default function DashboardView() {
     isLoading: isGetListOfProcessing,
     isRefetching: isRefetchingListOfProcessing,
   } = useQuery({
-    queryKey: ['getListOfProcessing', progressRangeDate, CNEE],
+    queryKey: ['getListOfProcessing', progressRangeDate, CNEE_CODE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getListOfProcessing', {
-        CNEE,
+        CNEE_CODE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -195,10 +195,10 @@ export default function DashboardView() {
     isLoading: isGetMonitoring,
     isRefetching: isRefetchMonitoring,
   } = useQuery<Monit[]>({
-    queryKey: ['getMonitoring', progressRangeDate, CNEE],
+    queryKey: ['getMonitoring', progressRangeDate, CNEE_CODE],
     queryFn: async () => {
       const response = await request.post('/monitoring/getMonitoring', {
-        CNEE,
+        CNEE_CODE,
         FROM_DATE:
           progressRangeDate?.from &&
           dayjs(progressRangeDate.from).format('YYYYMMDD'),
@@ -224,8 +224,8 @@ export default function DashboardView() {
         </div>
         <Cnee
           className="w-[100px]"
-          value={CNEE}
-          onChange={(e) => setCNEE(e.target.value)}
+          value={CNEE_CODE}
+          onChange={(e) => setCNEECODE(e.target.value)}
         />
         <DatepickerRange
           date={progressRangeDate}
@@ -255,9 +255,7 @@ export default function DashboardView() {
             <div className="h-8 text-2xl font-bold">
               {Count && <CountUp duration={1} end={Count.ATA_BORDER_CNT} />}
             </div>
-            <div className="mt-2">
-              {Count?.ATA_BORDER_CNT}/{Count?.ATA_BORDER_PER}
-            </div>
+            <div className="mt-2">{Count?.ATA_BORDER_PER}%</div>
           </CardContent>
         </Card>
         <Card>
@@ -273,9 +271,7 @@ export default function DashboardView() {
                 <CountUp duration={1} end={Count.PASS_BORDER_CNT}></CountUp>
               )}
             </div>
-            <div className="mt-2">
-              {Count?.PASS_BORDER_CNT}/{Count?.PASS_BORDER_PER}
-            </div>
+            <div className="mt-2">{Count?.PASS_BORDER_PER}%</div>
           </CardContent>
         </Card>
         <Card>
@@ -289,9 +285,7 @@ export default function DashboardView() {
             <div className="h-8 text-2xl font-bold">
               {Count && <CountUp duration={1} end={Count.ATA_FACTORY_CNT} />}
             </div>
-            <p className="mt-2">
-              {Count?.ATA_FACTORY_CNT}/{Count?.ATA_FACTORY_PER}
-            </p>
+            <p className="mt-2">{Count?.ATA_FACTORY_PER}%</p>
           </CardContent>
         </Card>
       </div>
@@ -322,32 +316,34 @@ export default function DashboardView() {
           </CardHeader>
           <CardContent className="relative">
             <Loading isLoading={isGetDelivery || isRefetchDelivery}></Loading>
-            <Table>
-              <TableHeader>
-                <TableRow className="whitespace-pre-line text-xs">
-                  <TableHead></TableHead>
-                  <TableHead>ATD ~ ATA Border</TableHead>
-                  <TableHead>~ Pass Border</TableHead>
-                  <TableHead>~ ATA VN Yard</TableHead>
-                  <TableHead>~ ATA Factory</TableHead>
-                  <TableHead>~ Total leadtime</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Delivery?.map((item: any) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.REGION_NAME}</TableCell>
-                    <TableCell>{item.ATA_BORDER}</TableCell>
-                    <TableCell>{item.PASS_BORDER}</TableCell>
-                    <TableCell>{item.ATA_VN_YARD}</TableCell>
-                    <TableCell>{item.ATA_FACTORY}</TableCell>
-                    <TableCell>
-                      {item.READTIME} {item.REDDAY}
-                    </TableCell>
+            {Delivery && Delivery?.length > 0 && (
+              <Table>
+                <TableHeader>
+                  <TableRow className="whitespace-pre-line text-xs">
+                    <TableHead></TableHead>
+                    <TableHead>ATD ~ ATA Border</TableHead>
+                    <TableHead>~ Pass Border</TableHead>
+                    <TableHead>~ ATA VN Yard</TableHead>
+                    <TableHead>~ ATA Factory</TableHead>
+                    <TableHead>~ Total leadtime</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {Delivery?.map((item: any) => (
+                    <TableRow key={item.id}>
+                      <TableCell>{item.REGION_NAME}</TableCell>
+                      <TableCell>{item.ATA_BORDER}</TableCell>
+                      <TableCell>{item.PASS_BORDER}</TableCell>
+                      <TableCell>{item.ATA_VN_YARD}</TableCell>
+                      <TableCell>{item.ATA_FACTORY}</TableCell>
+                      <TableCell>
+                        {item.READTIME} {item.REDDAY}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -380,121 +376,123 @@ export default function DashboardView() {
             <Loading
               isLoading={isGetListOfProcessing || isRefetchingListOfProcessing}
             ></Loading>
-            <Table className="mt-2">
-              <TableHeader>
-                <TableRow className="[&>th]:text-center">
-                  <TableHead></TableHead>
-                  <TableHead>
-                    {dayjs(ListOfProcessing?.[0].DAY1_DATE).format('DD-MMMM')}
-                  </TableHead>
-                  <TableHead>
-                    {dayjs(ListOfProcessing?.[0].DAY2_DATE).format('DD-MMMM')}
-                  </TableHead>
-                  <TableHead>
-                    {dayjs(ListOfProcessing?.[0].DAY3_DATE).format('DD-MMMM')}
-                  </TableHead>
-                  <TableHead>
-                    {dayjs(ListOfProcessing?.[0].DAY4_DATE).format('DD-MMMM')}
-                  </TableHead>
-                  <TableHead>
-                    {dayjs(ListOfProcessing?.[0].DAY5_DATE).format('DD-MMMM')}
-                  </TableHead>
-                  <TableHead>
-                    {dayjs(ListOfProcessing?.[0].DAY6_DATE).format('DD-MMMM')}
-                  </TableHead>
-                  <TableHead>
-                    {dayjs(ListOfProcessing?.[0].DAY7_DATE).format('DD-MMMM')}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ListOfProcessing?.map((item: any) => (
-                  <TableRow
-                    key={item.id}
-                    className="[&>td]:relative [&>td]:p-2 [&>td]:text-center"
-                  >
-                    <TableCell>{item.LOC}</TableCell>
-                    <TableCell>
-                      <div className="absolute inset-1">
-                        <div
-                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                          style={{
-                            width: `${(item.DAY1 / ListOfProcessing?.[0].DAY1) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                      <div className="relative z-10">{item.DAY1}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="absolute inset-1">
-                        <div
-                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                          style={{
-                            width: `${(item.DAY2 / ListOfProcessing?.[0].DAY2) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                      <div className="relative z-10">{item.DAY2}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="absolute inset-1">
-                        <div
-                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                          style={{
-                            width: `${(item.DAY3 / ListOfProcessing?.[0].DAY3) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                      <div className="relative z-10">{item.DAY3}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="absolute inset-1">
-                        <div
-                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                          style={{
-                            width: `${(item.DAY4 / ListOfProcessing?.[0].DAY4) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                      <div className="relative z-10">{item.DAY4}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="absolute inset-1">
-                        <div
-                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                          style={{
-                            width: `${(item.DAY5 / ListOfProcessing?.[0].DAY5) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                      <div className="relative z-10">{item.DAY5}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="absolute inset-1">
-                        <div
-                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                          style={{
-                            width: `${(item.DAY6 / ListOfProcessing?.[0].DAY6) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                      <div className="relative z-10">{item.DAY6}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="absolute inset-1">
-                        <div
-                          className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
-                          style={{
-                            width: `${(item.DAY7 / ListOfProcessing?.[0].DAY7) * 100}%`,
-                          }}
-                        ></div>
-                      </div>
-                      <div className="relative z-10">{item.DAY7}</div>
-                    </TableCell>
+            {ListOfProcessing && ListOfProcessing?.length > 0 && (
+              <Table className="mt-2">
+                <TableHeader>
+                  <TableRow className="[&>th]:text-center">
+                    <TableHead></TableHead>
+                    <TableHead>
+                      {dayjs(ListOfProcessing?.[0].DAY1_DATE).format('DD-MMMM')}
+                    </TableHead>
+                    <TableHead>
+                      {dayjs(ListOfProcessing?.[0].DAY2_DATE).format('DD-MMMM')}
+                    </TableHead>
+                    <TableHead>
+                      {dayjs(ListOfProcessing?.[0].DAY3_DATE).format('DD-MMMM')}
+                    </TableHead>
+                    <TableHead>
+                      {dayjs(ListOfProcessing?.[0].DAY4_DATE).format('DD-MMMM')}
+                    </TableHead>
+                    <TableHead>
+                      {dayjs(ListOfProcessing?.[0].DAY5_DATE).format('DD-MMMM')}
+                    </TableHead>
+                    <TableHead>
+                      {dayjs(ListOfProcessing?.[0].DAY6_DATE).format('DD-MMMM')}
+                    </TableHead>
+                    <TableHead>
+                      {dayjs(ListOfProcessing?.[0].DAY7_DATE).format('DD-MMMM')}
+                    </TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {ListOfProcessing?.map((item: any) => (
+                    <TableRow
+                      key={item.id}
+                      className="[&>td]:relative [&>td]:p-2 [&>td]:text-center"
+                    >
+                      <TableCell>{item.LOC}</TableCell>
+                      <TableCell>
+                        <div className="absolute inset-1">
+                          <div
+                            className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                            style={{
+                              width: `${(item.DAY1 / ListOfProcessing?.[0].DAY1) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="relative z-10">{item.DAY1}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="absolute inset-1">
+                          <div
+                            className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                            style={{
+                              width: `${(item.DAY2 / ListOfProcessing?.[0].DAY2) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="relative z-10">{item.DAY2}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="absolute inset-1">
+                          <div
+                            className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                            style={{
+                              width: `${(item.DAY3 / ListOfProcessing?.[0].DAY3) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="relative z-10">{item.DAY3}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="absolute inset-1">
+                          <div
+                            className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                            style={{
+                              width: `${(item.DAY4 / ListOfProcessing?.[0].DAY4) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="relative z-10">{item.DAY4}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="absolute inset-1">
+                          <div
+                            className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                            style={{
+                              width: `${(item.DAY5 / ListOfProcessing?.[0].DAY5) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="relative z-10">{item.DAY5}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="absolute inset-1">
+                          <div
+                            className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                            style={{
+                              width: `${(item.DAY6 / ListOfProcessing?.[0].DAY6) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="relative z-10">{item.DAY6}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="absolute inset-1">
+                          <div
+                            className="absolute inset-0 right-auto flex items-center justify-center border border-green-400 bg-gradient-to-r from-green-300 to-green-100 text-[#111111]"
+                            style={{
+                              width: `${(item.DAY7 / ListOfProcessing?.[0].DAY7) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <div className="relative z-10">{item.DAY7}</div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
         <Card>

@@ -13,7 +13,6 @@ const PolForm = forwardRef<HTMLSelectElement, SelectProps>(
         })
         return data
       },
-      staleTime: 1000 * 60 * 60,
     })
 
     return (

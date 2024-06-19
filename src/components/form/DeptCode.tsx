@@ -19,7 +19,6 @@ const DeptCodeSelect = forwardRef<HTMLSelectElement, SelectProps>(
         })
         return data
       },
-      staleTime: 1000 * 60 * 60,
       enabled: !!CUSTOMER_CODE,
     })
 

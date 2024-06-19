@@ -14,6 +14,7 @@ export default function ChartUI({ data }: Props) {
     <Chart
       options={{
         chart: {
+          stacked: true,
           toolbar: {
             show: false,
           },
@@ -54,6 +55,7 @@ export default function ChartUI({ data }: Props) {
           categories: data[0].date,
         },
         yaxis: {
+          tickAmount: 3,
           labels: {
             style: {
               colors: '#616161',

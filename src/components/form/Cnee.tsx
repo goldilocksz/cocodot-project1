@@ -11,7 +11,6 @@ const CneeSelect = forwardRef<HTMLSelectElement, SelectProps>(
         const { data } = await request.post('/webCommon/getCnee', {})
         return data
       },
-      staleTime: 1000 * 60 * 60,
     })
 
     return (

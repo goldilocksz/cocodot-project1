@@ -11,7 +11,6 @@ const Customer = forwardRef<HTMLSelectElement, SelectProps>(
         const { data } = await request.post('/customer/getCustomer', {})
         return data
       },
-      staleTime: 1000 * 60 * 60,
     })
 
     return (

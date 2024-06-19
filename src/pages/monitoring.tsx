@@ -142,7 +142,7 @@ export default function MonitoringView() {
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.05 }}
           >
-            <Card className="p-6">
+            <Card className="h-[210px] p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <div>{item.REF_NO}</div>
