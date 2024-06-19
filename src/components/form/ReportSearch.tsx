@@ -44,6 +44,7 @@ export default function ReportSearch({ search, setSearch }: Props) {
         : {}),
       ...(data.JOB_TO ? { JOB_TO: dayjs(data.JOB_TO).format('YYYYMMDD') } : {}),
       ...data,
+      random: Math.random(),
     })
   }
 

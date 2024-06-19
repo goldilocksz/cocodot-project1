@@ -18,6 +18,7 @@ import * as XLSX from 'xlsx'
 import request from '@/utils/request'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '@/components/ui/loading'
+import { omit } from 'radash'
 
 export interface Search {
   JOB_FROM: string
@@ -26,6 +27,7 @@ export interface Search {
   BL_NO: string
   CNEE_CODE: string | undefined
   URGENT: string
+  random: number
 }
 
 export default function BlReportView() {
@@ -41,6 +43,7 @@ export default function BlReportView() {
       BL_NO: '',
       CNEE_CODE: undefined,
       URGENT: 'N',
+      random: Math.random(),
     },
   )
 
@@ -55,7 +58,7 @@ export default function BlReportView() {
       const { data }: { data: TrReport[] } = await request.post(
         '/report/getBLReport',
         {
-          ...search,
+          ...omit(search, ['random']),
         },
       )
 

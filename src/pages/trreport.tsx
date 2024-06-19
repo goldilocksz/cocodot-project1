@@ -18,6 +18,7 @@ import request from '@/utils/request'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '@/components/ui/loading'
 import { RefreshCcw } from 'lucide-react'
+import { omit } from 'radash'
 
 export interface Search {
   JOB_FROM: string
@@ -26,6 +27,7 @@ export interface Search {
   BL_NO: string
   CNEE_CODE: string | undefined
   URGENT: string
+  random: number
 }
 
 export default function TrReportView() {
@@ -41,6 +43,7 @@ export default function TrReportView() {
       BL_NO: '',
       CNEE_CODE: undefined,
       URGENT: 'N',
+      random: Math.random(),
     },
   )
   const {
@@ -54,7 +57,7 @@ export default function TrReportView() {
       const { data }: { data: TrReport[] } = await request.post(
         '/report/getTRReport',
         {
-          ...search,
+          ...omit(search, ['random']),
         },
       )
 
