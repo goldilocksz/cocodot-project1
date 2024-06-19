@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { useQuery } from '@tanstack/react-query'
 import request from '@/utils/request'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Monitoring as Monit } from '@/types/data'
 import { group } from 'radash'
 import MultiBar from '@/components/chart/MultiBar'
@@ -25,20 +25,66 @@ import Cnee from '@/components/form/Cnee'
 import { DatepickerRange } from '@/components/ui/datepicker-range'
 import Loading from '@/components/ui/loading'
 import { DateRange } from 'react-day-picker'
+import { Select } from '@/components/ui/select'
 
+const CountdownTimer = ({
+  start,
+  initialSeconds,
+  refetch,
+}: {
+  start: boolean
+  initialSeconds: number
+  refetch: (num: number) => void
+}) => {
+  const [seconds, setSeconds] = useState<number>(initialSeconds)
+
+  useEffect(() => {
+    if (!start) return
+    const interval = setInterval(() => {
+      setSeconds((prevSeconds) => {
+        if (prevSeconds <= 1) {
+          refetch(Math.random())
+          return initialSeconds
+        }
+        return prevSeconds - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [start])
+
+  useEffect(() => {
+    setSeconds(initialSeconds)
+  }, [initialSeconds])
+
+  const formatTime = (totalSeconds: number): string => {
+    const minutes = Math.floor(totalSeconds / 60)
+    const seconds = totalSeconds % 60
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  }
+
+  return (
+    <div>
+      <h1>{formatTime(seconds)}</h1>
+    </div>
+  )
+}
 export default function DashboardView() {
   const [CNEE_CODE, setCNEECODE] = useState<string>('')
+  const [isRefetch, setIsRefetch] = useState<boolean>(true)
+  const [countDown, setCountDown] = useState<number>(5 * 60)
   const [progressRangeDate, setProgressRangeDate] = useState<DateRange>({
     from: dayjs().subtract(6, 'day').toDate(),
     to: new Date(),
   })
+  const [refetch, setRefetch] = useState(0)
 
   const {
     data: Count,
     isLoading: isGetCount,
     isRefetching: isRefetchingCount,
   } = useQuery({
-    queryKey: ['getMainCount', progressRangeDate, CNEE_CODE],
+    queryKey: ['getMainCount', progressRangeDate, CNEE_CODE, refetch],
     queryFn: async () => {
       const response = await request.post('/monitoring/getMainCount', {
         CNEE_CODE,
@@ -60,7 +106,7 @@ export default function DashboardView() {
     isLoading: isGetProgress,
     isRefetching: isRefetchProgress,
   } = useQuery({
-    queryKey: ['getRateOfProgress', progressRangeDate, CNEE_CODE],
+    queryKey: ['getRateOfProgress', progressRangeDate, CNEE_CODE, refetch],
     queryFn: async () => {
       const response = await request.post('/monitoring/getRateOfProgress', {
         CNEE_CODE,
@@ -92,7 +138,7 @@ export default function DashboardView() {
     isLoading: isGetDelivery,
     isRefetching: isRefetchDelivery,
   } = useQuery({
-    queryKey: ['getDelivery', progressRangeDate, CNEE_CODE],
+    queryKey: ['getDelivery', progressRangeDate, CNEE_CODE, refetch],
     queryFn: async () => {
       const response = await request.post('/monitoring/getDelivery', {
         CNEE_CODE,
@@ -117,7 +163,7 @@ export default function DashboardView() {
     isLoading: isGetLeadTime,
     isRefetching: isRefetchLeadTime,
   } = useQuery({
-    queryKey: ['getLeadTimeAVG', progressRangeDate, CNEE_CODE],
+    queryKey: ['getLeadTimeAVG', progressRangeDate, CNEE_CODE, refetch],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTimeAVG', {
         CNEE_CODE,
@@ -138,7 +184,7 @@ export default function DashboardView() {
   })
 
   const { data: LeadTime } = useQuery({
-    queryKey: ['getLeadTime', progressRangeDate, CNEE_CODE],
+    queryKey: ['getLeadTime', progressRangeDate, CNEE_CODE, refetch],
     queryFn: async () => {
       const response = await request.post('/monitoring/getLeadTime', {
         CNEE_CODE,
@@ -170,7 +216,7 @@ export default function DashboardView() {
     isLoading: isGetListOfProcessing,
     isRefetching: isRefetchingListOfProcessing,
   } = useQuery({
-    queryKey: ['getListOfProcessing', progressRangeDate, CNEE_CODE],
+    queryKey: ['getListOfProcessing', progressRangeDate, CNEE_CODE, refetch],
     queryFn: async () => {
       const response = await request.post('/monitoring/getListOfProcessing', {
         CNEE_CODE,
@@ -195,7 +241,7 @@ export default function DashboardView() {
     isLoading: isGetMonitoring,
     isRefetching: isRefetchMonitoring,
   } = useQuery<Monit[]>({
-    queryKey: ['getMonitoring', progressRangeDate, CNEE_CODE],
+    queryKey: ['getMonitoring', progressRangeDate, CNEE_CODE, refetch],
     queryFn: async () => {
       const response = await request.post('/monitoring/getMonitoring', {
         CNEE_CODE,
@@ -216,11 +262,28 @@ export default function DashboardView() {
   return (
     <>
       <div className="grid grid-cols-2 items-center justify-start gap-2 lg:flex lg:justify-end lg:gap-4">
+        <CountdownTimer
+          start={isRefetch}
+          initialSeconds={countDown}
+          refetch={setRefetch}
+        />
+        <Select
+          defaultValue="5"
+          onChange={(e) => setCountDown(Number(e.target.value) * 60)}
+          className="w-[120px]"
+        >
+          <option value="5">5 Minutes</option>
+          <option value="10">10 Minutes</option>
+        </Select>
         <div className="flex items-center gap-2">
           <Label htmlFor="airplane-mode" className="cursor-pointer">
             Auto Refetch
           </Label>
-          <Switch id="airplane-mode" checked={true} />
+          <Switch
+            id="airplane-mode"
+            checked={isRefetch}
+            onCheckedChange={setIsRefetch}
+          />
         </div>
         <Cnee
           className="w-[100px]"
