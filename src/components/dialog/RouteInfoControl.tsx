@@ -24,11 +24,9 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Order, TrakingInfo } from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/utils/request'
-import NationCode from '../form/NationCode'
-import GoogleMap from '../map'
 import { omit } from 'radash'
-import dayjs from 'dayjs'
 import ConfirmDialog from './ConfirmDialog'
+import GoogleMapMulti from '../map/multi'
 
 type Props = {
   detail: Order | undefined
@@ -40,8 +38,6 @@ const formSchema = z.object({
   JOB_DATE: z.string().optional(),
   TR_NO: z.string().optional(),
   TO_ROUTE_CODE: z.string().optional(),
-  LATITUDE: z.number().optional(),
-  LONGITUDE: z.number().optional(),
 })
 type FormKeys = keyof z.infer<typeof formSchema>
 
@@ -49,8 +45,6 @@ const RouteDefault = {
   JOB_DATE: '',
   TR_NO: '',
   TO_ROUTE_CODE: '',
-  LATITUDE: undefined,
-  LONGITUDE: undefined,
 }
 
 export default function RouteInfoControl({ detail, open, setOpen }: Props) {
@@ -76,28 +70,19 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     enabled: !!detail?.TR_NO && open,
   })
 
-  const { mutate: UpdateRoute, isPending: isUpdateRoute } = useMutation({
-    mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request.post('/webCommon/RouteMstSave', value)
-      if (!response.data) {
-        toast.error('Failed to update route code information')
-      } else {
-        setOpen(false)
-      }
-    },
-  })
-
   const { mutate: SaveRoute, isPending: isSaveRoute } = useMutation({
     mutationFn: async ({
+      SEQ,
       LATITUDE,
       LONGITUDE,
     }: {
-      LATITUDE: number
-      LONGITUDE: number
+      SEQ: string
+      LATITUDE: string
+      LONGITUDE: string
     }) => {
       const response = await request.post('/order/updateTrackingInfo', {
         TR_NO: detail?.TR_NO,
-        SEQ: seq,
+        SEQ,
         LATITUDE,
         LONGITUDE,
       })
@@ -110,18 +95,10 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
   })
 
   const { mutate: DeleteRoute, isPending: isDeleteRoute } = useMutation({
-    mutationFn: async ({
-      LATITUDE,
-      LONGITUDE,
-    }: {
-      LATITUDE: number
-      LONGITUDE: number
-    }) => {
+    mutationFn: async (SEQ: string) => {
       const response = await request.post('/order/deleteTrackingInfo', {
         TR_NO: detail?.TR_NO,
-        SEQ: seq,
-        LATITUDE,
-        LONGITUDE,
+        SEQ,
       })
       if (!response.data) {
         toast.error('Failed to delete route code information')
@@ -139,13 +116,15 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     }
   }, [open])
 
-  useEffect(() => {
-    if (!open) return
+  const handleSave = async (SEQ: string) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          form.setValue('LATITUDE', position.coords.latitude)
-          form.setValue('LONGITUDE', position.coords.longitude)
+          SaveRoute({
+            SEQ,
+            LATITUDE: position.coords.latitude.toString(),
+            LONGITUDE: position.coords.longitude.toString(),
+          })
         },
         (error) => {
           toast.error(error.message)
@@ -154,14 +133,8 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     } else {
       toast.error('Geolocation is not supported by this browser.')
     }
-  }, [open])
-
-  const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    UpdateRoute(value)
   }
-  const formSchemaMap = Object.keys(
-    omit(formSchema.shape, ['LATITUDE', 'LONGITUDE']),
-  ) as FormKeys[]
+  const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
 
   return (
     <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
@@ -171,11 +144,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
         </DialogHeader>
 
         <Form {...form}>
-          <form
-            id="routeForm"
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="relative grid grid-cols-3 gap-4"
-          >
+          <form id="routeForm" className="relative grid grid-cols-3 gap-4">
             {formSchemaMap.map((key: FormKeys) => (
               <FormField
                 key={key}
@@ -191,7 +160,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
                       )}
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -201,18 +170,11 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
           </form>
         </Form>
 
-        {form.watch('LATITUDE') && form.watch('LONGITUDE') && (
-          <div className="relative h-[300px]">
-            <GoogleMap
-              lat={form.watch('LATITUDE') as number}
-              lng={form.watch('LONGITUDE') as number}
-              setPosition={(value) => {
-                form.setValue('LATITUDE', value.lat)
-                form.setValue('LONGITUDE', value.lng)
-              }}
-            />
-          </div>
-        )}
+        <div className="relative h-[300px]">
+          {trakingInfo && trakingInfo?.length > 0 && (
+            <GoogleMapMulti data={trakingInfo} />
+          )}
+        </div>
 
         <div className="h-[300px] overflow-y-auto px-1">
           {trakingInfo?.map((item) => (
@@ -244,14 +206,8 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
                     <Button
                       variant="outline"
                       className="h-auto rounded-full border-0 px-2"
-                      onClick={() => {
-                        setSeq(item.SEQ)
-                        SaveRoute({
-                          LATITUDE: form.watch('LATITUDE') as number,
-                          LONGITUDE: form.watch('LONGITUDE') as number,
-                        })
-                      }}
-                      disabled={isSaveRoute}
+                      onClick={() => handleSave(item.SEQ)}
+                      type="submit"
                     >
                       {isSaveRoute ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -273,12 +229,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
           loading={isDeleteRoute}
           isOpen={isConfirm}
           setIsOpen={setIsConfirm}
-          callback={() =>
-            DeleteRoute({
-              LATITUDE: form.watch('LATITUDE') as number,
-              LONGITUDE: form.watch('LONGITUDE') as number,
-            })
-          }
+          callback={() => DeleteRoute(seq!)}
         />
       </DialogContent>
     </Dialog>
