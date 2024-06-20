@@ -37,6 +37,7 @@ type Props = {
 const formSchema = z.object({
   JOB_DATE: z.string().optional(),
   TR_NO: z.string().optional(),
+  FROM_ROUTE_CODE: z.string().optional(),
   TO_ROUTE_CODE: z.string().optional(),
 })
 type FormKeys = keyof z.infer<typeof formSchema>
@@ -44,6 +45,7 @@ type FormKeys = keyof z.infer<typeof formSchema>
 const RouteDefault = {
   JOB_DATE: '',
   TR_NO: '',
+  FROM_ROUTE_CODE: '',
   TO_ROUTE_CODE: '',
 }
 
@@ -145,28 +147,48 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
 
         <Form {...form}>
           <form id="routeForm" className="relative grid grid-cols-3 gap-4">
-            {formSchemaMap.map((key: FormKeys) => (
-              <FormField
-                key={key}
-                control={form.control}
-                name={key}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="capitalize">
-                      {key.replace(/_/g, ' ').toLowerCase()}
-                      {/* @ts-ignore */}
-                      {formSchema.shape[key]?.min && (
-                        <span className="ml-1 text-destructive">*</span>
-                      )}
-                    </FormLabel>
-                    <FormControl>
-                      <Input {...field} readOnly />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
+            <FormField
+              control={form.control}
+              name="JOB_DATE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Job Date</FormLabel>
+                  <FormControl>
+                    <Input {...field} readOnly />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TR_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>TR No</FormLabel>
+                  <FormControl>
+                    <Input {...field} readOnly />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TO_ROUTE_CODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Route Code</FormLabel>
+                  <FormControl>
+                    <Input
+                      defaultValue={`${form.watch('FROM_ROUTE_CODE')}-${form.watch('TO_ROUTE_CODE')}`}
+                      readOnly
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </form>
         </Form>
 

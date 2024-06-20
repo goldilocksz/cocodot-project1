@@ -22,6 +22,7 @@ import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import RouteInfoControl from '@/components/dialog/RouteInfoControl'
 
 export default function OrderView() {
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
   const [searchData, setSearchData] = useState<Order[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [open, setOpen] = useState(false)
@@ -78,6 +79,16 @@ export default function OrderView() {
       setDetail(undefined)
     }
   }, [isOpen])
+
+  const handleDoubleClick = (item: Order) => {
+    if (user.CUSTOMER_TYPE === 'LSP' && user.GRADE === '3') {
+      setDetail(item)
+      setOpen(true)
+    } else {
+      setDetail(item)
+      setIsOpen(true)
+    }
+  }
 
   return (
     <section className="relative grow">
@@ -140,10 +151,7 @@ export default function OrderView() {
               .map((item) => (
                 <TableRow
                   key={item.TR_NO}
-                  onDoubleClick={() => {
-                    setDetail(item)
-                    setIsOpen(true)
-                  }}
+                  onDoubleClick={() => handleDoubleClick(item)}
                 >
                   <TableCell>{item.id}</TableCell>
                   <TableCell>

@@ -120,8 +120,6 @@ export default function DashboardView() {
 
       const titleGroup = group(response.data, (item: any) => item.VIEW_DATE)
 
-      console.log(Object.keys(titleGroup).reverse())
-
       const data = {
         labels: Object.keys(titleGroup).reverse(),
         datasets: [

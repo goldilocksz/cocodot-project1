@@ -151,14 +151,17 @@ export default function OrderControl({
   setIsConfirm,
   refetch,
 }: Props) {
-  const [isGetBlInfo, setIsGetBlInfo] = useState(false)
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: OrderDefault,
   })
 
-  const { data: blInfo, refetch: refetchBlInfo } = useQuery({
-    queryKey: ['getOrderBLInfo', detail?.TR_NO],
+  const {
+    data: blInfo,
+    isPending: isGetBlInfo,
+    refetch: refetchBlInfo,
+  } = useQuery({
+    queryKey: ['getOrderBLInfo', isOpen],
     queryFn: async () => {
       const response = await request.post('/order/getOrderBLInfo', {
         TR_NO: detail?.TR_NO,
@@ -171,7 +174,7 @@ export default function OrderControl({
       }
       return response.data
     },
-    enabled: !!detail?.TR_NO && isOpen,
+    enabled: isOpen,
     gcTime: 0,
   })
 
@@ -768,14 +771,18 @@ export default function OrderControl({
             {isUpdateOrder && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {detail ? 'Update' : 'Add'}
           </Button>
-          <Button
-            form="routeForm"
-            variant="destructive"
-            onClick={() => setIsConfirm(true)}
-          >
-            {isUpdateOrder && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete
-          </Button>
+          {detail && (
+            <Button
+              form="routeForm"
+              variant="destructive"
+              onClick={() => setIsConfirm(true)}
+            >
+              {isUpdateOrder && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Delete
+            </Button>
+          )}
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>
