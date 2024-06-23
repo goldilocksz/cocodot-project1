@@ -26,6 +26,7 @@ import { DatepickerRange } from '@/components/ui/datepicker-range'
 import Loading from '@/components/ui/loading'
 import { DateRange } from 'react-day-picker'
 import { Select } from '@/components/ui/select'
+import { cn } from '@/utils/utils'
 
 const CountdownTimer = ({
   start,
@@ -598,17 +599,35 @@ export default function DashboardView() {
             ></Loading>
             {Monitoring?.map((item) => (
               <div key={item.id} className="border-b py-1 last:border-0">
-                <div className="flex items-start gap-1">
-                  <div className="whitespace-nowrap">LSP:</div>
-                  <div>{item.LSP_CD}</div>
-                </div>
-                <div className="flex items-start gap-1">
-                  <div className="whitespace-nowrap">Remarks:</div>
-                  <div>{item.REF_NO}</div>
-                </div>
-                <div className="flex items-start gap-1">
-                  <div className="whitespace-nowrap">Now Status:</div>
-                  <div>{item.NOW_STATUS}</div>
+                <div className="flex items-center justify-between">
+                  <div className="grow">
+                    <div className="flex items-center gap-1">
+                      <div className="whitespace-nowrap">LSP:</div>
+                      <div>{item.LSP_CD}</div>
+                    </div>
+                    <div className="flex items-start gap-1">
+                      <div className="whitespace-nowrap">Remarks:</div>
+                      <div>{item.REF_NO}</div>
+                    </div>
+                    <div className="flex items-start gap-1">
+                      <div className="whitespace-nowrap">Now Status:</div>
+                      <div>{item.NOW_STATUS}</div>
+                    </div>
+                  </div>
+                  <div className="relative ml-auto flex h-3 w-3">
+                    <span
+                      className={cn(
+                        'absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75',
+                        item.CHECK_YN === 'N' && 'bg-red-400',
+                      )}
+                    ></span>
+                    <span
+                      className={cn(
+                        'relative inline-flex h-3 w-3 rounded-full bg-green-500',
+                        item.CHECK_YN === 'N' && 'bg-red-400',
+                      )}
+                    ></span>
+                  </div>
                 </div>
               </div>
             ))}

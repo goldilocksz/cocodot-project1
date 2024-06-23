@@ -101,7 +101,6 @@ const formSchema = z.object({
       INCOTERMS: z.string().min(1, {
         message: 'Incoterms is required',
       }),
-      INVOICE_NO: z.string(),
       REF_INVOICE_NO: z.string().optional(),
       ITEM_CODE: z.string().optional(),
       QTY: z.number().optional(),
@@ -671,22 +670,6 @@ export default function OrderControl({
                               className="w-[120px] shrink-0"
                               {...field}
                             />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.INVOICE_NO`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Invoice No
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
