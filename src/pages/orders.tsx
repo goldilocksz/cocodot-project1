@@ -1,6 +1,6 @@
 import { Check, Plus, RefreshCcw, Route, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { Order } from '@/types/data'
 import {
   Table,
@@ -20,10 +20,29 @@ import OrderControl from '@/components/dialog/OrderControl'
 import Pagination from '@/components/pagination'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import RouteInfoControl from '@/components/dialog/RouteInfoControl'
+import OrderSearch from '@/components/form/OrderSearch'
+
+export interface Search {
+  JOB_DATE_FROM: string
+  JOB_DATE_TO: string
+  LSP_CD: string
+  TR_NO: string
+  random: number
+}
 
 export default function OrderView() {
   const user = JSON.parse(localStorage.getItem('user') || '{}')
-  const [searchData, setSearchData] = useState<Order[]>([])
+  const [list, setList] = useState<Order[]>([])
+  const [search, setSearch] = useReducer(
+    (state: Search, newState: Partial<Search>) => ({ ...state, ...newState }),
+    {
+      JOB_DATE_FROM: dayjs().subtract(13, 'day').format('YYYYMMDD'),
+      JOB_DATE_TO: dayjs().format('YYYYMMDD'),
+      LSP_CD: '',
+      TR_NO: '',
+      random: Math.random(),
+    },
+  )
   const [isOpen, setIsOpen] = useState(false)
   const [open, setOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
@@ -37,9 +56,14 @@ export default function OrderView() {
     isRefetching,
     refetch,
   } = useQuery<Order[]>({
-    queryKey: ['getOrderList'],
+    queryKey: ['getOrderList', search],
     queryFn: async () => {
-      const { data } = await request.post('/order/getOrderList', {})
+      const { data } = await request.post('/order/getOrderList', {
+        JOB_DATE_FROM: search.JOB_DATE_FROM,
+        JOB_DATE_TO: search.JOB_DATE_TO,
+        LSP_CD: search.LSP_CD,
+        TR_NO: search.TR_NO,
+      })
 
       const orders: Order[] = data?.map((user: any, index: number) => ({
         ...user,
@@ -57,7 +81,6 @@ export default function OrderView() {
         })
         return newObj
       })
-      setSearchData(orders)
       return filterList
     },
   })
@@ -108,13 +131,7 @@ export default function OrderView() {
       </div>
 
       <Card className="relative mt-6 p-6">
-        <SearchLine
-          setPage={setPage}
-          pageSize={pageSize}
-          setPageSize={setPageSize}
-          searchData={searchData}
-          queryKey={['getOrderList']}
-        />
+        <OrderSearch search={search} setSearch={setSearch} />
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
@@ -153,25 +170,25 @@ export default function OrderView() {
                   onDoubleClick={() => handleDoubleClick(item)}
                 >
                   <TableCell>{item.TR_NO}</TableCell>
-                  <TableCell>{item.BL_COUNT}</TableCell>
-                  <TableCell>NULL</TableCell>
+                  <TableCell>{item.BL_NO}</TableCell>
+                  <TableCell>{item.CNEE}</TableCell>
                   <TableCell>{item.LSP_CD}</TableCell>
                   <TableCell>{item.POL}</TableCell>
-                  <TableCell>NULL</TableCell>
-                  <TableCell>NULL</TableCell>
-                  <TableCell>NULL</TableCell>
-                  <TableCell>NULL</TableCell>
-                  <TableCell>NULL</TableCell>
+                  <TableCell>{item.VENDOR_NAME}</TableCell>
+                  <TableCell>{item.REF_INVOICE_NO}</TableCell>
+                  <TableCell>{item.INCOTERMS}</TableCell>
+                  <TableCell>{item.FROM_ROUTE_CODE}</TableCell>
+                  <TableCell>{item.TO_ROUTE_CODE}</TableCell>
                   <TableCell>{item.FROM_TRUCK_NO}</TableCell>
-                  <TableCell>NULL</TableCell>
-                  <TableCell>TO_TRUCK_NO</TableCell>
-                  <TableCell>TRUCK_TYPE</TableCell>
+                  <TableCell>{item.FROM_TRUCK_TYPE}</TableCell>
+                  <TableCell>{item.TO_TRUCK_NO}</TableCell>
+                  <TableCell>{item.TO_TRUCK_TYPE}</TableCell>
+                  <TableCell>{item.REGION_NAME}</TableCell>
                   <TableCell>
                     {dayjs(item.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss')}
                   </TableCell>
-                  <TableCell>ITEM_CODE</TableCell>
-                  <TableCell>{item.BL_COUNT}</TableCell>
-                  <TableCell>{item.TR_NO}</TableCell>
+                  <TableCell>{item.ITEM_CODE}</TableCell>
+                  <TableCell>{item.PLT_QTY}</TableCell>
                   <TableCell>
                     {item.URGENT === 'Y' ? (
                       <Check className="h-4 w-4 text-green-600" />

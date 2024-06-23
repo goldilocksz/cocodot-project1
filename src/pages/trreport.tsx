@@ -152,8 +152,8 @@ export default function TrReportView() {
               )
               .map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell>{item?.COMPANY_CODE || ''}</TableCell>
-                  <TableCell>{item?.TR_NO || ''}</TableCell>
+                  <TableCell>{item.COMPANY_CODE || ''}</TableCell>
+                  <TableCell>{item.TR_NO || ''}</TableCell>
                   <TableCell>{item?.STATUS || ''}</TableCell>
                   <TableCell>{item?.BL_NO || ''}</TableCell>
                   <TableCell>{item?.LSP_CD || ''}</TableCell>
@@ -169,13 +169,13 @@ export default function TrReportView() {
                   <TableCell>{item.VN_TRUCK_NO || ''}</TableCell>
                   <TableCell>{item.VN_TRUCK_TYPE || ''}</TableCell>
                   <TableCell>
-                    {dayjs(item.ETD).isValid()
+                    {item.ETD
                       ? dayjs(item.ETD).format('YYYY-MM-DD HH:mm:ss')
                       : ''}
                   </TableCell>
                   <TableCell>{item.PLT_QTY || ''}</TableCell>
                   <TableCell>
-                    {dayjs(item.ATA_FACTORY_TO_PICK_UP).isValid()
+                    {item.ATA_FACTORY_TO_PICK_UP
                       ? dayjs(item.ATA_FACTORY_TO_PICK_UP).format(
                           'YYYY-MM-DD HH:mm:ss',
                         )

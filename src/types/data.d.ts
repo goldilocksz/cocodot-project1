@@ -140,6 +140,17 @@ export interface TrReport {
 export interface Order {
   COMPANY_CODE: string
   TR_NO: string
+  BL_NO: string
+  CNEE: string
+  VENDOR_NAME: string
+  REF_INVOICE_NO: string
+  INCOTERMS: string
+  FROM_ROUTE_CODE: string
+  TO_ROUTE_CODE: string
+  FROM_TRUCK_TYPE: string
+  TO_TRUCK_TYPE: string
+  ITEM_CODE: string
+  PLT_QTY: number
   CUSTOMER_CODE: string
   CLIENT_CODE: string
   LSP_CD: string
