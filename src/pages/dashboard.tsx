@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import CountUp from 'react-countup'
 import Chart from '@/components/chart'
@@ -125,19 +125,11 @@ export default function DashboardView() {
         datasets: [
           {
             name: 'ATD FACTORY',
-            data: response.data.map((item: any) => ({
-              x: item.VIEW_DATE,
-              y: item['ATD FACTORY'],
-              goals: [
-                {
-                  name: 'ETD FACTORY',
-                  value: item['ETD FACTORY'],
-                  style: {
-                    strokeColor: '#52525b',
-                  },
-                },
-              ],
-            })),
+            data: response.data.map((item: any) => item['ATD FACTORY']),
+          },
+          {
+            name: 'ETD FACTORY',
+            data: response.data.map((item: any) => item['ETD FACTORY']),
           },
         ],
       }
@@ -307,6 +299,10 @@ export default function DashboardView() {
           date={progressRangeDate}
           setDate={setProgressRangeDate}
         ></DatepickerRange>
+        <Button onClick={() => setRefetch(Math.random())}>
+          <Search className="h-4 w-4" />
+          Search
+        </Button>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
@@ -329,7 +325,12 @@ export default function DashboardView() {
           <CardContent className="relative text-center">
             <Loading isLoading={isGetCount || isRefetchingCount}></Loading>
             <div className="h-8 text-2xl font-bold">
-              {Count && <CountUp duration={1} end={Count.ATA_BORDER_CNT} />}
+              {Count && (
+                <div className="flex items-center justify-center gap-1">
+                  <CountUp duration={1} end={Count.ATA_BORDER_CNT} /> {'/'}
+                  <CountUp duration={1} end={Count.PROCESSING} />
+                </div>
+              )}
             </div>
             <div className="mt-2">{Count?.ATA_BORDER_PER}%</div>
           </CardContent>
@@ -344,7 +345,10 @@ export default function DashboardView() {
             <Loading isLoading={isGetCount || isRefetchingCount}></Loading>
             <div className="h-8 text-2xl font-bold">
               {Count && (
-                <CountUp duration={1} end={Count.PASS_BORDER_CNT}></CountUp>
+                <div className="flex items-center justify-center gap-1">
+                  <CountUp duration={1} end={Count.PASS_BORDER_CNT} /> {'/'}
+                  <CountUp duration={1} end={Count.PROCESSING} />
+                </div>
               )}
             </div>
             <div className="mt-2">{Count?.PASS_BORDER_PER}%</div>
@@ -359,7 +363,12 @@ export default function DashboardView() {
           <CardContent className="relative text-center">
             <Loading isLoading={isGetCount || isRefetchingCount}></Loading>
             <div className="h-8 text-2xl font-bold">
-              {Count && <CountUp duration={1} end={Count.ATA_FACTORY_CNT} />}
+              {Count && (
+                <div className="flex items-center justify-center gap-1">
+                  <CountUp duration={1} end={Count.ATA_FACTORY_CNT} /> {'/'}
+                  <CountUp duration={1} end={Count.PROCESSING} />
+                </div>
+              )}
             </div>
             <p className="mt-2">{Count?.ATA_FACTORY_PER}%</p>
           </CardContent>
@@ -436,7 +445,7 @@ export default function DashboardView() {
                 <div>{item.ROUTE}</div>
                 <div className="flex items-center gap-1">
                   <div className="text-xl font-bold">{item.READTIME}</div>
-                  <div className="text-sm text-muted-foreground">hrc</div>
+                  <div className="text-sm text-muted-foreground">hrs</div>
                 </div>
               </div>
             ))}

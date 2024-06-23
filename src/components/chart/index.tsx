@@ -5,7 +5,6 @@ export default function ChartUI({ data }: any) {
     <Chart
       options={{
         chart: {
-          stacked: true,
           toolbar: {
             show: false,
           },
@@ -55,11 +54,6 @@ export default function ChartUI({ data }: any) {
               fontWeight: 400,
             },
           },
-        },
-        legend: {
-          show: true,
-          showForSingleSeries: true,
-          customLegendItems: ['ATD FACTORY', 'ETD FACTORY'],
         },
         grid: {
           show: true,

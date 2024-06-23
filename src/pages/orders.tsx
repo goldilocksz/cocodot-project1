@@ -1,4 +1,4 @@
-import { Plus, RefreshCcw, Route } from 'lucide-react'
+import { Check, Plus, RefreshCcw, Route, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
 import { Order } from '@/types/data'
@@ -119,26 +119,25 @@ export default function OrderView() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Cc Done Time</TableHead>
-              <TableHead>Update Date</TableHead>
-              <TableHead>Add User Id</TableHead>
-              <TableHead>Add User Name</TableHead>
-              <TableHead>Remarks</TableHead>
-              <TableHead>Job Date</TableHead>
-              <TableHead>Dt Count</TableHead>
-              <TableHead>Lsp Cd</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Time Zone</TableHead>
-              <TableHead>Add Date</TableHead>
-              <TableHead>Client Code</TableHead>
-              <TableHead>Company Code</TableHead>
-              <TableHead>To Truck No</TableHead>
-              <TableHead>Update User Id</TableHead>
-              <TableHead>Bl Count</TableHead>
-              <TableHead>Tr No</TableHead>
-              <TableHead>Region Code</TableHead>
-              <TableHead>Form Route</TableHead>
+              <TableHead>TR No</TableHead>
+              <TableHead>BL NO</TableHead>
+              <TableHead>CNEE</TableHead>
+              <TableHead>LSP CD</TableHead>
+              <TableHead>POL</TableHead>
+              <TableHead>VENDOR NAME</TableHead>
+              <TableHead>INVOICE NO</TableHead>
+              <TableHead>INCOTERMS</TableHead>
+              <TableHead>FROM(BORDER)</TableHead>
+              <TableHead>TO(BORDER)</TableHead>
+              <TableHead>FROM TRUCK NO</TableHead>
+              <TableHead>TRUCK TYPE</TableHead>
+              <TableHead>TO TRUCK NO</TableHead>
+              <TableHead>TRUCK TYPE</TableHead>
+              <TableHead>REGION</TableHead>
+              <TableHead>CC DONE TIME</TableHead>
+              <TableHead>ITEM CODE</TableHead>
+              <TableHead>PLT</TableHead>
+              <TableHead>URGENT</TableHead>
               <TableHead>Route</TableHead>
             </TableRow>
           </TableHeader>
@@ -153,32 +152,33 @@ export default function OrderView() {
                   key={item.TR_NO}
                   onDoubleClick={() => handleDoubleClick(item)}
                 >
-                  <TableCell>{item.id}</TableCell>
+                  <TableCell>{item.TR_NO}</TableCell>
+                  <TableCell>{item.BL_COUNT}</TableCell>
+                  <TableCell>NULL</TableCell>
+                  <TableCell>{item.LSP_CD}</TableCell>
+                  <TableCell>{item.POL}</TableCell>
+                  <TableCell>NULL</TableCell>
+                  <TableCell>NULL</TableCell>
+                  <TableCell>NULL</TableCell>
+                  <TableCell>NULL</TableCell>
+                  <TableCell>NULL</TableCell>
+                  <TableCell>{item.FROM_TRUCK_NO}</TableCell>
+                  <TableCell>NULL</TableCell>
+                  <TableCell>TO_TRUCK_NO</TableCell>
+                  <TableCell>TRUCK_TYPE</TableCell>
                   <TableCell>
                     {dayjs(item.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss')}
                   </TableCell>
-                  <TableCell>
-                    {dayjs(item.UPDATE_DATE).format('YYYY-MM-DD HH:mm:ss')}
-                  </TableCell>
-                  <TableCell>{item.ADD_USER_ID}</TableCell>
-                  <TableCell>{item.ADD_USER_NAME}</TableCell>
-                  <TableCell>{item.REMARKS}</TableCell>
-                  <TableCell>{item.JOB_DATE}</TableCell>
-                  <TableCell>{item.DT_COUNT}</TableCell>
-                  <TableCell>{item.LSP_CD}</TableCell>
-                  <TableCell>{item.STATUS}</TableCell>
-                  <TableCell>{item.TIME_ZONE}</TableCell>
-                  <TableCell>
-                    {dayjs(item.ADD_DATE).format('YYYY-MM-DD HH:mm:ss')}
-                  </TableCell>
-                  <TableCell>{item.CLIENT_CODE}</TableCell>
-                  <TableCell>{item.COMPANY_CODE}</TableCell>
-                  <TableCell>{item.TO_TRUCK_NO}</TableCell>
-                  <TableCell>{item.UPDATE_USER_ID}</TableCell>
+                  <TableCell>ITEM_CODE</TableCell>
                   <TableCell>{item.BL_COUNT}</TableCell>
                   <TableCell>{item.TR_NO}</TableCell>
-                  <TableCell>{item.REGION_CODE}</TableCell>
-                  <TableCell>{item.FROM_ROUTE_CODE}</TableCell>
+                  <TableCell>
+                    {item.URGENT === 'Y' ? (
+                      <Check className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <X className="h-4 w-4 text-destructive" />
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Button
                       variant="ghost"

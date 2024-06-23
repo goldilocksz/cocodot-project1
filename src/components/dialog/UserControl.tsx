@@ -136,6 +136,7 @@ const formSchema = z.object({
   USER_LANG: z.string().min(1, {
     message: 'User Lang is required',
   }),
+  GRADE: z.string().optional(),
   ACCOUNT_NAME: z
     .string()
     .max(50, {
@@ -158,6 +159,7 @@ const defaultValues = {
   USE_YN: 'Y',
   USER_LANG: '',
   ACCOUNT_NAME: '',
+  GRADE: '',
 }
 
 export default function UserControl({
@@ -249,6 +251,9 @@ export default function UserControl({
             </FormFieldItem>
             <FormFieldItem form={form} name="USER_LANG" isRequired>
               <UserLang {...form.register('USER_LANG')} />
+            </FormFieldItem>
+            <FormFieldItem form={form} name="GRADE">
+              <Input {...form.register('GRADE')} />
             </FormFieldItem>
             <FormFieldItem form={form} label="Use Y/N" name="USE_YN">
               <Switch
