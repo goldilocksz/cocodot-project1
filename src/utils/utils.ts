@@ -11,5 +11,5 @@ dayjs.extend(utc)
 
 export function dateFormat(date: string) {
   const utcDate = dayjs.utc(date)
-  return dayjs(utcDate).format('YYYY-MM-DD HH:mm:ss')
+  return dayjs(utcDate).format('YYYY-MM-DD HH:mm')
 }

@@ -21,6 +21,7 @@ import Pagination from '@/components/pagination'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import RouteInfoControl from '@/components/dialog/RouteInfoControl'
 import OrderSearch from '@/components/form/OrderSearch'
+import { dateFormat } from '@/utils/utils'
 
 export interface Search {
   JOB_DATE_FROM: string
@@ -184,9 +185,7 @@ export default function OrderView() {
                   <TableCell>{item.TO_TRUCK_NO}</TableCell>
                   <TableCell>{item.TO_TRUCK_TYPE}</TableCell>
                   <TableCell>{item.REGION_NAME}</TableCell>
-                  <TableCell>
-                    {dayjs(item.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss')}
-                  </TableCell>
+                  <TableCell>{dateFormat(item.CC_DONE_TIME)}</TableCell>
                   <TableCell>{item.ITEM_CODE}</TableCell>
                   <TableCell>{item.PLT_QTY}</TableCell>
                   <TableCell>

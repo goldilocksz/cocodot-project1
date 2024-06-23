@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table'
 import { Customer } from '@/types/data'
 import request from '@/utils/request'
+import { dateFormat } from '@/utils/utils'
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Plus, RefreshCcw } from 'lucide-react'
@@ -129,8 +130,7 @@ export default function customer() {
                   <TableCell>{item.CUSTOMER_NAME_ENG}</TableCell>
                   <TableCell>{item.TEL_NO}</TableCell>
                   <TableCell>
-                    {item.UPDATE_DATE &&
-                      dayjs(item.UPDATE_DATE).format('YYYY-MM-DD')}
+                    {item.UPDATE_DATE && dateFormat(item.UPDATE_DATE)}
                   </TableCell>
                   <TableCell>{item.ADD_USER_ID}</TableCell>
                   <TableCell>{item.CUSTOMER_TYPE}</TableCell>
@@ -141,7 +141,7 @@ export default function customer() {
                   <TableCell>{item.TIME_ZONE}</TableCell>
                   <TableCell>{item.CUSTOMER_NAME}</TableCell>
                   <TableCell>
-                    {item.ADD_DATE && dayjs(item.ADD_DATE).format('YYYY-MM-DD')}
+                    {item.ADD_DATE && dateFormat(item.ADD_DATE)}
                   </TableCell>
                   <TableCell>{item.CUSTOMER_CODE}</TableCell>
                   <TableCell>{item.UPDATE_USER_NAME}</TableCell>

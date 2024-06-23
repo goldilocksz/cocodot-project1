@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/utils/utils'
+import { cn, dateFormat } from '@/utils/utils'
 import { Loader2, Plus, RefreshCcw, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import {
@@ -147,7 +147,7 @@ export default function MonitoringView() {
                 <div>
                   <div>{item.REF_NO}</div>
                   <div className="text-sm text-muted-foreground">
-                    {item.LAST_UPDATE_DATE}
+                    {dateFormat(item.LAST_UPDATE_DATE)}
                   </div>
                 </div>
                 <div className="relative flex h-3 w-3 self-start">
