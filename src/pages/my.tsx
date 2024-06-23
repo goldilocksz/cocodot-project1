@@ -18,44 +18,6 @@ import request from '@/utils/request'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 
-interface FormFieldItemProps<T extends FieldValues> {
-  name: Path<T>
-  label?: string
-  isRequired?: boolean
-  children: ReactNode
-  form: { control: Control<T> }
-}
-
-const FormFieldItem = <T extends FieldValues>({
-  name,
-  label,
-  isRequired,
-  children,
-  form,
-}: FormFieldItemProps<T>) => {
-  return (
-    <FormField
-      key={name}
-      control={form.control}
-      name={name}
-      render={(_) => (
-        <FormItem>
-          <FormLabel className="capitalize">
-            {label
-              ? label
-              : name.includes('_')
-                ? name.replace(/_/g, ' ').toLowerCase()
-                : name}
-            {isRequired && <span className="ml-1 text-destructive">*</span>}
-          </FormLabel>
-          <FormControl>{children}</FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  )
-}
-
 export default function my() {
   const user = localStorage.getItem('user')
   const form = useForm({
@@ -105,25 +67,77 @@ export default function my() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="relative grid grid-cols-2 gap-4"
           >
-            <FormFieldItem form={form} name="USER_ID">
-              <Input
-                {...form.register('USER_ID')}
-                readOnly
-                className="bg-gray-200"
-              />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="PW">
-              <Input {...form.register('PW')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="USER_NAME">
-              <Input {...form.register('USER_NAME')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="TEL_NO">
-              <Input {...form.register('TEL_NO')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="EMAIL">
-              <Input {...form.register('EMAIL')} />
-            </FormFieldItem>
+            <FormField
+              control={form.control}
+              name="USER_ID"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">User Id</FormLabel>
+                  <FormControl>
+                    <Input {...field} readOnly className="bg-gray-200" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="PW"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    PW
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="USER_NAME"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    User Name
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TEL_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Tel No</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="EMAIL"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="col-span-2 mt-4 flex items-center justify-center">
               <Button type="submit" disabled={isUpdateUser}>
                 {isUpdateUser ? (

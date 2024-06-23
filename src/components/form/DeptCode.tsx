@@ -10,7 +10,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 const DeptCodeSelect = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, CUSTOMER_CODE, ...props }, ref) => {
+  ({ CUSTOMER_CODE, ...props }, ref) => {
     const { data: DeptCode, isLoading } = useQuery({
       queryKey: ['getDeptCode', CUSTOMER_CODE],
       queryFn: async () => {

@@ -1,4 +1,5 @@
 import { Auth } from '@/types/data'
+import request from '@/utils/request'
 import {
   ReactNode,
   createContext,
@@ -23,6 +24,7 @@ interface AuthProviderProps {
 const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const navigate = useNavigate()
   const [user, setUser] = useState<Auth | null>(null)
+  const [menu, setMenu] = useState()
 
   useEffect(() => {
     const user = localStorage.getItem('user')

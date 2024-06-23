@@ -26,49 +26,11 @@ import NationCode from '../form/NationCode'
 import { User } from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/utils/request'
-import { Switch } from '../ui/switch'
 import Customer from '../form/Customer'
 import DeptCodeSelect from '../form/DeptCode'
 import CommonTruckType from '../form/CommonTruckType'
 import UserLang from '../form/UserLang'
-
-interface FormFieldItemProps<T extends FieldValues> {
-  name: Path<T>
-  label?: string
-  isRequired?: boolean
-  children: ReactNode
-  form: { control: Control<T> }
-}
-
-const FormFieldItem = <T extends FieldValues>({
-  name,
-  label,
-  isRequired,
-  children,
-  form,
-}: FormFieldItemProps<T>) => {
-  return (
-    <FormField
-      key={name}
-      control={form.control}
-      name={name}
-      render={(_) => (
-        <FormItem>
-          <FormLabel className="capitalize">
-            {label
-              ? label
-              : name.includes('_')
-                ? name.replace(/_/g, ' ').toLowerCase()
-                : name}
-            {isRequired && <span className="ml-1 text-destructive">*</span>}
-          </FormLabel>
-          <FormControl>{children}</FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  )
-}
+import { Switch } from '../ui/switch'
 
 type Props = {
   detail: User | undefined
@@ -189,6 +151,8 @@ export default function UserControl({
 
   useEffect(() => {
     if (detail) {
+      console.log(detail)
+
       form.reset(detail)
     } else {
       form.reset(defaultValues)
@@ -196,8 +160,6 @@ export default function UserControl({
   }, [isOpen, detail])
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    console.log(value)
-
     UpdateUser(value)
   }
   return (
@@ -213,57 +175,228 @@ export default function UserControl({
             onSubmit={form.handleSubmit(onSubmit)}
             className="relative grid grid-cols-2 gap-4"
           >
-            <FormFieldItem form={form} name="USER_ID" isRequired>
-              <Input {...form.register('USER_ID')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="PW">
-              <Input {...form.register('PW')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="CUSTOMER_CODE" isRequired>
-              <Customer {...form.register('CUSTOMER_CODE')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="DEPT_CODE" isRequired>
-              <DeptCodeSelect
-                CUSTOMER_CODE={form.watch('CUSTOMER_CODE')}
-                {...form.register('DEPT_CODE')}
-              />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="USER_NAME" isRequired>
-              <Input {...form.register('USER_NAME')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="ACCOUNT_NAME">
-              <Input {...form.register('ACCOUNT_NAME')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="TEL_NO" isRequired>
-              <Input {...form.register('TEL_NO')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="EMAIL">
-              <Input {...form.register('EMAIL')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="NATION_CD" isRequired>
-              <NationCode {...form.register('NATION_CD')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="TRUCK_NO" isRequired>
-              <Input {...form.register('TRUCK_NO')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="TRUCK_TYPE">
-              <CommonTruckType {...form.register('TRUCK_TYPE')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="USER_LANG" isRequired>
-              <UserLang {...form.register('USER_LANG')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} name="GRADE">
-              <Input {...form.register('GRADE')} />
-            </FormFieldItem>
-            <FormFieldItem form={form} label="Use Y/N" name="USE_YN">
-              <Switch
-                checked={form.watch('USE_YN') === 'Y'}
-                onCheckedChange={(check) =>
-                  form.setValue('USE_YN', check ? 'Y' : 'N')
-                }
-                className="!mt-4 block"
-              />
-            </FormFieldItem>
+            <FormField
+              control={form.control}
+              name="USER_ID"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    User ID
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="PW"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    PW
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="CUSTOMER_CODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Customer Code
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Customer {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="DEPT_CODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Dept Code
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <DeptCodeSelect
+                      {...field}
+                      CUSTOMER_CODE={form.watch('CUSTOMER_CODE')}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="USER_NAME"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    User Name
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ACCOUNT_NAME"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Account Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TEL_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Tel No
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="EMAIL"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Email
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="NATION_CD"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Nation Cd
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <NationCode {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TRUCK_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Truck No
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TRUCK_TYPE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Truck Type</FormLabel>
+                  <FormControl>
+                    <CommonTruckType {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="USER_LANG"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    User Lang
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <UserLang {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="GRADE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Grade</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="GRADE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Grade</FormLabel>
+                  <FormControl>
+                    <div className="flex h-10 items-center">
+                      <Switch
+                        checked={field.value === 'Y'}
+                        onCheckedChange={(check) =>
+                          field.onChange(field.value ? 'Y' : 'N')
+                        }
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </form>
         </Form>
         <DialogFooter className="sm:justify-center">

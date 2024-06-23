@@ -4,7 +4,7 @@ import { forwardRef } from 'react'
 import request from '@/utils/request'
 
 const RegionCode = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, type, value, ...props }, ref) => {
+  ({ className, type, ...props }, ref) => {
     const { data: NationCode, isPending } = useQuery({
       queryKey: ['geRegionCode'],
       queryFn: async () => {
@@ -16,7 +16,7 @@ const RegionCode = forwardRef<HTMLSelectElement, SelectProps>(
     })
 
     return (
-      <Select ref={ref} defaultValue={value === 'NULL' ? '' : value} {...props}>
+      <Select ref={ref} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
         {NationCode?.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
           <option key={item.DT_CODE} value={item.DT_CODE}>

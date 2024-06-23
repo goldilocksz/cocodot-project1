@@ -19,6 +19,7 @@ import request from '@/utils/request'
 import { useQuery } from '@tanstack/react-query'
 import Loading from '@/components/ui/loading'
 import { omit } from 'radash'
+import { dateFormat } from '@/utils/utils'
 
 export interface Search {
   JOB_FROM: string
@@ -61,23 +62,8 @@ export default function BlReportView() {
           ...omit(search, ['random']),
         },
       )
-
-      const allKeys = Array.from(
-        new Set(data.flatMap((obj) => Object.keys(obj))),
-      ) as (keyof TrReport)[]
-
-      const filterList = data.map((obj, index: number) => {
-        let newObj: any = {}
-        newObj['id'] = index + 1
-        allKeys.forEach((key) => {
-          newObj[key] = obj[key] ?? ''
-        })
-        return newObj
-      })
-      return filterList?.slice(
-        (page - 1) * parseInt(pageSize),
-        page * parseInt(pageSize),
-      )
+      setList(data)
+      return data
     },
   })
 
@@ -148,105 +134,108 @@ export default function BlReportView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {BlReports?.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>{item?.COMPANY_CODE || ''}</TableCell>
-                <TableCell>{item?.TR_NO || ''}</TableCell>
-                <TableCell>{item?.STATUS || ''}</TableCell>
-                <TableCell>{item?.BL_NO || ''}</TableCell>
-                <TableCell>{item?.LSP_CD || ''}</TableCell>
-                <TableCell>{item?.JOB_DATE || ''}</TableCell>
-                <TableCell>{item?.POL || ''}</TableCell>
-                <TableCell>{item.SINGLE_OR_CONSOL || ''}</TableCell>
-                <TableCell>{item.FROM_ROUTE_CODE || ''}</TableCell>
-                <TableCell>{item.FROM_NATION || ''}</TableCell>
-                <TableCell>{item.CN_TRUCK_NO || ''}</TableCell>
-                <TableCell>{item.CN_TRUCK_TYPE || ''}</TableCell>
-                <TableCell>{item.TO_ROUTE_CODE || ''}</TableCell>
-                <TableCell>{item.TO_NATION || ''}</TableCell>
-                <TableCell>{item.VN_TRUCK_NO || ''}</TableCell>
-                <TableCell>{item.VN_TRUCK_TYPE || ''}</TableCell>
-                <TableCell>
-                  {dayjs(item.ETD).isValid()
-                    ? dayjs(item.ETD).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>{item.PLT_QTY || ''}</TableCell>
-                <TableCell>
-                  {dayjs(item.ATA_FACTORY_TO_PICK_UP).isValid()
-                    ? dayjs(item.ATA_FACTORY_TO_PICK_UP).format(
-                        'YYYY-MM-DD HH:mm:ss',
-                      )
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.PICK_UP_TIME).isValid()
-                    ? dayjs(item.PICK_UP_TIME).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.ATD_FACTORY).isValid()
-                    ? dayjs(item.ATD_FACTORY).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.ETA_BORDER).isValid()
-                    ? dayjs(item.ETA_BORDER).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>{item.ATA_BORDER || ''}</TableCell>
-                <TableCell>
-                  {dayjs(item.BORDER_PASS).isValid()
-                    ? dayjs(item.BORDER_PASS).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>{item.URGENT || ''}</TableCell>
-                <TableCell>{item.REGION_CODE || ''}</TableCell>
-                <TableCell>{item.REGION_NAME || ''}</TableCell>
-                <TableCell>
-                  {dayjs(item.CC_DONE_TIME).isValid()
-                    ? dayjs(item.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.ARRIVE_VIETAM_YARD_CN).isValid()
-                    ? dayjs(item.ARRIVE_VIETAM_YARD_CN).format(
-                        'YYYY-MM-DD HH:mm:ss',
-                      )
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.ARRIVE_VIETAM_YARD_VN).isValid()
-                    ? dayjs(item.ARRIVE_VIETAM_YARD_VN).format(
-                        'YYYY-MM-DD HH:mm:ss',
-                      )
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.TRANSLOADING).isValid()
-                    ? dayjs(item.TRANSLOADING).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.DEPART_FROM_VIETNAM_YARD).isValid()
-                    ? dayjs(item.DEPART_FROM_VIETNAM_YARD).format(
-                        'YYYY-MM-DD HH:mm:ss',
-                      )
-                    : ''}
-                </TableCell>
-                <TableCell>
-                  {dayjs(item.ETA_CNEE_FACTORY).isValid()
-                    ? dayjs(item.ETA_CNEE_FACTORY).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-                <TableCell>{item.ATA_CNEE_FACTORY || ''}</TableCell>
-                <TableCell>
-                  {dayjs(item.UNLOADING).isValid()
-                    ? dayjs(item.UNLOADING).format('YYYY-MM-DD HH:mm:ss')
-                    : ''}
-                </TableCell>
-              </TableRow>
-            ))}
+            {list
+              ?.slice(
+                (page - 1) * parseInt(pageSize),
+                page * parseInt(pageSize),
+              )
+              .map((item) => (
+                <TableRow key={item.TR_NO}>
+                  <TableCell>{item.COMPANY_CODE || ''}</TableCell>
+                  <TableCell>{item.TR_NO || ''}</TableCell>
+                  <TableCell>{item?.STATUS || ''}</TableCell>
+                  <TableCell>{item?.BL_NO || ''}</TableCell>
+                  <TableCell>{item?.LSP_CD || ''}</TableCell>
+                  <TableCell>{item?.JOB_DATE || ''}</TableCell>
+                  <TableCell>{item?.POL || ''}</TableCell>
+                  <TableCell>{item.SINGLE_OR_CONSOL || ''}</TableCell>
+                  <TableCell>{item.FROM_ROUTE_CODE || ''}</TableCell>
+                  <TableCell>{item.FROM_NATION || ''}</TableCell>
+                  <TableCell>{item.CN_TRUCK_NO || ''}</TableCell>
+                  <TableCell>{item.CN_TRUCK_TYPE || ''}</TableCell>
+                  <TableCell>{item.TO_ROUTE_CODE || ''}</TableCell>
+                  <TableCell>{item.TO_NATION || ''}</TableCell>
+                  <TableCell>{item.VN_TRUCK_NO || ''}</TableCell>
+                  <TableCell>{item.VN_TRUCK_TYPE || ''}</TableCell>
+                  <TableCell>
+                    {item.ETD !== 'NULL' && dateFormat(item.ETD)}
+                  </TableCell>
+                  <TableCell>{item.PLT_QTY || ''}</TableCell>
+                  <TableCell>
+                    {item.ATA_FACTORY_TO_PICK_UP !== 'NULL' &&
+                      item.ATA_FACTORY_TO_PICK_UP &&
+                      dateFormat(item.ATA_FACTORY_TO_PICK_UP)}
+                  </TableCell>
+                  <TableCell>
+                    {item.PICK_UP_TIME !== 'NULL' &&
+                      item.PICK_UP_TIME &&
+                      dateFormat(item.PICK_UP_TIME)}
+                  </TableCell>
+                  <TableCell>
+                    {item.ATD_FACTORY !== 'NULL' &&
+                      item.ATD_FACTORY &&
+                      dateFormat(item.ATD_FACTORY)}
+                  </TableCell>
+                  <TableCell>
+                    {item.ETA_BORDER !== 'NULL' &&
+                      item.ETA_BORDER &&
+                      dateFormat(item.ETA_BORDER)}
+                  </TableCell>
+                  <TableCell>
+                    {item.ATA_BORDER !== 'NULL' &&
+                      item.ATA_BORDER &&
+                      dateFormat(item.ATA_BORDER)}
+                  </TableCell>
+                  <TableCell>
+                    {item.BORDER_PASS !== 'NULL' &&
+                      item.BORDER_PASS &&
+                      dateFormat(item.BORDER_PASS)}
+                  </TableCell>
+                  <TableCell>{item.URGENT || ''}</TableCell>
+                  <TableCell>{item.REGION_CODE || ''}</TableCell>
+                  <TableCell>{item.REGION_NAME || ''}</TableCell>
+                  <TableCell>
+                    {item.CC_DONE_TIME !== 'NULL' &&
+                      item.CC_DONE_TIME &&
+                      dateFormat(item.CC_DONE_TIME)}
+                  </TableCell>
+                  <TableCell>
+                    {item.ARRIVE_VIETAM_YARD_CN !== 'NULL' &&
+                      item.ARRIVE_VIETAM_YARD_CN &&
+                      dateFormat(item.ARRIVE_VIETAM_YARD_CN)}
+                  </TableCell>
+                  <TableCell>
+                    {item.ARRIVE_VIETAM_YARD_VN !== 'NULL' &&
+                      item.ARRIVE_VIETAM_YARD_VN &&
+                      dateFormat(item.ARRIVE_VIETAM_YARD_VN)}
+                  </TableCell>
+                  <TableCell>
+                    {item.TRANSLOADING !== 'NULL' &&
+                      item.TRANSLOADING &&
+                      dateFormat(item.TRANSLOADING)}
+                  </TableCell>
+                  <TableCell>
+                    {item.DEPART_FROM_VIETNAM_YARD !== 'NULL' &&
+                      item.DEPART_FROM_VIETNAM_YARD &&
+                      dateFormat(item.DEPART_FROM_VIETNAM_YARD)}
+                  </TableCell>
+                  <TableCell>
+                    {item.ETA_CNEE_FACTORY !== 'NULL' &&
+                      item.ETA_CNEE_FACTORY &&
+                      dateFormat(item.ETA_CNEE_FACTORY)}
+                  </TableCell>
+                  <TableCell>
+                    {item.ATA_CNEE_FACTORY !== 'NULL' &&
+                      item.ATA_CNEE_FACTORY &&
+                      dateFormat(item.ATA_CNEE_FACTORY)}
+                  </TableCell>
+                  <TableCell>
+                    {item.UNLOADING !== 'NULL' &&
+                      item.UNLOADING &&
+                      dateFormat(item.UNLOADING)}
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
 

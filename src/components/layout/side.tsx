@@ -1,7 +1,4 @@
 import { Link } from 'react-router-dom'
-import { Bell } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
 import Navbar from './navbar'
 
 export default function side() {

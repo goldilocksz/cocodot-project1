@@ -18,6 +18,8 @@ import {
 import { useLocation } from 'react-router-dom'
 import { cn } from '@/utils/utils'
 import { Fragment, useState } from 'react'
+import request from '@/utils/request'
+import { useQuery } from '@tanstack/react-query'
 
 const Menu = [
   {
@@ -80,6 +82,16 @@ const Menu = [
 export default function navbar() {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
+
+  const { data: menu } = useQuery({
+    queryKey: ['getMenu'],
+    queryFn: async () => {
+      const { data } = await request.post('/webCommon/getMenu', {
+        OS_TYPE: 'WEB',
+      })
+      return data
+    },
+  })
 
   return (
     <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">

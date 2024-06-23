@@ -31,38 +31,6 @@ import request from '@/utils/request'
 import { Select } from '../ui/select'
 import { Switch } from '../ui/switch'
 
-interface FormFieldItemProps<T extends FieldValues> {
-  name: Path<T>
-  isRequired?: boolean
-  children: ReactNode
-  form: { control: Control<T> }
-}
-
-const FormFieldItem = <T extends FieldValues>({
-  name,
-  isRequired,
-  children,
-  form,
-}: FormFieldItemProps<T>) => {
-  return (
-    <FormField
-      key={name}
-      control={form.control}
-      name={name}
-      render={(_) => (
-        <FormItem>
-          <FormLabel className="capitalize">
-            {name.replace(/_/g, ' ').toLowerCase()}
-            {isRequired && <span className="ml-1 text-destructive">*</span>}
-          </FormLabel>
-          <FormControl>{children}</FormControl>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
-  )
-}
-
 type Props = {
   detail: Customer | undefined
   isOpen: boolean
@@ -146,9 +114,6 @@ export default function CustomerControl({ detail, isOpen, setIsOpen }: Props) {
             onSubmit={form.handleSubmit(onSubmit)}
             className="relative grid grid-cols-2 gap-4"
           >
-            <FormFieldItem form={form} name="USER_ID" isRequired>
-              <Input {...form.register('USER_ID')} />
-            </FormFieldItem>
           </form>
         </Form> */}
         <DialogFooter className="sm:justify-center">

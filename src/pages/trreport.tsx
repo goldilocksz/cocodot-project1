@@ -11,7 +11,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import Pagination from '@/components/pagination'
-import dayjs from 'dayjs'
 import { Button } from '@/components/ui/button'
 import * as XLSX from 'xlsx'
 import request from '@/utils/request'
@@ -19,6 +18,8 @@ import { useQuery } from '@tanstack/react-query'
 import Loading from '@/components/ui/loading'
 import { RefreshCcw } from 'lucide-react'
 import { omit } from 'radash'
+import { dateFormat } from '@/utils/utils'
+import dayjs from 'dayjs'
 
 export interface Search {
   JOB_FROM: string
@@ -61,20 +62,8 @@ export default function TrReportView() {
         },
       )
 
-      const allKeys = Array.from(
-        new Set(data.flatMap((obj) => Object.keys(obj))),
-      ) as (keyof TrReport)[]
-
-      const filterList = data.map((obj, index: number) => {
-        let newObj: any = {}
-        newObj['id'] = index + 1
-        allKeys.forEach((key) => {
-          newObj[key] = obj[key] ?? ''
-        })
-        return newObj
-      })
-      setList(filterList)
-      return filterList
+      setList(data)
+      return data
     },
   })
 
@@ -151,7 +140,7 @@ export default function TrReportView() {
                 page * parseInt(pageSize),
               )
               .map((item) => (
-                <TableRow key={item.id}>
+                <TableRow key={item.TR_NO}>
                   <TableCell>{item.COMPANY_CODE || ''}</TableCell>
                   <TableCell>{item.TR_NO || ''}</TableCell>
                   <TableCell>{item?.STATUS || ''}</TableCell>
@@ -169,85 +158,81 @@ export default function TrReportView() {
                   <TableCell>{item.VN_TRUCK_NO || ''}</TableCell>
                   <TableCell>{item.VN_TRUCK_TYPE || ''}</TableCell>
                   <TableCell>
-                    {item.ETD
-                      ? dayjs(item.ETD).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.ETD !== 'NULL' && dateFormat(item.ETD)}
                   </TableCell>
                   <TableCell>{item.PLT_QTY || ''}</TableCell>
                   <TableCell>
-                    {item.ATA_FACTORY_TO_PICK_UP
-                      ? dayjs(item.ATA_FACTORY_TO_PICK_UP).format(
-                          'YYYY-MM-DD HH:mm:ss',
-                        )
-                      : ''}
+                    {item.ATA_FACTORY_TO_PICK_UP !== 'NULL' &&
+                      item.ATA_FACTORY_TO_PICK_UP &&
+                      dateFormat(item.ATA_FACTORY_TO_PICK_UP)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.PICK_UP_TIME).isValid()
-                      ? dayjs(item.PICK_UP_TIME).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.PICK_UP_TIME !== 'NULL' &&
+                      item.PICK_UP_TIME &&
+                      dateFormat(item.PICK_UP_TIME)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.ATD_FACTORY).isValid()
-                      ? dayjs(item.ATD_FACTORY).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.ATD_FACTORY !== 'NULL' &&
+                      item.ATD_FACTORY &&
+                      dateFormat(item.ATD_FACTORY)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.ETA_BORDER).isValid()
-                      ? dayjs(item.ETA_BORDER).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.ETA_BORDER !== 'NULL' &&
+                      item.ETA_BORDER &&
+                      dateFormat(item.ETA_BORDER)}
                   </TableCell>
-                  <TableCell>{item.ATA_BORDER || ''}</TableCell>
                   <TableCell>
-                    {dayjs(item.BORDER_PASS).isValid()
-                      ? dayjs(item.BORDER_PASS).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.ATA_BORDER !== 'NULL' &&
+                      item.ATA_BORDER &&
+                      dateFormat(item.ATA_BORDER)}
+                  </TableCell>
+                  <TableCell>
+                    {item.BORDER_PASS !== 'NULL' &&
+                      item.BORDER_PASS &&
+                      dateFormat(item.BORDER_PASS)}
                   </TableCell>
                   <TableCell>{item.URGENT || ''}</TableCell>
                   <TableCell>{item.REGION_CODE || ''}</TableCell>
                   <TableCell>{item.REGION_NAME || ''}</TableCell>
                   <TableCell>
-                    {dayjs(item.CC_DONE_TIME).isValid()
-                      ? dayjs(item.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.CC_DONE_TIME !== 'NULL' &&
+                      item.CC_DONE_TIME &&
+                      dateFormat(item.CC_DONE_TIME)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.ARRIVE_VIETAM_YARD_CN).isValid()
-                      ? dayjs(item.ARRIVE_VIETAM_YARD_CN).format(
-                          'YYYY-MM-DD HH:mm:ss',
-                        )
-                      : ''}
+                    {item.ARRIVE_VIETAM_YARD_CN !== 'NULL' &&
+                      item.ARRIVE_VIETAM_YARD_CN &&
+                      dateFormat(item.ARRIVE_VIETAM_YARD_CN)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.ARRIVE_VIETAM_YARD_VN).isValid()
-                      ? dayjs(item.ARRIVE_VIETAM_YARD_VN).format(
-                          'YYYY-MM-DD HH:mm:ss',
-                        )
-                      : ''}
+                    {item.ARRIVE_VIETAM_YARD_VN !== 'NULL' &&
+                      item.ARRIVE_VIETAM_YARD_VN &&
+                      dateFormat(item.ARRIVE_VIETAM_YARD_VN)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.TRANSLOADING).isValid()
-                      ? dayjs(item.TRANSLOADING).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.TRANSLOADING !== 'NULL' &&
+                      item.TRANSLOADING &&
+                      dateFormat(item.TRANSLOADING)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.DEPART_FROM_VIETNAM_YARD).isValid()
-                      ? dayjs(item.DEPART_FROM_VIETNAM_YARD).format(
-                          'YYYY-MM-DD HH:mm:ss',
-                        )
-                      : ''}
+                    {item.DEPART_FROM_VIETNAM_YARD !== 'NULL' &&
+                      item.DEPART_FROM_VIETNAM_YARD &&
+                      dateFormat(item.DEPART_FROM_VIETNAM_YARD)}
                   </TableCell>
                   <TableCell>
-                    {dayjs(item.ETA_CNEE_FACTORY).isValid()
-                      ? dayjs(item.ETA_CNEE_FACTORY).format(
-                          'YYYY-MM-DD HH:mm:ss',
-                        )
-                      : ''}
+                    {item.ETA_CNEE_FACTORY !== 'NULL' &&
+                      item.ETA_CNEE_FACTORY &&
+                      dateFormat(item.ETA_CNEE_FACTORY)}
                   </TableCell>
-                  <TableCell>{item.ATA_CNEE_FACTORY || ''}</TableCell>
                   <TableCell>
-                    {dayjs(item.UNLOADING).isValid()
-                      ? dayjs(item.UNLOADING).format('YYYY-MM-DD HH:mm:ss')
-                      : ''}
+                    {item.ATA_CNEE_FACTORY !== 'NULL' &&
+                      item.ATA_CNEE_FACTORY &&
+                      dateFormat(item.ATA_CNEE_FACTORY)}
+                  </TableCell>
+                  <TableCell>
+                    {item.UNLOADING !== 'NULL' &&
+                      item.UNLOADING &&
+                      dateFormat(item.UNLOADING)}
                   </TableCell>
                 </TableRow>
               ))}

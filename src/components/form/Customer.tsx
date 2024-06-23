@@ -4,7 +4,7 @@ import { forwardRef } from 'react'
 import request from '@/utils/request'
 
 const Customer = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, type, ...props }, ref) => {
+  ({ type, ...props }, ref) => {
     const { data: Cnee, isPending } = useQuery({
       queryKey: ['getCustomerCode'],
       queryFn: async () => {
@@ -14,7 +14,7 @@ const Customer = forwardRef<HTMLSelectElement, SelectProps>(
     })
 
     return (
-      <Select ref={ref} className={className} {...props}>
+      <Select ref={ref} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
         {Cnee?.map((item: { CUSTOMER_CODE: string; CUSTOMER_NAME: string }) => (
           <option

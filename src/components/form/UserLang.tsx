@@ -15,16 +15,11 @@ const UserLang = forwardRef<
       })
       return data
     },
-    staleTime: 1000 * 60 * 60,
   })
 
   return (
     <Select ref={ref} {...props}>
-      {isLoading ? (
-        <option>Loading...</option>
-      ) : (
-        <option value="">Select</option>
-      )}
+      <option>Select</option>
       {UserLang?.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
         <option key={item.DT_CODE} value={item.LOC_VALUE}>
           {item.DT_CODE}

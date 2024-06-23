@@ -1,6 +1,5 @@
 import Side from '@/components/layout/side'
 import Header from '@/components/layout/header'
-import Breadcrumb from '@/components/breadcrumb'
 import { Outlet } from 'react-router-dom'
 import AuthProvider from './authProvider'
 
