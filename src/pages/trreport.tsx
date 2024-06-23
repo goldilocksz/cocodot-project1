@@ -139,8 +139,8 @@ export default function TrReportView() {
                 (page - 1) * parseInt(pageSize),
                 page * parseInt(pageSize),
               )
-              .map((item) => (
-                <TableRow key={item.TR_NO}>
+              .map((item, index) => (
+                <TableRow key={`trreport-${index}`}>
                   <TableCell>{item.COMPANY_CODE || ''}</TableCell>
                   <TableCell>{item.TR_NO || ''}</TableCell>
                   <TableCell>{item?.STATUS || ''}</TableCell>
