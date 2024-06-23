@@ -121,7 +121,7 @@ export default function DashboardView() {
       const titleGroup = group(response.data, (item: any) => item.VIEW_DATE)
 
       const data = {
-        labels: Object.keys(titleGroup).reverse(),
+        labels: Object.keys(titleGroup),
         datasets: [
           {
             name: 'ATD FACTORY',
@@ -204,7 +204,7 @@ export default function DashboardView() {
       const titleGroup = group(response.data, (item: any) => item.TITLE)
 
       const data = {
-        labels: Object.keys(titleGroup).reverse(),
+        labels: Object.keys(titleGroup),
         datasets: Object.values(routeGroup).map((item: any) => ({
           name: item[0].ROUTE,
           data: item.map((item: any) => item.READTIME),
