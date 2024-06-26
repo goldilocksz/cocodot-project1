@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -50,65 +50,70 @@ type Props = {
   refetch: () => void
 }
 
-const formSchema = z.object({
-  CLIENT_CODE: z.string().min(1, {
-    message: 'Customer code is required',
-  }),
-  LSP_CD: z.string().min(1, {
-    message: 'LSP code is required',
-  }),
-  ETD: z.string(),
-  TR_NO: z.string(),
-  JOB_DATE: z.string().min(1, {
-    message: 'Job date is required',
-  }),
-  FROM_ROUTE_CODE: z.string().min(1, {
-    message: 'From route code is required',
-  }),
-  FROM_TRUCK_NO: z.string(),
-  FROM_TRUCK_TYPE: z.string().optional(),
-  TO_ROUTE_CODE: z.string().min(1, {
-    message: 'To route code is required',
-  }),
-  TO_TRUCK_NO: z.string().optional(),
-  TO_TRUCK_TYPE: z.string().optional(),
-  URGENT: z.string().optional(),
-  CC_DONE_TIME: z.string().optional(),
-  REGION_CODE: z.string().min(1, {
-    message: 'Region code is required',
-  }),
-  REGION_NAME: z.string(),
-  POL: z.string().min(1, {
-    message: 'POL is required',
-  }),
-  IMP_EXP: z.string().optional(),
-  ETA_BORDER: z.string().optional(),
-  ETA_CNEE_FACTORY: z.string().optional(),
-  FROM_NATION_CD: z.string().optional(),
-  TO_NATION_CD: z.string().optional(),
-  BLDATA: z.array(
-    z.object({
-      BL_NO: z.string().min(1, {
-        message: 'BL No is required',
-      }),
-      CNEE_CODE: z.string().min(1, {
-        message: 'Cnee code is required',
-      }),
-      CNEE_NAME: z.string().min(1, {
-        message: 'Cnee name is required',
-      }),
-      VENDOR_NAME: z.string().min(1, {
-        message: 'Vendor name is required',
-      }),
-      INCOTERMS: z.string().min(1, {
-        message: 'Incoterms is required',
-      }),
-      REF_INVOICE_NO: z.string().optional(),
-      ITEM_CODE: z.string().optional(),
-      QTY: z.number().optional(),
+const formSchema = z
+  .object({
+    CLIENT_CODE: z.string().min(1, {
+      message: 'Customer code is required',
     }),
-  ),
-})
+    LSP_CD: z.string().min(1, {
+      message: 'LSP code is required',
+    }),
+    ETD: z.string(),
+    TR_NO: z.string(),
+    JOB_DATE: z.string().min(1, {
+      message: 'Job date is required',
+    }),
+    FROM_ROUTE_CODE: z.string().min(1, {
+      message: 'From route code is required',
+    }),
+    FROM_TRUCK_NO: z.string(),
+    FROM_TRUCK_TYPE: z.string().optional(),
+    TO_ROUTE_CODE: z.string().min(1, {
+      message: 'To route code is required',
+    }),
+    TO_TRUCK_NO: z.string().optional(),
+    TO_TRUCK_TYPE: z.string().optional(),
+    URGENT: z.string().optional(),
+    CC_DONE_TIME: z.string().optional(),
+    REGION_CODE: z.string().min(1, {
+      message: 'Region code is required',
+    }),
+    REGION_NAME: z.string(),
+    POL: z.string().min(1, {
+      message: 'POL is required',
+    }),
+    IMP_EXP: z.string().optional(),
+    ETA_BORDER: z.string().optional(),
+    ETA_CNEE_FACTORY: z.string().optional(),
+    FROM_NATION_CD: z.string().optional(),
+    TO_NATION_CD: z.string().optional(),
+    BLDATA: z.array(
+      z.object({
+        BL_NO: z.string().min(1, {
+          message: 'BL No is required',
+        }),
+        CNEE_CODE: z.string().min(1, {
+          message: 'Cnee code is required',
+        }),
+        CNEE_NAME: z.string().min(1, {
+          message: 'Cnee name is required',
+        }),
+        VENDOR_NAME: z.string().min(1, {
+          message: 'Vendor name is required',
+        }),
+        INCOTERMS: z.string().min(1, {
+          message: 'Incoterms is required',
+        }),
+        REF_INVOICE_NO: z.string().optional(),
+        ITEM_CODE: z.string().optional(),
+        QTY: z.number().optional(),
+      }),
+    ),
+  })
+  .refine((value) => value.FROM_ROUTE_CODE !== value.TO_ROUTE_CODE, {
+    path: ['TO_ROUTE_CODE'],
+    message: 'From route code must be different from to route code',
+  })
 
 const OrderDefault = {
   CLIENT_CODE: '',
@@ -173,24 +178,6 @@ export default function OrderControl({
     enabled: isOpen,
     gcTime: 0,
   })
-
-  // useEffect(() => {
-  //   if (!detail?.TR_NO) return
-
-  //   const fetchBlInfo = async () => {
-  //     setIsGetBlInfo(true)
-  //     const response = await request.post('/order/getOrderBLInfo', {
-  //       TR_NO: detail?.TR_NO,
-  //     })
-
-  //     form.setValue('BLDATA', response.data || [])
-  //     setIsGetBlInfo(false)
-  //     return response.data
-  //   }
-  //   if (isOpen) {
-  //     fetchBlInfo()
-  //   }
-  // }, [])
 
   const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
