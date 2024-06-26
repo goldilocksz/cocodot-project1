@@ -23,7 +23,7 @@ import {
 } from '../ui/dialog'
 import { NumericFormat } from 'react-number-format'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import TruckType from '../form/TruckType'
+import TruckType from '../form/FromTruckType'
 import NationCode from '../form/NationCode'
 import { Customer } from '@/types/data'
 import { toast } from 'sonner'

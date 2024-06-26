@@ -8,7 +8,6 @@ import NationCode from '@/components/form/NationCode'
 import Pol from '@/components/form/Pol'
 import RegionCode from '@/components/form/RegionCode'
 import RouteMst from '@/components/form/RouteMst'
-import TruckType from '@/components/form/TruckType'
 import UserLang from '@/components/form/UserLang'
 
 export default function test() {
@@ -24,7 +23,6 @@ export default function test() {
       <Pol></Pol>
       <RegionCode></RegionCode>
       <RouteMst></RouteMst>
-      <TruckType></TruckType>
       <UserLang></UserLang>
     </div>
   )

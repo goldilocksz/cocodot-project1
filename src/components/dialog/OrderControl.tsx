@@ -33,13 +33,14 @@ import Pol from '../form/Pol'
 import { Datepicker } from '../ui/datepicker'
 import RegionCode from '../form/RegionCode'
 import RouteMst from '../form/RouteMst'
-import TruckType from '../form/TruckType'
 import ClientCode from '../form/ClientCode'
 import LspCode from '../form/LspCode'
 import { DatepickerTime } from '../ui/datepicker-time'
 import { Label } from '../ui/label'
 import dayjs from 'dayjs'
 import { dateFormat } from '@/utils/utils'
+import FromTruckType from '../form/FromTruckType'
+import ToTruckType from '../form/ToTruckType'
 
 type Props = {
   detail: Order | undefined
@@ -136,7 +137,6 @@ const OrderDefault = {
       CNEE_NAME: '',
       VENDOR_NAME: '',
       INCOTERMS: '',
-      INVOICE_NO: '',
       REF_INVOICE_NO: '',
       ITEM_CODE: '',
       QTY: 1,
@@ -156,11 +156,7 @@ export default function OrderControl({
     defaultValues: OrderDefault,
   })
 
-  const {
-    data: blInfo,
-    isPending: isGetBlInfo,
-    refetch: refetchBlInfo,
-  } = useQuery({
+  const { isPending: isGetBlInfo } = useQuery({
     queryKey: ['getOrderBLInfo', isOpen],
     queryFn: async () => {
       const response = await request.post('/order/getOrderBLInfo', {
@@ -194,7 +190,7 @@ export default function OrderControl({
   //   if (isOpen) {
   //     fetchBlInfo()
   //   }
-  // }, [detail?.TR_NO, isOpen])
+  // }, [])
 
   const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
@@ -210,12 +206,19 @@ export default function OrderControl({
 
   useEffect(() => {
     if (detail) {
+      console.log(detail.ETA_BORDER)
+
       form.reset({
         ...detail,
-        JOB_DATE: dateFormat(detail.JOB_DATE),
-        CC_DONE_TIME: dateFormat(detail.CC_DONE_TIME),
-        ETA_BORDER: dateFormat(detail.ETA_BORDER),
-        ETA_CNEE_FACTORY: dateFormat(detail.ETA_CNEE_FACTORY),
+        ...(detail.CC_DONE_TIME
+          ? { CC_DONE_TIME: dateFormat(detail.CC_DONE_TIME) }
+          : {}),
+        ...(detail.ETA_BORDER
+          ? { ETA_BORDER: dateFormat(detail.ETA_BORDER) }
+          : {}),
+        ...(detail.ETA_CNEE_FACTORY
+          ? { ETA_CNEE_FACTORY: dateFormat(detail.ETA_CNEE_FACTORY) }
+          : {}),
       })
     } else {
       form.reset(OrderDefault)
@@ -239,10 +242,13 @@ export default function OrderControl({
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
     UpdateOrder({
       ...value,
-      CC_DONE_TIME: dayjs(value.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss'),
-      ETA_CNEE_FACTORY: dayjs(value.ETA_CNEE_FACTORY).format(
-        'YYYY-MM-DD HH:mm:ss',
-      ),
+      ...(value.CC_DONE_TIME
+        ? { CC_DONE_TIME: dateFormat(value.CC_DONE_TIME) }
+        : {}),
+      ...(value.ETA_BORDER ? { ETA_BORDER: dateFormat(value.ETA_BORDER) } : {}),
+      ...(value.ETA_CNEE_FACTORY
+        ? { ETA_CNEE_FACTORY: dateFormat(value.ETA_CNEE_FACTORY) }
+        : {}),
     })
   }
 
@@ -430,7 +436,7 @@ export default function OrderControl({
                       <span className="ml-1 text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <TruckType
+                      <FromTruckType
                         nationcode={form.watch('FROM_NATION_CD')}
                         value={field.value}
                         onChange={(e) => {
@@ -462,7 +468,7 @@ export default function OrderControl({
                   <FormItem className="flex-1">
                     <FormLabel className="capitalize">To Truck No</FormLabel>
                     <FormControl>
-                      <TruckType
+                      <ToTruckType
                         nationcode={form.watch('TO_NATION_CD')}
                         value={field.value}
                         onChange={(e) => {
@@ -608,155 +614,159 @@ export default function OrderControl({
                 </div>
               )}
               <div className="space-y-2">
-                {form.watch('BLDATA')?.map((item, index) => (
-                  <div key={index} className="relative col-span-4 flex gap-2">
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.BL_NO`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            BL No
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
+                {!isGetBlInfo &&
+                  form.watch('BLDATA')?.map((item, index) => (
+                    <div
+                      key={`BLDATA-${index}`}
+                      className="relative col-span-4 flex gap-2"
+                    >
+                      <FormField
+                        control={form.control}
+                        name={`BLDATA.${index}.BL_NO`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              BL No
+                              <span className="ml-1 text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`BLDATA.${index}.CNEE_CODE`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              CNEE
+                              <span className="ml-1 text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Cnee
+                                className="w-[120px] shrink-0"
+                                value={field.value}
+                                onChange={(e) => {
+                                  field.onChange(e.target.value)
+                                  form.setValue(
+                                    `BLDATA.${index}.CNEE_NAME`,
+                                    e.target.options[e.target.selectedIndex]
+                                      .dataset.name || '',
+                                  )
+                                }}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`BLDATA.${index}.VENDOR_NAME`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Vendor Name
+                              <span className="ml-1 text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`BLDATA.${index}.INCOTERMS`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Incoterms
+                              <span className="ml-1 text-destructive">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <Incoterms
+                                className="w-[120px] shrink-0"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`BLDATA.${index}.REF_INVOICE_NO`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Ref Invoice No</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`BLDATA.${index}.ITEM_CODE`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Item Code</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`BLDATA.${index}.QTY`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Qty(PLT)</FormLabel>
+                            <FormControl>
+                              <NumericFormat
+                                className="w-[80px]"
+                                customInput={Input}
+                                maxLength={2}
+                                isAllowed={(values) =>
+                                  !values.formattedValue.includes('-')
+                                }
+                                value={field.value}
+                                onValueChange={(values) =>
+                                  field.onChange(values.floatValue)
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {index === 0 ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => AddNewBldata()}
+                          className="mt-8 self-start px-3"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          onClick={() => RemoveBldata(index)}
+                          className="mt-8 self-start px-3"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
                       )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.CNEE_CODE`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            CNEE
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Cnee
-                              className="w-[120px] shrink-0"
-                              value={field.value}
-                              onChange={(e) => {
-                                field.onChange(e.target.value)
-                                form.setValue(
-                                  `BLDATA.${index}.CNEE_NAME`,
-                                  e.target.options[e.target.selectedIndex]
-                                    .dataset.name || '',
-                                )
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.VENDOR_NAME`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Vendor Name
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.INCOTERMS`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Incoterms
-                            <span className="ml-1 text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Incoterms
-                              className="w-[120px] shrink-0"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.REF_INVOICE_NO`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Ref Invoice No</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.ITEM_CODE`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Item Code</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`BLDATA.${index}.QTY`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Qty(PLT)</FormLabel>
-                          <FormControl>
-                            <NumericFormat
-                              className="w-[80px]"
-                              customInput={Input}
-                              maxLength={2}
-                              isAllowed={(values) =>
-                                !values.formattedValue.includes('-')
-                              }
-                              value={field.value}
-                              onValueChange={(values) =>
-                                field.onChange(values.floatValue)
-                              }
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    {index === 0 ? (
-                      <Button
-                        variant="outline"
-                        onClick={() => AddNewBldata()}
-                        className="mt-8 self-start px-3"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        onClick={() => RemoveBldata(index)}
-                        className="mt-8 self-start px-3"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+                    </div>
+                  ))}
               </div>
             </div>
           </form>
