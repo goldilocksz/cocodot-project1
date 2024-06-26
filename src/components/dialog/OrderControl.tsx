@@ -39,6 +39,7 @@ import LspCode from '../form/LspCode'
 import { DatepickerTime } from '../ui/datepicker-time'
 import { Label } from '../ui/label'
 import dayjs from 'dayjs'
+import { dateFormat } from '@/utils/utils'
 
 type Props = {
   detail: Order | undefined
@@ -80,8 +81,8 @@ const formSchema = z.object({
     message: 'POL is required',
   }),
   IMP_EXP: z.string().optional(),
-  ATA_BORDER: z.string().optional(),
-  ATA_CNEE_FACTORY: z.string().optional(),
+  ETA_BORDER: z.string().optional(),
+  ETA_CNEE_FACTORY: z.string().optional(),
   FROM_NATION_CD: z.string().optional(),
   TO_NATION_CD: z.string().optional(),
   BLDATA: z.array(
@@ -123,8 +124,8 @@ const OrderDefault = {
   REGION_NAME: '',
   POL: '',
   IMP_EXP: 'IMP',
-  ATA_BORDER: '',
-  ATA_CNEE_FACTORY: '',
+  ETA_BORDER: '',
+  ETA_CNEE_FACTORY: '',
   URGENT: 'N',
   FROM_NATION_CD: '',
   TO_NATION_CD: '',
@@ -209,7 +210,13 @@ export default function OrderControl({
 
   useEffect(() => {
     if (detail) {
-      form.reset(detail)
+      form.reset({
+        ...detail,
+        JOB_DATE: dateFormat(detail.JOB_DATE),
+        CC_DONE_TIME: dateFormat(detail.CC_DONE_TIME),
+        ETA_BORDER: dateFormat(detail.ETA_BORDER),
+        ETA_CNEE_FACTORY: dateFormat(detail.ETA_CNEE_FACTORY),
+      })
     } else {
       form.reset(OrderDefault)
     }
@@ -230,7 +237,13 @@ export default function OrderControl({
   }
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    UpdateOrder(value)
+    UpdateOrder({
+      ...value,
+      CC_DONE_TIME: dayjs(value.CC_DONE_TIME).format('YYYY-MM-DD HH:mm:ss'),
+      ETA_CNEE_FACTORY: dayjs(value.ETA_CNEE_FACTORY).format(
+        'YYYY-MM-DD HH:mm:ss',
+      ),
+    })
   }
 
   return (
@@ -535,7 +548,7 @@ export default function OrderControl({
             />
             <FormField
               control={form.control}
-              name="ATA_BORDER"
+              name="ETA_BORDER"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">ETA Border</FormLabel>
@@ -551,7 +564,7 @@ export default function OrderControl({
             />
             <FormField
               control={form.control}
-              name="ATA_CNEE_FACTORY"
+              name="ETA_CNEE_FACTORY"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="capitalize">ETA Cnee Factory</FormLabel>

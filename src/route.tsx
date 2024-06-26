@@ -15,6 +15,7 @@ import Customer from '@/pages/customer'
 import My from './pages/my'
 
 import NotFound from '@/pages/not-found'
+import Test from '@/pages/test'
 
 export default function AppRoute() {
   return (
@@ -32,6 +33,7 @@ export default function AppRoute() {
           <Route path="/route" element={<RouteCom />}></Route>
           <Route path="/customer" element={<Customer />}></Route>
           <Route path="/my" element={<My />}></Route>
+          <Route path="/test" element={<Test />}></Route>
         </Route>
       </Route>
       <Route path="*" element={<NotFound />}></Route>

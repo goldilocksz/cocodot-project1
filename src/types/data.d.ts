@@ -183,6 +183,8 @@ export interface Order {
   DT_COUNT: number
   BL_COUNT: number
   id: number
+  ETA_BORDER: string
+  ETA_CNEE_FACTORY: string
 }
 
 export interface Monitoring {
