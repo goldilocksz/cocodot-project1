@@ -1,5 +1,5 @@
-import { ReactNode, useEffect } from 'react'
-import { Control, FieldValues, Path, useForm } from 'react-hook-form'
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
@@ -16,20 +16,14 @@ import { Loader2, Minus, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog'
-import { NumericFormat } from 'react-number-format'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import TruckType from '../form/FromTruckType'
-import NationCode from '../form/NationCode'
 import { Customer as TCustomer } from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/utils/request'
-import { Select } from '../ui/select'
-import { Switch } from '../ui/switch'
 import Customer from '../form/Customer'
 
 type Props = {
@@ -42,7 +36,6 @@ type Props = {
 }
 
 const formSchema = z.object({
-  S_COMPANY_CODE: z.string().optional(),
   CUSTOMER_CODE: z.string(),
   CUSTOMER_NAME: z.string().optional(),
   CUSTOMER_NAME_ENG: z.string().optional(),
@@ -59,8 +52,6 @@ const formSchema = z.object({
   PIC_EMAIL: z.string().optional(),
   STATUS: z.string().optional(),
   REMARKS: z.string().optional(),
-  S_USER_ID: z.string().optional(),
-  S_USER_NAME: z.string().optional(),
   DATA: z.array(
     z.object({
       CUSTOMER_CODE: z.string().optional(),
@@ -76,7 +67,6 @@ const formSchema = z.object({
 })
 
 const defaultValues = {
-  S_COMPANY_CODE: 'GDL',
   CUSTOMER_CODE: 'GDL',
   CUSTOMER_NAME: 'GDL',
   CUSTOMER_NAME_ENG: 'GDL',
@@ -93,8 +83,6 @@ const defaultValues = {
   PIC_EMAIL: 'GDL',
   STATUS: 'GDL',
   REMARKS: 'GDL',
-  S_USER_ID: 'psh',
-  S_USER_NAME: 'park sanghyun',
   DATA: [
     {
       CUSTOMER_CODE: '',
@@ -192,19 +180,6 @@ export default function CustomerControl({
             onSubmit={form.handleSubmit(onSubmit)}
             className="relative grid grid-cols-4 gap-4"
           >
-            <FormField
-              control={form.control}
-              name="S_COMPANY_CODE"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">S Company Code</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={form.control}
               name="CUSTOMER_CODE"
@@ -418,33 +393,6 @@ export default function CustomerControl({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="S_USER_ID"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">S User Id</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="S_USER_NAME"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="capitalize">S User Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <div className="relative col-span-4 mt-6 border-t pt-6">
               {isGetData && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">

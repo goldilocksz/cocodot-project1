@@ -69,6 +69,8 @@ export default function TrReportView() {
 
   function downloadXlsx() {
     if (!TrReports?.length) return
+    console.log(TrReports)
+
     const workbook = XLSX.utils.book_new()
     const worksheet = XLSX.utils?.json_to_sheet(TrReports)
     XLSX.utils.book_append_sheet(workbook, worksheet, 'test')

@@ -597,7 +597,7 @@ export default function DashboardView() {
             <Loading
               isLoading={isGetMonitoring || isRefetchMonitoring}
             ></Loading>
-            {Monitoring?.map((item) => (
+            {Monitoring?.slice(0, 5).map((item) => (
               <div key={item.id} className="border-b py-1 last:border-0">
                 <div className="flex items-center justify-between">
                   <div className="grow">
