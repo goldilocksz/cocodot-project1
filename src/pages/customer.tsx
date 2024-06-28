@@ -43,21 +43,8 @@ export default function customer() {
         '/customer/getCustomer',
         {},
       )
-
-      const allKeys = Array.from(
-        new Set(data.flatMap((obj) => Object.keys(obj))),
-      ) as (keyof Customer)[]
-
-      const filterList = data.map((obj, index: number) => {
-        let newObj: any = {}
-        newObj['id'] = index + 1
-        allKeys.forEach((key) => {
-          newObj[key] = obj[key] ?? ''
-        })
-        return newObj
-      })
-      setSearchData(filterList)
-      return filterList
+      setSearchData(data)
+      return data
     },
   })
 
@@ -96,14 +83,8 @@ export default function customer() {
           pageSize={pageSize}
           setPageSize={setPageSize}
           searchData={searchData}
-          queryKey={['getUserList']}
-          searchKey={[
-            'USER_ID',
-            'COMPANY_CODE',
-            'CUSTOMER_CODE',
-            'USER_NAME',
-            'TEL_NO',
-          ]}
+          queryKey={['getCustomer']}
+          searchKey={['CUSTOMER_CODE', 'CUSTOMER_NAME', 'CUSTOMER_TYPE']}
         />
 
         <Table className="mt-6 min-w-[1280px]">
@@ -132,9 +113,9 @@ export default function customer() {
                 (page - 1) * parseInt(pageSize),
                 page * parseInt(pageSize),
               )
-              .map((item) => (
+              .map((item, index) => (
                 <TableRow
-                  key={item.id}
+                  key={`CUSTOMER-${index}`}
                   onDoubleClick={() => {
                     setDetail(item)
                     setIsOpen(true)

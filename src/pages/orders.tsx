@@ -66,23 +66,7 @@ export default function OrderView() {
         TR_NO: search.TR_NO,
       })
 
-      const orders: Order[] = data?.map((user: any, index: number) => ({
-        ...user,
-      }))
-
-      const allKeys = Array.from(
-        new Set(orders.flatMap((obj) => Object.keys(obj))),
-      ) as (keyof Order)[]
-
-      const filterList = orders.map((obj, index: number) => {
-        let newObj: any = {}
-        newObj['id'] = index + 1
-        allKeys.forEach((key) => {
-          newObj[key] = obj[key] ?? ''
-        })
-        return newObj
-      })
-      return filterList
+      return data
     },
   })
 
