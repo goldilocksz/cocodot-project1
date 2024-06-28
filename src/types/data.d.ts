@@ -107,6 +107,7 @@ export interface TrReport {
   LSP_CD: string
   JOB_DATE: string
   POL: string
+  VENDOR_NAME: string
   SINGLE_OR_CONSOL: string
   FROM_ROUTE_CODE: string
   FROM_NATION: string

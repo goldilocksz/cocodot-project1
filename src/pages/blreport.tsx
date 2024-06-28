@@ -103,6 +103,7 @@ export default function BlReportView() {
               <TableHead>Lsp Cd</TableHead>
               <TableHead>Job Date</TableHead>
               <TableHead>Pol</TableHead>
+              <TableHead>Vendor Name</TableHead>
               <TableHead>Single Or Consol</TableHead>
               <TableHead>From Route Code</TableHead>
               <TableHead>From Nation</TableHead>
@@ -148,6 +149,7 @@ export default function BlReportView() {
                   <TableCell>{item?.LSP_CD || ''}</TableCell>
                   <TableCell>{item?.JOB_DATE || ''}</TableCell>
                   <TableCell>{item?.POL || ''}</TableCell>
+                  <TableCell>{item?.VENDOR_NAME || ''}</TableCell>
                   <TableCell>{item.SINGLE_OR_CONSOL || ''}</TableCell>
                   <TableCell>{item.FROM_ROUTE_CODE || ''}</TableCell>
                   <TableCell>{item.FROM_NATION || ''}</TableCell>
