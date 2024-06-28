@@ -12,7 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Minus, Plus } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -25,102 +25,585 @@ import { NumericFormat } from 'react-number-format'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import TruckType from '../form/FromTruckType'
 import NationCode from '../form/NationCode'
-import { Customer } from '@/types/data'
+import { Customer as TCustomer } from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/utils/request'
 import { Select } from '../ui/select'
 import { Switch } from '../ui/switch'
+import Customer from '../form/Customer'
 
 type Props = {
-  detail: Customer | undefined
+  detail: TCustomer | undefined
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  setIsConfirm: (isConfirm: boolean) => void
+  isDeleteCustomer: boolean
+  refetch: () => void
 }
 
-const formSchema = z.object({})
-type FormKeys = keyof z.infer<typeof formSchema>
+const formSchema = z.object({
+  S_COMPANY_CODE: z.string().optional(),
+  CUSTOMER_CODE: z.string(),
+  CUSTOMER_NAME: z.string().optional(),
+  CUSTOMER_NAME_ENG: z.string().optional(),
+  CUSTOMER_TYPE: z.string().optional(),
+  CUSTOMER_LEVEL: z.string().optional(),
+  TEL_NO: z.string().optional(),
+  FAX_NO: z.string().optional(),
+  EMAIL: z.string().optional(),
+  ADDR: z.string().optional(),
+  IRS_NO: z.string().optional(),
+  DIRECTOR: z.string().optional(),
+  PIC_NAME: z.string().optional(),
+  PIC_TEL: z.string().optional(),
+  PIC_EMAIL: z.string().optional(),
+  STATUS: z.string().optional(),
+  REMARKS: z.string().optional(),
+  S_USER_ID: z.string().optional(),
+  S_USER_NAME: z.string().optional(),
+  DATA: z.array(
+    z.object({
+      CUSTOMER_CODE: z.string().optional(),
+      DEPT_CODE: z.string().optional(),
+      DEPT_NAME: z.string().optional(),
+      DEPT_NAME_ENG: z.string().optional(),
+      PIC_NAME: z.string().optional(),
+      PIC_TEL: z.string().optional(),
+      PIC_EMAIL: z.string().optional(),
+      REMARKS: z.string().optional(),
+    }),
+  ),
+})
 
 const defaultValues = {
-  UPDATE_USER_ID: '',
-  CUSTOMER_NAME_ENG: '',
-  TEL_NO: '',
-  UPDATE_DATE: '',
-  ADD_USER_ID: '',
-  CUSTOMER_TYPE: '',
-  ADD_USER_NAME: '',
-  REMARKS: '',
-  STATUS: '',
-  FAX_NO: '',
-  TIME_ZONE: '',
-  CUSTOMER_NAME: '',
-  ADD_DATE: '',
-  CUSTOMER_CODE: '',
-  UPDATE_USER_NAME: '',
+  S_COMPANY_CODE: 'GDL',
+  CUSTOMER_CODE: 'GDL',
+  CUSTOMER_NAME: 'GDL',
+  CUSTOMER_NAME_ENG: 'GDL',
+  CUSTOMER_TYPE: 'GDL',
+  CUSTOMER_LEVEL: 'GDL',
+  TEL_NO: 'GDL',
+  FAX_NO: 'GDL',
+  EMAIL: 'GDL',
+  ADDR: 'GDL',
+  IRS_NO: 'GDL',
+  DIRECTOR: 'GDL',
+  PIC_NAME: 'GDL',
+  PIC_TEL: 'GDL',
+  PIC_EMAIL: 'GDL',
+  STATUS: 'GDL',
+  REMARKS: 'GDL',
+  S_USER_ID: 'psh',
+  S_USER_NAME: 'park sanghyun',
+  DATA: [
+    {
+      CUSTOMER_CODE: '',
+      DEPT_CODE: '',
+      DEPT_NAME: '',
+      DEPT_NAME_ENG: '',
+      PIC_NAME: '',
+      PIC_TEL: '',
+      PIC_EMAIL: '',
+      REMARKS: '',
+    },
+  ],
 }
 
-export default function CustomerControl({ detail, isOpen, setIsOpen }: Props) {
-  const form = useForm<z.infer<typeof formSchema>>({
+type TFormSchema = z.infer<typeof formSchema>
+
+export default function CustomerControl({
+  detail,
+  isOpen,
+  setIsOpen,
+  setIsConfirm,
+  isDeleteCustomer,
+  refetch,
+}: Props) {
+  const form = useForm<TFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues,
   })
 
-  const { data: dept } = useQuery({
-    queryKey: ['getDept', detail?.CUSTOMER_CODE],
+  const { isLoading: isGetData } = useQuery({
+    queryKey: ['getOrderBLInfo', isOpen],
     queryFn: async () => {
-      const { data } = await request.post('/customer/getCustomerDept', {
+      const response = await request.post('/customer/getCustomerDept', {
         CUSTOMER_CODE: detail?.CUSTOMER_CODE,
       })
-      return data
+
+      if (response.data.length === 0) {
+        form.setValue('DATA', defaultValues.DATA)
+      } else {
+        form.setValue('DATA', response.data)
+      }
+      return response.data
     },
-    enabled: !!detail?.CUSTOMER_CODE,
+    enabled: isOpen,
   })
 
-  const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
-    mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request.post('/user/userSave', {
+  const { mutate: UpdateCustomer, isPending: isUpdateCustomer } = useMutation({
+    mutationFn: async (value: TFormSchema) => {
+      const response = await request.post('/customer/CustomerSave', {
         ...value,
       })
       if (!response) {
         toast.error('Failed to update user information')
       } else {
         setIsOpen(false)
-        window.location.reload()
+        refetch()
       }
     },
   })
 
   useEffect(() => {
     if (detail) {
+      console.log(detail)
+
       form.reset(detail)
     } else {
       form.reset(defaultValues)
     }
   }, [isOpen, detail])
 
-  const onSubmit = async (value: z.infer<typeof formSchema>) => {
-    UpdateUser(value)
+  const AddNewBldata = () => {
+    form.setValue('DATA', [...form.getValues('DATA'), defaultValues.DATA[0]])
   }
-  const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
+
+  const RemoveBldata = (index: number) => {
+    form.setValue(
+      'DATA',
+      form.getValues('DATA').filter((_, i) => i !== index),
+    )
+  }
+
+  const onSubmit = async (value: TFormSchema) => {
+    UpdateCustomer(value)
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-6xl">
         <DialogHeader>
           <DialogTitle>{detail ? 'Edit' : 'Add'} Customer</DialogTitle>
         </DialogHeader>
-        {/* <Form {...form}>
+        <Form {...form}>
           <form
             id="userForm"
             onSubmit={form.handleSubmit(onSubmit)}
-            className="relative grid grid-cols-2 gap-4"
+            className="relative grid grid-cols-4 gap-4"
           >
+            <FormField
+              control={form.control}
+              name="S_COMPANY_CODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">S Company Code</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="CUSTOMER_CODE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Customer Code
+                    <span className="ml-1 text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="CUSTOMER_NAME"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Customer Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="CUSTOMER_NAME_ENG"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">
+                    Customer Name Eng
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="CUSTOMER_TYPE"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Customer Type</FormLabel>
+                  <FormControl>
+                    <Customer {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="CUSTOMER_LEVEL"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Customer Level</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="TEL_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Tel No</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="FAX_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Fax No</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="EMAIL"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ADDR"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Address</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="IRS_NO"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">IRS No</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="DIRECTOR"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Director</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="PIC_NAME"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Pic Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="PIC_TEL"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Pic Tel</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="PIC_EMAIL"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Pic Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="STATUS"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Status</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="REMARKS"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">Remarks</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="S_USER_ID"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">S User Id</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="S_USER_NAME"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="capitalize">S User Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="relative col-span-4 mt-6 border-t pt-6">
+              {isGetData && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+              )}
+              <div className="space-y-2">
+                {!isGetData &&
+                  form.watch('DATA')?.map((item, index) => (
+                    <div
+                      key={`DATA-${index}`}
+                      className="relative col-span-4 flex gap-2"
+                    >
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.CUSTOMER_CODE`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Customer Code</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.DEPT_CODE`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dept Code</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.DEPT_NAME`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dept Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.DEPT_NAME_ENG`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dept Name Eng</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.PIC_NAME`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pic Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.PIC_TEL`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pic Tel</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.PIC_EMAIL`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Pic Email</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`DATA.${index}.REMARKS`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Remarks</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {index === 0 ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => AddNewBldata()}
+                          className="mt-8 self-start px-3"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          onClick={() => RemoveBldata(index)}
+                          className="mt-8 self-start px-3"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            </div>
           </form>
-        </Form> */}
+        </Form>
         <DialogFooter className="sm:justify-center">
           <Button type="submit" form="userForm">
-            {isUpdateUser && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isUpdateCustomer && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
             {detail ? 'Update' : 'Add'}
           </Button>
+          {detail && (
+            <Button
+              form="routeForm"
+              variant="destructive"
+              onClick={() => setIsConfirm(true)}
+            >
+              {isDeleteCustomer && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
+              Delete
+            </Button>
+          )}
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel
           </Button>

@@ -47,6 +47,7 @@ type Props = {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   setIsConfirm: (isConfirm: boolean) => void
+  isDeleteOrder: boolean
   refetch: () => void
 }
 
@@ -154,6 +155,7 @@ export default function OrderControl({
   isOpen,
   setIsOpen,
   setIsConfirm,
+  isDeleteOrder,
   refetch,
 }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -193,8 +195,6 @@ export default function OrderControl({
 
   useEffect(() => {
     if (detail) {
-      console.log(detail.ETA_BORDER)
-
       form.reset({
         ...detail,
         ...(detail.CC_DONE_TIME
@@ -770,7 +770,7 @@ export default function OrderControl({
               variant="destructive"
               onClick={() => setIsConfirm(true)}
             >
-              {isUpdateOrder && (
+              {isDeleteOrder && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
               Delete

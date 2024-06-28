@@ -1,3 +1,4 @@
+import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import CustomerControl from '@/components/dialog/CustomerControl'
 import ReportSearch from '@/components/form/ReportSearch'
 import SearchLine from '@/components/form/SearchLine'
@@ -16,13 +17,14 @@ import {
 import { Customer } from '@/types/data'
 import request from '@/utils/request'
 import { dateFormat } from '@/utils/utils'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Plus, RefreshCcw } from 'lucide-react'
 import { useState } from 'react'
 
 export default function customer() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isConfirm, setIsConfirm] = useState(false)
   const [searchData, setSearchData] = useState<Customer[]>([])
   const [detail, setDetail] = useState<Customer | undefined>()
   const [page, setPage] = useState(1)
@@ -56,6 +58,18 @@ export default function customer() {
       })
       setSearchData(filterList)
       return filterList
+    },
+  })
+
+  const { mutate: deleteCustomer, isPending: isDeleteCustomer } = useMutation({
+    mutationKey: ['deleteCustomer'],
+    mutationFn: async () => {
+      await request.post('/customer/CustomerDelete', {
+        CUSTOMER_CODE: detail?.CUSTOMER_CODE,
+      })
+      setIsConfirm(false)
+      setIsOpen(false)
+      refetch()
     },
   })
 
@@ -161,7 +175,24 @@ export default function customer() {
         />
       </Card>
 
-      <CustomerControl detail={detail} isOpen={isOpen} setIsOpen={setIsOpen} />
+      <CustomerControl
+        detail={detail}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        setIsConfirm={setIsConfirm}
+        isDeleteCustomer={isDeleteCustomer}
+        refetch={refetch}
+      />
+
+      <ConfirmDialog
+        title="Delete Order"
+        desc="Are you sure you want to delete order"
+        btnText="Delete"
+        loading={isDeleteCustomer}
+        isOpen={isConfirm}
+        setIsOpen={setIsConfirm}
+        callback={() => deleteCustomer()}
+      />
     </section>
   )
 }

@@ -228,6 +228,7 @@ export default function OrderView() {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         setIsConfirm={setIsConfirm}
+        isDeleteOrder={isDeleteOrder}
         refetch={refetch}
       />
 
