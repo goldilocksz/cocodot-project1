@@ -137,11 +137,11 @@ export default function UserControl({
 
   const { mutate: UpdateUser, isPending: isUpdateUser } = useMutation({
     mutationFn: async (value: z.infer<typeof formSchema>) => {
-      const response = await request.post('/user/userSave', {
+      const response: any = await request.post('/user/userSave', {
         ...value,
       })
-      if (!response) {
-        toast.error('Failed to update user information')
+      if (response < 0) {
+        toast.error('The ID is already in use')
       } else {
         setIsOpen(false)
         refetch()
