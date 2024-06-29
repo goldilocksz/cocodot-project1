@@ -434,7 +434,7 @@ export default function DashboardView() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center">
-            <CardTitle>ESTIMATED L/T(Border Passing)</CardTitle>
+            <CardTitle>Estimated L/T(Border Passing)</CardTitle>
           </CardHeader>
           <CardContent className="relative">
             <Loading isLoading={isGetLeadTime || isRefetchLeadTime}></Loading>
