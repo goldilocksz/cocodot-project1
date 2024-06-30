@@ -90,21 +90,23 @@ export default function customer() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
-              <TableHead>UPDATE_USER_ID</TableHead>
-              <TableHead>CUSTOMER_NAME_ENG</TableHead>
-              <TableHead>TEL_NO</TableHead>
-              <TableHead>UPDATE_DATE</TableHead>
-              <TableHead>ADD_USER_ID</TableHead>
-              <TableHead>CUSTOMER_TYPE</TableHead>
-              <TableHead>ADD_USER_NAME</TableHead>
-              <TableHead>REMARKS</TableHead>
-              <TableHead>STATUS</TableHead>
-              <TableHead>FAX_NO</TableHead>
-              <TableHead>TIME_ZONE</TableHead>
-              <TableHead>CUSTOMER_NAME</TableHead>
-              <TableHead>ADD_DATE</TableHead>
-              <TableHead>CUSTOMER_CODE</TableHead>
-              <TableHead>UPDATE_USER_NAME</TableHead>
+              <TableHead>Customer Code</TableHead>
+              <TableHead>CUSTOMER TYPE</TableHead>
+              <TableHead>Dept Code</TableHead>
+              <TableHead>Dept Name</TableHead>
+              <TableHead>Dept Name Eng</TableHead>
+              <TableHead>Pic Name</TableHead>
+              <TableHead>Pic Tel</TableHead>
+              <TableHead>Pic Email</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Remarks</TableHead>
+              <TableHead>Time Zone</TableHead>
+              <TableHead>Add Date</TableHead>
+              <TableHead>Add User Id</TableHead>
+              <TableHead>Add User Name</TableHead>
+              <TableHead>Update Date</TableHead>
+              <TableHead>Update User id</TableHead>
+              <TableHead>Update User Name</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -121,24 +123,22 @@ export default function customer() {
                     setIsOpen(true)
                   }}
                 >
-                  <TableCell>{item.UPDATE_USER_ID}</TableCell>
-                  <TableCell>{item.CUSTOMER_NAME_ENG}</TableCell>
-                  <TableCell>{item.TEL_NO}</TableCell>
-                  <TableCell>
-                    {item.UPDATE_DATE && dateFormat(item.UPDATE_DATE)}
-                  </TableCell>
-                  <TableCell>{item.ADD_USER_ID}</TableCell>
-                  <TableCell>{item.CUSTOMER_TYPE}</TableCell>
-                  <TableCell>{item.ADD_USER_NAME}</TableCell>
-                  <TableCell>{item.REMARKS}</TableCell>
-                  <TableCell>{item.STATUS}</TableCell>
-                  <TableCell>{item.FAX_NO}</TableCell>
-                  <TableCell>{item.TIME_ZONE}</TableCell>
-                  <TableCell>{item.CUSTOMER_NAME}</TableCell>
-                  <TableCell>
-                    {item.ADD_DATE && dateFormat(item.ADD_DATE)}
-                  </TableCell>
                   <TableCell>{item.CUSTOMER_CODE}</TableCell>
+                  <TableCell>{item.CUSTOMER_TYPE}</TableCell>
+                  <TableCell>{item.DEPT_CODE}</TableCell>
+                  <TableCell>{item.DEPT_NAME}</TableCell>
+                  <TableCell>{item.DEPT_NAME_ENG}</TableCell>
+                  <TableCell>{item.PIC_NAME}</TableCell>
+                  <TableCell>{item.PIC_TEL}</TableCell>
+                  <TableCell>{item.PIC_EMAIL}</TableCell>
+                  <TableCell>{item.STATUS}</TableCell>
+                  <TableCell>{item.REMARKS}</TableCell>
+                  <TableCell>{item.TIME_ZONE}</TableCell>
+                  <TableCell>{dateFormat(item.ADD_DATE)}</TableCell>
+                  <TableCell>{item.ADD_USER_ID}</TableCell>
+                  <TableCell>{item.ADD_USER_NAME}</TableCell>
+                  <TableCell>{dateFormat(item.UPDATE_DATE)}</TableCell>
+                  <TableCell>{item.UPDATE_USER_ID}</TableCell>
                   <TableCell>{item.UPDATE_USER_NAME}</TableCell>
                 </TableRow>
               ))}

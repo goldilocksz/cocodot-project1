@@ -218,6 +218,12 @@ export interface Customer {
   ADD_DATE: string
   CUSTOMER_CODE: string
   UPDATE_USER_NAME: string
+  DEPT_CODE: string
+  DEPT_NAME: string
+  DEPT_NAME_ENG: string
+  PIC_NAME: string
+  PIC_TEL: string
+  PIC_EMAIL: string
 }
 
 export interface TrakingInfo {
