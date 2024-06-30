@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useNavigate } from 'react-router-dom'
 
 import PrivateRoutes from '@/components/layout/PrivateRoutes'
 import Login from '@/pages/login'
@@ -24,16 +24,16 @@ const componentMapping: Record<
     className?: string
   }>
 > = {
-  Dashboard,
-  Monitoring,
-  Users: Users,
-  Customer,
-  Orders,
-  'TR Report': TrReport,
-  'B/L Report': BlReport,
-  Common,
-  Route: RouteCom,
-  'My page': My,
+  MN0510: Dashboard,
+  MN0520: Monitoring,
+  MN0530: Users,
+  MN0540: Customer,
+  MN0550: Orders,
+  MN0561: TrReport,
+  MN0562: BlReport,
+  MN0580: Common,
+  MN0590: RouteCom,
+  MN0600: My,
 }
 
 interface MenuItem {
@@ -45,14 +45,22 @@ interface MenuItem {
 }
 
 export default function AppRoute() {
+  const user = localStorage.getItem('user')
+  const navigate = useNavigate()
+
   const { data: Menu } = useQuery<MenuItem[]>({
     queryKey: ['getMenu'],
     queryFn: async () => {
       const { data } = await request.post('/webCommon/getMenu', {
         OS_TYPE: 'WEB',
       })
+      setTimeout(() => {
+        navigate(data[0].SRC_PATH)
+      }, 5000)
+
       return data
     },
+    enabled: !!user,
   })
 
   return (
@@ -60,13 +68,15 @@ export default function AppRoute() {
       <Route path="/login" element={<Login />} />
       <Route element={<PrivateRoutes />}>
         <Route element={<Layout />}>
-          {Menu?.map((item) => {
-            const Component = componentMapping[item.MENU_NAME]
+          {Menu?.filter((item) => item.SRC_PATH !== '').map((item) => {
+            const Component = componentMapping[item.MENU_ID]
             return (
               <Route
                 key={item.MENU_ID}
                 path={item.SRC_PATH}
-                element={<Component />}
+                element={
+                  Component ? <Component /> : <div>Component not found</div>
+                }
               ></Route>
             )
           })}

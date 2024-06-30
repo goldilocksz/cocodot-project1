@@ -125,9 +125,8 @@ export default function navbar() {
         const IconComponent = iconMapping[item.MENU_NAME]
 
         return (
-          <Fragment>
+          <Fragment key={item.MENU_ID}>
             <NavLink
-              key={item.MENU_ID}
               to={item.SRC_PATH === '' ? '#' : item.SRC_PATH}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
