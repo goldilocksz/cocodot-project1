@@ -102,6 +102,7 @@ interface MenuItem {
   MENU_NAME: string
   OS_TYPE: string
   SRC_PATH: string
+  MENU_TYPE: string
 }
 
 export default function navbar() {
@@ -120,23 +121,44 @@ export default function navbar() {
 
   return (
     <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
-      {Menu?.filter((item) => item.SRC_PATH !== '').map((item) => {
+      {Menu?.map((item) => {
         const IconComponent = iconMapping[item.MENU_NAME]
 
         return (
-          <NavLink
-            key={item.MENU_ID}
-            to={item.SRC_PATH}
-            className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
-              item.SRC_PATH.split('/')[1] ===
-                pathname.split('/')[1].split('?')[0] &&
-                'bg-zinc-200 text-black',
-            )}
-          >
-            {IconComponent && <IconComponent className="h-4 w-4" />}
-            {item.MENU_NAME}
-          </NavLink>
+          <Fragment>
+            <NavLink
+              key={item.MENU_ID}
+              to={item.SRC_PATH === '' ? '#' : item.SRC_PATH}
+              className={cn(
+                'flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
+                item.SRC_PATH.split('/')[1] ===
+                  pathname.split('/')[1].split('?')[0] &&
+                  'bg-zinc-200 text-black',
+                (item.MENU_ID === 'MN0561' || item.MENU_ID === 'MN0562') &&
+                  'pl-10',
+              )}
+              onClick={() => item.SRC_PATH === '' && setOpen(!open)}
+            >
+              {IconComponent && <IconComponent className="h-4 w-4" />}
+              {item.MENU_NAME}
+              {item.MENU_TYPE === 'F' && (
+                <ChevronDown className="ml-auto h-4 w-4" />
+              )}
+            </NavLink>
+            {/* {item.subMenu?.map((item) => (
+            <NavLink
+              key={item.name}
+              to={item.href}
+              className={cn(
+                'ml-2 flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
+                item.href === pathname && 'bg-zinc-200 text-black',
+              )}
+            >
+              {item.href === pathname && <ChevronRight className="h-4 w-4" />}
+              {item.name}
+            </NavLink>
+          ))} */}
+          </Fragment>
         )
       })}
     </nav>
