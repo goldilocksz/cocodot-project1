@@ -82,12 +82,7 @@ const formSchema = z.object({
       message: 'Tel No must be less than 20 characters',
     }),
   EMAIL: z.string().optional(),
-  TRUCK_NO: z
-    .string()
-    .max(10, {
-      message: 'Truck No must be less than 10 characters',
-    })
-    .optional(),
+  TRUCK_NO: z.string().optional(),
   TRUCK_TYPE: z.string().optional(),
   NATION_CD: z.string().min(1, {
     message: 'Customer Code is required',
@@ -196,10 +191,7 @@ export default function UserControl({
               name="PW"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    PW
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel className="capitalize">PW</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -292,10 +284,7 @@ export default function UserControl({
               name="EMAIL"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    Email
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel className="capitalize">Email</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -324,10 +313,7 @@ export default function UserControl({
               name="TRUCK_NO"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">
-                    Truck No
-                    <span className="ml-1 text-destructive">*</span>
-                  </FormLabel>
+                  <FormLabel className="capitalize">Truck No</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -382,7 +368,9 @@ export default function UserControl({
               name="GRADE"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="capitalize">Grade</FormLabel>
+                  <FormLabel className="capitalize">
+                    Activate/Inactivate
+                  </FormLabel>
                   <FormControl>
                     <div className="flex h-10 items-center">
                       <Switch
