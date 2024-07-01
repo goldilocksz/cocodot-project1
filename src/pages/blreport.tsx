@@ -96,7 +96,6 @@ export default function BlReportView() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
-              <TableHead>Company Code</TableHead>
               <TableHead>Tr No</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Bl No</TableHead>
@@ -142,7 +141,6 @@ export default function BlReportView() {
               )
               .map((item, index) => (
                 <TableRow key={`blreport-${index}`}>
-                  <TableCell>{item.COMPANY_CODE || ''}</TableCell>
                   <TableCell>{item.TR_NO || ''}</TableCell>
                   <TableCell>{item?.STATUS || ''}</TableCell>
                   <TableCell>{item?.BL_NO || ''}</TableCell>
