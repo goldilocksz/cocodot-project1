@@ -145,8 +145,6 @@ export default function CustomerControl({
 
   useEffect(() => {
     if (detail) {
-      console.log(detail)
-
       form.reset(detail)
     } else {
       form.reset(defaultValues)

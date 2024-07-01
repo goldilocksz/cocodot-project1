@@ -31,9 +31,9 @@ const componentMapping: Record<
   MN0550: Orders,
   MN0561: TrReport,
   MN0562: BlReport,
-  MN0580: Common,
-  MN0590: RouteCom,
-  MN0600: My,
+  MN0570: Common,
+  MN0580: RouteCom,
+  MN0590: My,
 }
 
 interface MenuItem {
@@ -54,9 +54,13 @@ export default function AppRoute() {
       const { data } = await request.post('/webCommon/getMenu', {
         OS_TYPE: 'WEB',
       })
-      // setTimeout(() => {
-      //   navigate(data[0].SRC_PATH)
-      // }, 500)
+      if (data.length === 0) {
+        navigate('/my')
+      } else {
+        setTimeout(() => {
+          navigate(data[0].SRC_PATH)
+        }, 500)
+      }
 
       return data
     },
@@ -80,6 +84,7 @@ export default function AppRoute() {
               ></Route>
             )
           })}
+          <Route path="/my" element={<My />} />
         </Route>
       </Route>
     </Routes>

@@ -20,7 +20,7 @@ import { dateFormat } from '@/utils/utils'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { Plus, RefreshCcw } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function customer() {
   const [isOpen, setIsOpen] = useState(false)
@@ -59,6 +59,12 @@ export default function customer() {
       refetch()
     },
   })
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDetail(undefined)
+    }
+  }, [isOpen])
 
   return (
     <section className="relative grow">
