@@ -130,9 +130,7 @@ export default function navbar() {
               to={item.SRC_PATH === '' ? '#' : item.SRC_PATH}
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-3 text-muted-foreground transition-all hover:text-primary',
-                item.SRC_PATH.split('/')[1] ===
-                  pathname.split('/')[1].split('?')[0] &&
-                  'bg-zinc-200 text-black',
+                item.SRC_PATH === pathname && 'bg-zinc-200 text-black',
                 (item.MENU_ID === 'MN0561' || item.MENU_ID === 'MN0562') &&
                   'pl-10',
               )}

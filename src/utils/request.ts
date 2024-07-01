@@ -24,11 +24,13 @@ request.interceptors.response.use(
     return response
   },
   (error) => {
+    console.log(error.response.status)
+
     if (error.response.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       toast.error('토큰이 만료되어 자동 로그아웃 되였습니다.')
-      window.location.href = '/login'
+      location.href = '/login'
     }
 
     return Promise.reject(

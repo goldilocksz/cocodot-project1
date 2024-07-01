@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 
 import PrivateRoutes from '@/components/layout/PrivateRoutes'
 import Login from '@/pages/login'
@@ -15,78 +15,49 @@ import Customer from '@/pages/customer'
 import My from './pages/my'
 
 import NotFound from '@/pages/not-found'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import request from './utils/request'
 
-const componentMapping: Record<
-  string,
-  React.ComponentType<{
-    className?: string
-  }>
-> = {
-  MN0510: Dashboard,
-  MN0520: Monitoring,
-  MN0530: Users,
-  MN0540: Customer,
-  MN0550: Orders,
-  MN0561: TrReport,
-  MN0562: BlReport,
-  MN0570: Common,
-  MN0580: RouteCom,
-  MN0590: My,
-}
-
-interface MenuItem {
-  MENU_ID: string
-  MENU_NAME: string
-  OS_TYPE: string
-  SRC_PATH: string
-  MENU_TYPE: string
-}
-
 export default function AppRoute() {
-  const user = localStorage.getItem('user')
   const navigate = useNavigate()
+  const pathname = useLocation().pathname
+  const isAuth = localStorage.getItem('token')
 
-  const { data: Menu } = useQuery<MenuItem[]>({
-    queryKey: ['getMenu'],
-    queryFn: async () => {
-      const { data } = await request.post('/webCommon/getMenu', {
+  useEffect(() => {
+    const getMenu = async () => {
+      const response = await request.post('/webCommon/getMenu', {
         OS_TYPE: 'WEB',
       })
-      if (data.length === 0) {
-        navigate('/my')
-      } else {
-        setTimeout(() => {
-          navigate(data[0].SRC_PATH)
-        }, 500)
+      const findMenu = response.data.find(
+        (item: any) => item.SRC_PATH === pathname,
+      )
+      if (!findMenu) {
+        navigate('/404')
       }
-
-      return data
-    },
-    enabled: !!user,
-  })
+    }
+    if (isAuth) {
+      getMenu()
+    }
+  }, [pathname, isAuth])
 
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route element={<PrivateRoutes />}>
         <Route element={<Layout />}>
-          {Menu?.filter((item) => item.SRC_PATH !== '').map((item) => {
-            const Component = componentMapping[item.MENU_ID]
-            return (
-              <Route
-                key={item.MENU_ID}
-                path={item.SRC_PATH}
-                element={
-                  Component ? <Component /> : <div>Component not found</div>
-                }
-              ></Route>
-            )
-          })}
-          <Route path="/my" element={<My />} />
+          <Route path="/" element={<Dashboard />}></Route>
+          <Route path="/monitoring" element={<Monitoring />}></Route>
+          <Route path="/users" element={<Users />}></Route>
+          <Route path="/orders" element={<Orders />}></Route>
+          <Route path="/trreport" element={<TrReport />}></Route>
+          <Route path="/blreport" element={<BlReport />}></Route>
+          <Route path="/common" element={<Common />}></Route>
+          <Route path="/route" element={<RouteCom />}></Route>
+          <Route path="/customer" element={<Customer />}></Route>
+          <Route path="/my" element={<My />}></Route>
         </Route>
       </Route>
+      <Route path="*" element={<NotFound />}></Route>
     </Routes>
   )
 }
