@@ -122,7 +122,7 @@ export default function UsersView() {
           </Button>
           <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
             <Plus className="h-4 w-4" />
-            User
+            Add User
           </Button>
         </div>
       </div>
