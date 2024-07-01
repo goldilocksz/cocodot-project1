@@ -54,9 +54,9 @@ export default function AppRoute() {
       const { data } = await request.post('/webCommon/getMenu', {
         OS_TYPE: 'WEB',
       })
-      setTimeout(() => {
-        navigate(data[0].SRC_PATH)
-      }, 5000)
+      // setTimeout(() => {
+      //   navigate(data[0].SRC_PATH)
+      // }, 500)
 
       return data
     },

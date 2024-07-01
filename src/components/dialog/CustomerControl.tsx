@@ -67,22 +67,22 @@ const formSchema = z.object({
 })
 
 const defaultValues = {
-  CUSTOMER_CODE: 'GDL',
-  CUSTOMER_NAME: 'GDL',
-  CUSTOMER_NAME_ENG: 'GDL',
-  CUSTOMER_TYPE: 'GDL',
-  CUSTOMER_LEVEL: 'GDL',
-  TEL_NO: 'GDL',
-  FAX_NO: 'GDL',
-  EMAIL: 'GDL',
-  ADDR: 'GDL',
-  IRS_NO: 'GDL',
-  DIRECTOR: 'GDL',
-  PIC_NAME: 'GDL',
-  PIC_TEL: 'GDL',
-  PIC_EMAIL: 'GDL',
-  STATUS: 'GDL',
-  REMARKS: 'GDL',
+  CUSTOMER_CODE: '',
+  CUSTOMER_NAME: '',
+  CUSTOMER_NAME_ENG: '',
+  CUSTOMER_TYPE: '',
+  CUSTOMER_LEVEL: '',
+  TEL_NO: '',
+  FAX_NO: '',
+  EMAIL: '',
+  ADDR: '',
+  IRS_NO: '',
+  DIRECTOR: '',
+  PIC_NAME: '',
+  PIC_TEL: '',
+  PIC_EMAIL: '',
+  STATUS: '',
+  REMARKS: '',
   DATA: [
     {
       CUSTOMER_CODE: '',
@@ -126,7 +126,7 @@ export default function CustomerControl({
       }
       return response.data
     },
-    enabled: isOpen,
+    enabled: isOpen && !!detail,
   })
 
   const { mutate: UpdateCustomer, isPending: isUpdateCustomer } = useMutation({
