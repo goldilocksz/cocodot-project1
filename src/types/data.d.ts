@@ -136,6 +136,12 @@ export interface TrReport {
   ETA_CNEE_FACTORY: string
   ATA_CNEE_FACTORY: string
   UNLOADING: string
+  CNEE: string
+  INVOICE_NO: string
+  INCOTERMS: string
+  ITEM_CODE: string
+  WEEK: string
+  ETD_FACTORY: string
 }
 
 export interface Order {

@@ -108,10 +108,12 @@ export default function OrderView() {
             <RefreshCcw className="h-4 w-4" />
             Data Refresh
           </Button>
-          <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
-            <Plus className="h-4 w-4" />
-            Add Order
-          </Button>
+          {user?.GRADE !== '3' && (
+            <Button className="flex gap-1" onClick={() => setIsOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Add Order
+            </Button>
+          )}
         </div>
       </div>
 

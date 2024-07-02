@@ -97,7 +97,8 @@ export default function TrReportView() {
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
-            {/* <TableHead>Tr Number</TableHead>
+            <TableRow>
+              <TableHead>Tr Number</TableHead>
               <TableHead>Bl Number</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>CNEE</TableHead>
@@ -133,42 +134,6 @@ export default function TrReportView() {
               <TableHead>Depart from Vietnam yard</TableHead>
               <TableHead>ETA CNEE Factory</TableHead>
               <TableHead>ATA Cnee Factory</TableHead>
-              <TableHead>Unloading</TableHead> */}
-            <TableRow>
-              <TableHead>Tr No</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Bl No</TableHead>
-              <TableHead>Lsp Cd</TableHead>
-              <TableHead>Job Date</TableHead>
-              <TableHead>Pol</TableHead>
-              <TableHead>Vendor Name</TableHead>
-              <TableHead>Single Or Consol</TableHead>
-              <TableHead>From Route Code</TableHead>
-              <TableHead>From Nation</TableHead>
-              <TableHead>Cn Truck No</TableHead>
-              <TableHead>Cn Truck Type</TableHead>
-              <TableHead>To Route Code</TableHead>
-              <TableHead>To Nation</TableHead>
-              <TableHead>Vn Truck No</TableHead>
-              <TableHead>Vn Truck Type</TableHead>
-              <TableHead>Etd</TableHead>
-              <TableHead>Plt Qty</TableHead>
-              <TableHead>Ata Factory To Pick Up</TableHead>
-              <TableHead>Pick Up Time</TableHead>
-              <TableHead>Atd Factory</TableHead>
-              <TableHead>Eta Border</TableHead>
-              <TableHead>Ata Border</TableHead>
-              <TableHead>Border Pass</TableHead>
-              <TableHead>Urgent</TableHead>
-              <TableHead>Region Code</TableHead>
-              <TableHead>Region Name</TableHead>
-              <TableHead>Cc Done Time</TableHead>
-              <TableHead>Arrive Vietam Yard Cn</TableHead>
-              <TableHead>Arrive Vietam Yard Vn</TableHead>
-              <TableHead>Transloading</TableHead>
-              <TableHead>Depart From Vietnam Yard</TableHead>
-              <TableHead>Eta Cnee Factory</TableHead>
-              <TableHead>Ata Cnee Factory</TableHead>
               <TableHead>Unloading</TableHead>
             </TableRow>
           </TableHeader>
@@ -180,99 +145,43 @@ export default function TrReportView() {
               )
               .map((item, index) => (
                 <TableRow key={`trreport-${index}`}>
-                  <TableCell>{item.TR_NO || ''}</TableCell>
-                  <TableCell>{item?.STATUS || ''}</TableCell>
-                  <TableCell>{item?.BL_NO || ''}</TableCell>
-                  <TableCell>{item?.LSP_CD || ''}</TableCell>
-                  <TableCell>{item?.JOB_DATE || ''}</TableCell>
-                  <TableCell>{item?.POL || ''}</TableCell>
-                  <TableCell>{item?.VENDOR_NAME || ''}</TableCell>
-                  <TableCell>{item.SINGLE_OR_CONSOL || ''}</TableCell>
-                  <TableCell>{item.FROM_ROUTE_CODE || ''}</TableCell>
-                  <TableCell>{item.FROM_NATION || ''}</TableCell>
-                  <TableCell>{item.CN_TRUCK_NO || ''}</TableCell>
-                  <TableCell>{item.CN_TRUCK_TYPE || ''}</TableCell>
-                  <TableCell>{item.TO_ROUTE_CODE || ''}</TableCell>
-                  <TableCell>{item.TO_NATION || ''}</TableCell>
-                  <TableCell>{item.VN_TRUCK_NO || ''}</TableCell>
-                  <TableCell>{item.VN_TRUCK_TYPE || ''}</TableCell>
-                  <TableCell>
-                    {item.ETD !== 'NULL' && dateFormat(item.ETD)}
-                  </TableCell>
-                  <TableCell>{item.PLT_QTY || ''}</TableCell>
-                  <TableCell>
-                    {item.ATA_FACTORY_TO_PICK_UP !== 'NULL' &&
-                      item.ATA_FACTORY_TO_PICK_UP &&
-                      dateFormat(item.ATA_FACTORY_TO_PICK_UP)}
-                  </TableCell>
-                  <TableCell>
-                    {item.PICK_UP_TIME !== 'NULL' &&
-                      item.PICK_UP_TIME &&
-                      dateFormat(item.PICK_UP_TIME)}
-                  </TableCell>
-                  <TableCell>
-                    {item.ATD_FACTORY !== 'NULL' &&
-                      item.ATD_FACTORY &&
-                      dateFormat(item.ATD_FACTORY)}
-                  </TableCell>
-                  <TableCell>
-                    {item.ETA_BORDER !== 'NULL' &&
-                      item.ETA_BORDER &&
-                      dateFormat(item.ETA_BORDER)}
-                  </TableCell>
-                  <TableCell>
-                    {item.ATA_BORDER !== 'NULL' &&
-                      item.ATA_BORDER &&
-                      dateFormat(item.ATA_BORDER)}
-                  </TableCell>
-                  <TableCell>
-                    {item.BORDER_PASS !== 'NULL' &&
-                      item.BORDER_PASS &&
-                      dateFormat(item.BORDER_PASS)}
-                  </TableCell>
-                  <TableCell>{item.URGENT || ''}</TableCell>
-                  <TableCell>{item.REGION_CODE || ''}</TableCell>
-                  <TableCell>{item.REGION_NAME || ''}</TableCell>
-                  <TableCell>
-                    {item.CC_DONE_TIME !== 'NULL' &&
-                      item.CC_DONE_TIME &&
-                      dateFormat(item.CC_DONE_TIME)}
-                  </TableCell>
-                  <TableCell>
-                    {item.ARRIVE_VIETAM_YARD_CN !== 'NULL' &&
-                      item.ARRIVE_VIETAM_YARD_CN &&
-                      dateFormat(item.ARRIVE_VIETAM_YARD_CN)}
-                  </TableCell>
-                  <TableCell>
-                    {item.ARRIVE_VIETAM_YARD_VN !== 'NULL' &&
-                      item.ARRIVE_VIETAM_YARD_VN &&
-                      dateFormat(item.ARRIVE_VIETAM_YARD_VN)}
-                  </TableCell>
-                  <TableCell>
-                    {item.TRANSLOADING !== 'NULL' &&
-                      item.TRANSLOADING &&
-                      dateFormat(item.TRANSLOADING)}
-                  </TableCell>
-                  <TableCell>
-                    {item.DEPART_FROM_VIETNAM_YARD !== 'NULL' &&
-                      item.DEPART_FROM_VIETNAM_YARD &&
-                      dateFormat(item.DEPART_FROM_VIETNAM_YARD)}
-                  </TableCell>
-                  <TableCell>
-                    {item.ETA_CNEE_FACTORY !== 'NULL' &&
-                      item.ETA_CNEE_FACTORY &&
-                      dateFormat(item.ETA_CNEE_FACTORY)}
-                  </TableCell>
-                  <TableCell>
-                    {item.ATA_CNEE_FACTORY !== 'NULL' &&
-                      item.ATA_CNEE_FACTORY &&
-                      dateFormat(item.ATA_CNEE_FACTORY)}
-                  </TableCell>
-                  <TableCell>
-                    {item.UNLOADING !== 'NULL' &&
-                      item.UNLOADING &&
-                      dateFormat(item.UNLOADING)}
-                  </TableCell>
+                  <TableCell>{item?.TR_NO}</TableCell>
+                  <TableCell>{item?.BL_NO}</TableCell>
+                  <TableCell>{item?.STATUS}</TableCell>
+                  <TableCell>{item?.CNEE}</TableCell>
+                  <TableCell>{item?.LSP_CD}</TableCell>
+                  <TableCell>{item?.POL}</TableCell>
+                  <TableCell>{item?.VENDOR_NAME}</TableCell>
+                  <TableCell>{item?.INVOICE_NO}</TableCell>
+                  <TableCell>{item?.INCOTERMS}</TableCell>
+                  <TableCell>{item?.ITEM_CODE}</TableCell>
+                  <TableCell>{item?.PLT_QTY}</TableCell>
+                  <TableCell>{item?.SINGLE_OR_CONSOL}</TableCell>
+                  <TableCell>{item?.URGENT}</TableCell>
+                  <TableCell>{item?.REGION_NAME}</TableCell>
+                  <TableCell>{item?.FROM_ROUTE_CODE}</TableCell>
+                  <TableCell>{item?.CN_TRUCK_NO}</TableCell>
+                  <TableCell>{item?.CN_TRUCK_TYPE}</TableCell>
+                  <TableCell>{item?.VN_TRUCK_NO}</TableCell>
+                  <TableCell>{item?.VN_TRUCK_TYPE}</TableCell>
+                  <TableCell>{item?.FROM_NATION}</TableCell>
+                  <TableCell>{item?.WEEK}</TableCell>
+                  <TableCell>{item?.JOB_DATE}</TableCell>
+                  <TableCell>{item?.ETD_FACTORY}</TableCell>
+                  <TableCell>{item?.ATA_FACTORY_TO_PICK_UP}</TableCell>
+                  <TableCell>{item?.PICK_UP_TIME}</TableCell>
+                  <TableCell>{item?.ATD_FACTORY}</TableCell>
+                  <TableCell>{item?.ETA_BORDER}</TableCell>
+                  <TableCell>{item?.ATA_BORDER}</TableCell>
+                  <TableCell>{item?.CC_DONE_TIME}</TableCell>
+                  <TableCell>{item?.BORDER_PASS}</TableCell>
+                  <TableCell>{item?.ARRIVE_VIETAM_YARD_CN}</TableCell>
+                  <TableCell>{item?.ARRIVE_VIETAM_YARD_VN}</TableCell>
+                  <TableCell>{item?.TRANSLOADING}</TableCell>
+                  <TableCell>{item?.DEPART_FROM_VIETNAM_YARD}</TableCell>
+                  <TableCell>{item?.ETA_CNEE_FACTORY}</TableCell>
+                  <TableCell>{item?.ATA_CNEE_FACTORY}</TableCell>
+                  <TableCell>{item?.UNLOADING}</TableCell>
                 </TableRow>
               ))}
           </TableBody>
