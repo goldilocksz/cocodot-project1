@@ -32,7 +32,7 @@ export default function AppRoute() {
         (item: any) => item.SRC_PATH === pathname,
       )
       if (!findMenu) {
-        navigate('/404')
+        navigate('/my')
       }
       //  else {
       //   navigate(response.data[0].SRC_PATH)
