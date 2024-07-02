@@ -112,7 +112,7 @@ export default function CustomerControl({
     defaultValues,
   })
 
-  const { isLoading: isGetData } = useQuery({
+  const { isLoading: isGetData, refetch: refetchDept } = useQuery({
     queryKey: ['getOrderBLInfo', isOpen],
     queryFn: async () => {
       const response = await request.post('/customer/getCustomerDept', {
@@ -141,6 +141,9 @@ export default function CustomerControl({
         CUSTOMER_CODE,
         DEPT_CODE,
       })
+      console.log('asd')
+
+      refetchDept()
     },
   })
 
@@ -170,11 +173,11 @@ export default function CustomerControl({
     form.setValue('DATA', [...form.getValues('DATA'), defaultValues.DATA[0]])
   }
 
-  const RemoveBldata = (index: number) => {
-    form.setValue(
-      'DATA',
-      form.getValues('DATA').filter((_, i) => i !== index),
-    )
+  const RemoveBldata = (item: any) => {
+    DeleteCustomer({
+      CUSTOMER_CODE: item?.CUSTOMER_CODE,
+      DEPT_CODE: item.DEPT_CODE,
+    })
   }
 
   const onSubmit = async (value: TFormSchema) => {
@@ -534,7 +537,7 @@ export default function CustomerControl({
                       ) : (
                         <Button
                           variant="outline"
-                          onClick={() => RemoveBldata(index)}
+                          onClick={() => RemoveBldata(item)}
                           className="mt-8 self-start px-3"
                         >
                           <Minus className="h-4 w-4" />

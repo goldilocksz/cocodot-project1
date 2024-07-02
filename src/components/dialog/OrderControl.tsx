@@ -163,7 +163,7 @@ export default function OrderControl({
     defaultValues: OrderDefault,
   })
 
-  const { isPending: isGetBlInfo } = useQuery({
+  const { isPending: isGetBlInfo, refetch: refetchBlInfo } = useQuery({
     queryKey: ['getOrderBLInfo', isOpen],
     queryFn: async () => {
       const response = await request.post('/order/getOrderBLInfo', {
@@ -179,6 +179,16 @@ export default function OrderControl({
     },
     enabled: isOpen,
     gcTime: 0,
+  })
+
+  const { mutate: DeleteBlInfo } = useMutation({
+    mutationFn: async ({ TR_NO, BL_NO }: { TR_NO: string; BL_NO: string }) => {
+      await request.post('/order/OrderBLInfoDelete', {
+        TR_NO,
+        BL_NO,
+      })
+      refetchBlInfo()
+    },
   })
 
   const { mutate: UpdateOrder, isPending: isUpdateOrder } = useMutation({
@@ -219,11 +229,11 @@ export default function OrderControl({
     ])
   }
 
-  const RemoveBldata = (index: number) => {
-    form.setValue(
-      'BLDATA',
-      form.getValues('BLDATA').filter((_, i) => i !== index),
-    )
+  const RemoveBldata = (item: any) => {
+    DeleteBlInfo({
+      TR_NO: item.TR_NO,
+      BL_NO: item.BL_NO,
+    })
   }
 
   const onSubmit = async (value: z.infer<typeof formSchema>) => {
@@ -746,7 +756,7 @@ export default function OrderControl({
                       ) : (
                         <Button
                           variant="outline"
-                          onClick={() => RemoveBldata(index)}
+                          onClick={() => RemoveBldata(item)}
                           className="mt-8 self-start px-3"
                         >
                           <Minus className="h-4 w-4" />
