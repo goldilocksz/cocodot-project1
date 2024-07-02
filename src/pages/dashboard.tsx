@@ -371,14 +371,19 @@ export default function DashboardView() {
                 </div>
               )}
             </div>
-            <p className="mt-2">{Count?.ATA_FACTORY_PER}%</p>
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <span>{Count?.ATA_FACTORY_PER}%</span> <span>(Unit shpt)</span>
+            </div>
           </CardContent>
         </Card>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>A Rate Of Progress</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <div>A Rate Of Progress</div>
+              <span className="text-sm font-normal">(unit shpt)</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="relative min-h-[400px]">
             <Loading isLoading={isGetProgress || isRefetchProgress}></Loading>
@@ -387,7 +392,10 @@ export default function DashboardView() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Lead Time(Border Passing)</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              <div>Lead Time(Border Passing)</div>
+              <span className="text-sm font-normal">(unit hours)</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="relative min-h-[400px]">
             <Loading isLoading={isGetDelivery || isRefetchDelivery}></Loading>
@@ -398,7 +406,10 @@ export default function DashboardView() {
       <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader className="flex flex-row items-center">
-            <CardTitle>Delivery Leadtime by Regional</CardTitle>
+            <CardTitle className="flex flex-1 items-center justify-between">
+              <div>Delivery Leadtime by Regional</div>
+              <span className="text-sm font-normal">(unit shpt)</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="relative">
             <Loading isLoading={isGetDelivery || isRefetchDelivery}></Loading>
@@ -456,7 +467,10 @@ export default function DashboardView() {
       <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader className="flex flex-row items-center">
-            <CardTitle>A list of progress</CardTitle>
+            <CardTitle className="flex flex-1 items-center justify-between">
+              <div>A list of progress</div>
+              <span className="text-sm font-normal">(unit shpt)</span>
+            </CardTitle>
           </CardHeader>
           <CardContent className="relative min-h-[300px]">
             <Loading
