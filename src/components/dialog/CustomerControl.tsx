@@ -129,6 +129,21 @@ export default function CustomerControl({
     enabled: isOpen && !!detail,
   })
 
+  const { mutate: DeleteCustomer } = useMutation({
+    mutationFn: async ({
+      CUSTOMER_CODE,
+      DEPT_CODE,
+    }: {
+      CUSTOMER_CODE: string
+      DEPT_CODE: string
+    }) => {
+      const response = await request.post('/customer/CustomerDeptDelete', {
+        CUSTOMER_CODE,
+        DEPT_CODE,
+      })
+    },
+  })
+
   const { mutate: UpdateCustomer, isPending: isUpdateCustomer } = useMutation({
     mutationFn: async (value: TFormSchema) => {
       const response = await request.post('/customer/CustomerSave', {

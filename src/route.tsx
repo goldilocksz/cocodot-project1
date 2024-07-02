@@ -33,6 +33,8 @@ export default function AppRoute() {
       )
       if (!findMenu) {
         navigate('/404')
+      } else {
+        navigate(response.data[0].SRC_PATH)
       }
     }
     if (isAuth) {

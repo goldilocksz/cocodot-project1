@@ -18,7 +18,7 @@ export default function ChartUI({ data }: any) {
         dataLabels: {
           enabled: true,
         },
-        colors: ['#52525b', '#2563eb', '#020617'],
+        colors: ['#2563eb', '#52525b', '#020617'],
         stroke: {
           width: 1,
           lineCap: 'round',
@@ -36,7 +36,7 @@ export default function ChartUI({ data }: any) {
           },
           labels: {
             style: {
-              colors: ['#52525b', '#2563eb', '#020617'],
+              colors: ['#2563eb', '#52525b', '#020617'],
               fontSize: '12px',
               fontFamily: 'inherit',
               fontWeight: 400,

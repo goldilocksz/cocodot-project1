@@ -24,8 +24,6 @@ request.interceptors.response.use(
     return response
   },
   (error) => {
-    console.log(error.response.status)
-
     if (error.response.status === 401) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')

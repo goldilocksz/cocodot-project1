@@ -125,12 +125,12 @@ export default function DashboardView() {
         labels: Object.keys(titleGroup),
         datasets: [
           {
-            name: 'ETD FACTORY',
-            data: response.data.map((item: any) => item['ETD FACTORY']),
+            name: 'ATD FACTORY(plan)',
+            data: response.data.map((item: any) => item['ATD FACTORY']),
           },
           {
-            name: 'ATD FACTORY',
-            data: response.data.map((item: any) => item['ATD FACTORY']),
+            name: 'ETD FACTORY(actual)',
+            data: response.data.map((item: any) => item['ETD FACTORY']),
           },
         ],
       }

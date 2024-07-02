@@ -97,6 +97,43 @@ export default function TrReportView() {
 
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
+            {/* <TableHead>Tr Number</TableHead>
+              <TableHead>Bl Number</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>CNEE</TableHead>
+              <TableHead>LSP Name</TableHead>
+              <TableHead>Pol</TableHead>
+              <TableHead>Vendor name</TableHead>
+              <TableHead>Invoice No.</TableHead>
+              <TableHead>Incoterms</TableHead>
+              <TableHead>Item code</TableHead>
+              <TableHead>PLT</TableHead>
+              <TableHead>Single or Consol</TableHead>
+              <TableHead>URGENT</TableHead>
+              <TableHead>REGION</TableHead>
+              <TableHead>Route code</TableHead>
+              <TableHead>CN Truck no.</TableHead>
+              <TableHead>CN Truck type</TableHead>
+              <TableHead>VN Truck no.</TableHead>
+              <TableHead>VN Truck type</TableHead>
+              <TableHead>From_Nation</TableHead>
+              <TableHead>Week</TableHead>
+              <TableHead>JOB DATE</TableHead>
+              <TableHead>ETD Factory</TableHead>
+              <TableHead>ATA Factory to pick up</TableHead>
+              <TableHead>Pick up Time</TableHead>
+              <TableHead>ATD Factory</TableHead>
+              <TableHead>ETA Border</TableHead>
+              <TableHead>ATA Border</TableHead>
+              <TableHead>CC done(CN)</TableHead>
+              <TableHead>Border pass</TableHead>
+              <TableHead>Arrive Vietam yard(CN)</TableHead>
+              <TableHead>Arrive Vietam yard(VN)</TableHead>
+              <TableHead>Transloading</TableHead>
+              <TableHead>Depart from Vietnam yard</TableHead>
+              <TableHead>ETA CNEE Factory</TableHead>
+              <TableHead>ATA Cnee Factory</TableHead>
+              <TableHead>Unloading</TableHead> */}
             <TableRow>
               <TableHead>Tr No</TableHead>
               <TableHead>Status</TableHead>
