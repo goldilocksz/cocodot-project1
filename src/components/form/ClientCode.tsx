@@ -3,9 +3,9 @@ import { Select, SelectProps } from '../ui/select'
 import { forwardRef } from 'react'
 import request from '@/utils/request'
 
-const ClientCode = forwardRef<HTMLSelectElement, SelectProps>(
+const ClientCodeSelect = forwardRef<HTMLSelectElement, SelectProps>(
   ({ className, type, ...props }, ref) => {
-    const { data: Cnee, isPending } = useQuery({
+    const { data: ClientCode, isPending } = useQuery({
       queryKey: ['getClientCode'],
       queryFn: async () => {
         const { data } = await request.post('/webCommon/getClient', {})
@@ -16,14 +16,16 @@ const ClientCode = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <Select ref={ref} className={className} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Cnee?.map((item: { CLIENT_CODE: string; CLIENT_NAME: string }) => (
-          <option key={item.CLIENT_CODE} value={item.CLIENT_NAME}>
-            {item.CLIENT_NAME}
-          </option>
-        ))}
+        {ClientCode?.map(
+          (item: { CLIENT_CODE: string; CLIENT_NAME: string }) => (
+            <option key={item.CLIENT_CODE} value={item.CLIENT_CODE}>
+              {item.CLIENT_NAME}
+            </option>
+          ),
+        )}
       </Select>
     )
   },
 )
 
-export default ClientCode
+export default ClientCodeSelect
