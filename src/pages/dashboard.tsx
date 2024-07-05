@@ -125,11 +125,11 @@ export default function DashboardView() {
         labels: Object.keys(titleGroup),
         datasets: [
           {
-            name: 'ATD FACTORY(plan)',
+            name: 'ATD FACTORY(actual)',
             data: response.data.map((item: any) => item['ATD FACTORY']),
           },
           {
-            name: 'ETD FACTORY(actual)',
+            name: 'ETD FACTORY(plan)',
             data: response.data.map((item: any) => item['ETD FACTORY']),
           },
         ],
@@ -305,6 +305,7 @@ export default function DashboardView() {
           Search
         </Button>
       </div>
+      <div className="flex items-center justify-end">Unit: shpt</div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-center space-y-0 pb-2">
@@ -372,7 +373,7 @@ export default function DashboardView() {
               )}
             </div>
             <div className="mt-2 flex items-center justify-center gap-2">
-              <span>{Count?.ATA_FACTORY_PER}%</span> <span>(Unit shpt)</span>
+              {Count?.ATA_FACTORY_PER}%
             </div>
           </CardContent>
         </Card>
@@ -382,7 +383,7 @@ export default function DashboardView() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div>A Rate Of Progress</div>
-              <span className="text-sm font-normal">(unit shpt)</span>
+              <span className="text-sm font-normal">(Unit: shpt)</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="relative min-h-[400px]">
@@ -394,7 +395,7 @@ export default function DashboardView() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div>Lead Time(Border Passing)</div>
-              <span className="text-sm font-normal">(unit hours)</span>
+              <span className="text-sm font-normal">(Unit: hours)</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="relative min-h-[400px]">
@@ -408,7 +409,7 @@ export default function DashboardView() {
           <CardHeader className="flex flex-row items-center">
             <CardTitle className="flex flex-1 items-center justify-between">
               <div>Delivery Leadtime by Regional</div>
-              <span className="text-sm font-normal">(unit shpt)</span>
+              <span className="text-sm font-normal">(Unit: hours)</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="relative">
@@ -469,7 +470,7 @@ export default function DashboardView() {
           <CardHeader className="flex flex-row items-center">
             <CardTitle className="flex flex-1 items-center justify-between">
               <div>A list of progress</div>
-              <span className="text-sm font-normal">(unit shpt)</span>
+              <span className="text-sm font-normal">(Unit: shpt)</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="relative min-h-[300px]">

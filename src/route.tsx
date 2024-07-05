@@ -34,9 +34,6 @@ export default function AppRoute() {
       if (!findMenu) {
         navigate('/my')
       }
-      //  else {
-      //   navigate(response.data[0].SRC_PATH)
-      // }
     }
     if (isAuth) {
       getMenu()

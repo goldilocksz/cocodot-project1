@@ -45,6 +45,7 @@ export default function ChartUI({ data }: any) {
           categories: data.labels,
         },
         yaxis: {
+          tickAmount: 3,
           labels: {
             style: {
               colors: '#616161',
