@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js'
-import { Dispatch, FormEvent, SetStateAction, useState } from 'react'
+import { Dispatch, FormEvent, SetStateAction, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
 import { X, Search } from 'lucide-react'
 import { Input } from '../ui/input'
@@ -32,21 +32,34 @@ export default function SearchLine<T>({
   queryKey,
 }: Props<T>) {
   const [search, setSearch] = useState('')
+  const [filteredData, setFilteredData] = useState<T[] | undefined>(searchData)
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    setFilteredData(searchData)
+  }, [searchData])
 
   const handleSearch = (event: FormEvent<SearchFormProps>) => {
     event.preventDefault()
     setPage(1)
     if (!searchData) return
+
     const fuse = new Fuse(searchData, {
       includeScore: true,
       threshold: 0.3,
       keys: searchKey ? searchKey : Object.keys(searchData[0]!),
     })
-    queryClient.setQueryData(
-      queryKey,
-      fuse.search(search).map((item) => item.item),
-    )
+
+    const filtered = fuse.search(search).map((item) => item.item)
+    setFilteredData(filtered)
+
+    queryClient.setQueryData(queryKey, filtered)
+  }
+
+  const handleClearSearch = () => {
+    setSearch('')
+    setFilteredData(searchData)
+    queryClient.setQueryData(queryKey, searchData)
   }
 
   return (
@@ -62,6 +75,7 @@ export default function SearchLine<T>({
             onChange={(e) => {
               setSearch(e.target.value)
               if (!e.target.value.trim()) {
+                setFilteredData(searchData)
                 queryClient.setQueryData(queryKey, searchData)
               }
             }}
@@ -69,10 +83,7 @@ export default function SearchLine<T>({
           {search.trim() && (
             <div
               className="absolute right-0 top-0 cursor-pointer p-3"
-              onClick={() => {
-                setSearch('')
-                queryClient.setQueryData(queryKey, searchData)
-              }}
+              onClick={handleClearSearch}
             >
               <X className="h-4 w-4" />
             </div>
@@ -86,7 +97,7 @@ export default function SearchLine<T>({
       <div className="flex items-center gap-6 whitespace-nowrap">
         <div>
           <span className="text-sm text-muted-foreground">Count: </span>
-          {queryClient.getQueryData<T[]>(queryKey)?.length}
+          {filteredData?.length}
         </div>
         <div className="flex items-center gap-2">
           <div className="text-sm text-muted-foreground">Page:</div>

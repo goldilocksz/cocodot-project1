@@ -1,31 +1,44 @@
-import { useQuery } from '@tanstack/react-query'
-import { Select, SelectProps } from '../ui/select'
-import { forwardRef } from 'react'
-import request from '@/utils/request'
+import { Select, SelectProps } from '../ui/select';
+import { forwardRef, useEffect, useState } from 'react';
+import request from '@/utils/request';
 
-const PolForm = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, type, ...props }, ref) => {
-    const { data: Pol, isPending } = useQuery({
-      queryKey: ['getPol'],
-      queryFn: async () => {
-        const { data } = await request.post('/webCommon/getCommonCode', {
-          GROUP_CODE: 'POL',
-        })
-        return data
-      },
-    })
+interface PolFormProps extends SelectProps {
+  className?: string;
+}
+
+const PolForm = forwardRef<HTMLSelectElement, PolFormProps>(
+  ({ className, ...props }, ref) => {
+    const [Pol, setPol] = useState<{ DT_CODE: string; LOC_VALUE: string }[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+      const fetchPolData = async () => {
+        try {
+          const { data } = await request.post('/webCommon/getCommonCode', {
+            GROUP_CODE: 'POL',
+          });
+          setPol(data);
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error fetching POL codes:', error);
+          setIsLoading(false);
+        }
+      };
+
+      fetchPolData();
+    }, []);
 
     return (
-      <Select ref={ref} {...props}>
-        {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Pol?.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
+      <Select ref={ref} {...props} className={className}>
+        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {Pol.map((item) => (
           <option key={item.DT_CODE} value={item.LOC_VALUE}>
             {item.LOC_VALUE}
           </option>
         ))}
       </Select>
-    )
-  },
-)
+    );
+  }
+);
 
-export default PolForm
+export default PolForm;

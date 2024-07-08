@@ -1,29 +1,47 @@
-import { useQuery } from '@tanstack/react-query'
-import { Select, SelectProps } from '../ui/select'
-import { forwardRef } from 'react'
-import request from '@/utils/request'
+import { Select, SelectProps } from '../ui/select';
+import { forwardRef, useEffect, useState } from 'react';
+import request from '@/utils/request';
 
-const LspCode = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, type, ...props }, ref) => {
-    const { data: Cnee, isPending } = useQuery({
-      queryKey: ['getLspCode'],
-      queryFn: async () => {
-        const { data } = await request.post('/webCommon/getLSPCode', {})
-        return data
-      },
-    })
+interface Lsp {
+  LSP_CODE: string;
+  LSP_NAME: string;
+}
+
+interface LspCodeProps extends SelectProps {}
+
+const LspCode = forwardRef<HTMLSelectElement, LspCodeProps>(
+  ({ className, ...props }, ref) => {
+    const [lsps, setLsps] = useState<Lsp[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setIsLoading(true);
+          const { data } = await request.post('/webCommon/getLSPCode', {});
+          setLsps(data);
+        } catch (error) {
+          console.error('Error fetching LSP codes:', error);
+          // Handle error state here if needed
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchData();
+    }, []);
 
     return (
       <Select ref={ref} className={className} {...props}>
-        {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Cnee?.map((item: { LSP_CODE: string; LSP_NAME: string }) => (
+        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {lsps.map((item) => (
           <option key={item.LSP_CODE} value={item.LSP_NAME}>
             {item.LSP_NAME}
           </option>
         ))}
       </Select>
-    )
+    );
   },
-)
+);
 
-export default LspCode
+export default LspCode;

@@ -1,22 +1,33 @@
-import { useQuery } from '@tanstack/react-query'
 import { Select, SelectProps } from '../ui/select'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import request from '@/utils/request'
 
 const Customer = forwardRef<HTMLSelectElement, SelectProps>(
   ({ type, ...props }, ref) => {
-    const { data: Cnee, isPending } = useQuery({
-      queryKey: ['getCustomerCode'],
-      queryFn: async () => {
-        const { data } = await request.post('/customer/getCustomer', {})
-        return data
-      },
-    })
+    const [customerData, setCustomerData] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setIsLoading(true);
+          const { data } = await request.post('/customer/getCustomer', {});
+          setCustomerData(data);
+        } catch (error) {
+          console.error('Error fetching Customer data:', error);
+          // Handle error state here if needed
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchData();
+    }, []);
 
     return (
       <Select ref={ref} {...props}>
-        {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {Cnee?.map((item: { CUSTOMER_CODE: string; CUSTOMER_NAME: string }) => (
+        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {customerData.map((item: { CUSTOMER_CODE: string; CUSTOMER_NAME: string }) => (
           <option
             key={item.CUSTOMER_CODE}
             value={item.CUSTOMER_CODE}
@@ -26,8 +37,8 @@ const Customer = forwardRef<HTMLSelectElement, SelectProps>(
           </option>
         ))}
       </Select>
-    )
+    );
   },
-)
+);
 
-export default Customer
+export default Customer;

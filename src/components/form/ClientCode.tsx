@@ -1,31 +1,40 @@
-import { useQuery } from '@tanstack/react-query'
 import { Select, SelectProps } from '../ui/select'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import request from '@/utils/request'
 
 const ClientCodeSelect = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, type, ...props }, ref) => {
-    const { data: ClientCode, isPending } = useQuery({
-      queryKey: ['getClientCode'],
-      queryFn: async () => {
-        const { data } = await request.post('/webCommon/getClient', {})
-        return data
-      },
-    })
+  ({ className, ...props }, ref) => {
+    const [clientCode, setClientCode] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setIsLoading(true);
+          const { data } = await request.post('/webCommon/getClient', {});
+          setClientCode(data);
+        } catch (error) {
+          console.error('Error fetching client codes:', error);
+          // Handle error state here if needed
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchData();
+    }, []);
 
     return (
       <Select ref={ref} className={className} {...props}>
-        {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {ClientCode?.map(
-          (item: { CLIENT_CODE: string; CLIENT_NAME: string }) => (
-            <option key={item.CLIENT_CODE} value={item.CLIENT_CODE}>
-              {item.CLIENT_NAME}
-            </option>
-          ),
-        )}
+        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {clientCode.map((item: { CLIENT_CODE: string; CLIENT_NAME: string }) => (
+          <option key={item.CLIENT_CODE} value={item.CLIENT_CODE}>
+            {item.CLIENT_NAME}
+          </option>
+        ))}
       </Select>
-    )
-  },
-)
+    );
+  }
+);
 
-export default ClientCodeSelect
+export default ClientCodeSelect;

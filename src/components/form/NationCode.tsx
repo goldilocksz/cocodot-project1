@@ -1,31 +1,49 @@
-import { useQuery } from '@tanstack/react-query'
-import { Select, SelectProps } from '../ui/select'
-import { forwardRef } from 'react'
-import request from '@/utils/request'
+import { Select, SelectProps } from '../ui/select';
+import { forwardRef, useEffect, useState } from 'react';
+import request from '@/utils/request';
 
-const NationCodeForm = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, type, ...props }, ref) => {
-    const { data: NationCode, isPending } = useQuery({
-      queryKey: ['getNationCode'],
-      queryFn: async () => {
-        const { data } = await request.post('/webCommon/getCommonCode', {
-          GROUP_CODE: 'NATION_CD',
-        })
-        return data
-      },
-    })
+interface NationCode {
+  DT_CODE: string;
+  LOC_VALUE: string;
+}
+
+interface NationCodeFormProps extends SelectProps {}
+
+const NationCodeForm = forwardRef<HTMLSelectElement, NationCodeFormProps>(
+  ({ className, ...props }, ref) => {
+    const [nationCodes, setNationCodes] = useState<NationCode[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setIsLoading(true);
+          const { data } = await request.post('/webCommon/getCommonCode', {
+            GROUP_CODE: 'NATION_CD',
+          });
+          setNationCodes(data);
+        } catch (error) {
+          console.error('Error fetching nation codes:', error);
+          // Handle error state here if needed
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchData();
+    }, []);
 
     return (
-      <Select ref={ref} {...props}>
-        {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {NationCode?.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
+      <Select ref={ref} className={className} {...props}>
+        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {nationCodes.map((item) => (
           <option key={item.DT_CODE} value={item.LOC_VALUE}>
             {item.LOC_VALUE}
           </option>
         ))}
       </Select>
-    )
+    );
   },
-)
+);
 
-export default NationCodeForm
+export default NationCodeForm;
