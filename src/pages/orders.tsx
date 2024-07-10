@@ -118,11 +118,10 @@ export default function OrderView() {
       </div>
 
       <Card className="relative mt-6 p-6">
-        <OrderSearch search={search} setSearch={setSearch} />
-
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
+			<TableHead>Route</TableHead>
               <TableHead>TR No</TableHead>
               <TableHead>BL NO</TableHead>
               <TableHead>CNEE</TableHead>
@@ -142,7 +141,7 @@ export default function OrderView() {
               <TableHead>ITEM CODE</TableHead>
               <TableHead>PLT</TableHead>
               <TableHead>URGENT</TableHead>
-              <TableHead>Route</TableHead>
+              
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -156,6 +155,18 @@ export default function OrderView() {
                   key={item.TR_NO}
                   onDoubleClick={() => handleDoubleClick(item)}
                 >
+					<TableCell>
+				                    <Button
+				                      variant="ghost"
+				                      className="h-10 w-10 rounded-full p-0"
+				                      onClick={() => {
+				                        setDetail(item)
+				                        setOpen(true)
+				                      }}
+				                    >
+				                      <Route className="h-4 w-4" />
+				                    </Button>
+				                  </TableCell>
                   <TableCell>{item.TR_NO}</TableCell>
                   <TableCell>{item.BL_NO}</TableCell>
                   <TableCell>{item.CNEE}</TableCell>
@@ -181,18 +192,7 @@ export default function OrderView() {
                       <X className="h-4 w-4 text-destructive" />
                     )}
                   </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      className="h-10 w-10 rounded-full p-0"
-                      onClick={() => {
-                        setDetail(item)
-                        setOpen(true)
-                      }}
-                    >
-                      <Route className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+                  
                 </TableRow>
               ))}
           </TableBody>

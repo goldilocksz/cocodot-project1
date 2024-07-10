@@ -3,16 +3,16 @@ import { Select, SelectProps } from '../ui/select';
 import { forwardRef, ForwardRefRenderFunction } from 'react';
 import request from '@/utils/request';
 
-interface LspCodeProps extends SelectProps {
+interface OrderProps extends SelectProps {
   className?: string;
 }
 
-const LspCode: ForwardRefRenderFunction<HTMLSelectElement, LspCodeProps> = 
+const Order: ForwardRefRenderFunction<HTMLSelectElement, OrderProps> = 
   ({ className, ...props }, ref) => {
-    const { data: LspCodes, isPending } = useQuery({
-      queryKey: ['getLspCode'],
+    const { data: Orders, isPending } = useQuery({
+      queryKey: ['getOrder'],
       queryFn: async () => {
-        const { data } = await request.post('/webCommon/getLSPCode', {});
+        const { data } = await request.post('/webCommon/getOrder', {});
         return data;
       },
     });
@@ -20,7 +20,7 @@ const LspCode: ForwardRefRenderFunction<HTMLSelectElement, LspCodeProps> =
     return (
       <Select ref={ref} className={className} {...props}>
         {isPending ? <option>Loading...</option> : <option>Select</option>}
-        {LspCodes?.map((item: { LSP_CODE: string; LSP_NAME: string }) => (
+        {Orders?.map((item: { LSP_CODE: string; LSP_NAME: string }) => (
           <option key={item.LSP_CODE} value={item.LSP_NAME}>
             {item.LSP_NAME}
           </option>
@@ -29,4 +29,4 @@ const LspCode: ForwardRefRenderFunction<HTMLSelectElement, LspCodeProps> =
     );
   };
 
-export default forwardRef(LspCode);
+export default forwardRef(Order);

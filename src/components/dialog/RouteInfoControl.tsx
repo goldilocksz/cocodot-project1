@@ -192,13 +192,13 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
           </form>
         </Form>
 
-        <div className="relative h-[300px]">
+        <div className="relative h-[150px] mb-4">
           {trakingInfo && trakingInfo?.length > 0 && (
             <GoogleMapMulti data={trakingInfo} />
           )}
         </div>
 
-        <div className="h-[300px] overflow-y-auto px-1">
+        <div className="h-[200px] overflow-y-auto px-1">
           {trakingInfo?.map((item) => (
             <div
               key={item.SEQ}
