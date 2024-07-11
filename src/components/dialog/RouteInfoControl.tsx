@@ -26,7 +26,7 @@ import { toast } from 'sonner'
 import request from '@/utils/request'
 import { omit } from 'radash'
 import ConfirmDialog from './ConfirmDialog'
-import GoogleMapMulti from '../map/multi'
+import GoogleRouteInfo from '../map/routeInfoMap'
 
 type Props = {
   detail: Order | undefined
@@ -193,12 +193,12 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
         </Form>
 
         <div className="relative h-[150px] mb-4">
-          {trakingInfo && trakingInfo?.length > 0 && (
-            <GoogleMapMulti data={trakingInfo} />
+          {trakingInfo && trakingInfo.length > 0 && (
+            <GoogleRouteInfo key={trakingInfo.length} data={trakingInfo} />
           )}
         </div>
 
-        <div className="h-[200px] overflow-y-auto px-1">
+        <div className="h-[150px] overflow-y-auto px-1">
           {trakingInfo?.map((item) => (
             <div
               key={item.SEQ}

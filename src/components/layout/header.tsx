@@ -79,6 +79,11 @@ export default function Header() {
   const handleLinkClick = (path: string) => {
     closeSheet(); // SheetContent 닫기
     navigate(path); // 메뉴 이동
+	const element = document.querySelector('div[data-state="open"]');
+	// 클래스 제거
+	if (element) {
+	  element.classList.remove('fixed', 'inset-0', 'z-50', 'bg-black/80', 'data-[state=open]:animate-in', 'data-[state=closed]:animate-out', 'data-[state=closed]:fade-out-0', 'data-[state=open]:fade-in-0');
+	}
   };
 
   return (
@@ -144,6 +149,7 @@ export default function Header() {
         <div
           className="fixed inset-0 bg-white bg-opacity-50 z-50" // 수정된 부분: bg-black/20에서 bg-white bg-opacity-50으로 변경
           onClick={() => setIsSheetOpen(false)} // 배경 클릭 시 SheetContent 닫기 및 배경 밝게 설정
+		  id = "TEST"
         ></div>
       )}
     </header>
