@@ -60,7 +60,7 @@
     "@types/react-csv": "^1.1.10",
     "@types/react-dom": "^18.2.22",
     "@types/react-query": "^1.2.9",
-    "@vitejs/plugin-react-swc": "^3.5.0",
+    "@vitejs/plugin-react-swc": "^3.7.0",
     "autoprefixer": "^10.0.1",
     "drizzle-kit": "^0.20.14",
     "editorjs-parser": "^1.5.3",
