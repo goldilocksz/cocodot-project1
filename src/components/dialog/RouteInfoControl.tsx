@@ -51,6 +51,7 @@ const RouteDefault = {
 
 export default function RouteInfoControl({ detail, open, setOpen }: Props) {
   const [isConfirm, setIsConfirm] = useState(false)
+  const [isSaveConfirm, setIsSaveConfirm] = useState(false) // Save 확인 대화상자 상태
   const [seq, setSeq] = useState<string>()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -119,14 +120,20 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
   }, [open])
 
   const handleSave = async (SEQ: string) => {
+    setSeq(SEQ)
+    setIsSaveConfirm(true)
+  }
+
+  const confirmSave = async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           SaveRoute({
-            SEQ,
+            SEQ: seq!,
             LATITUDE: position.coords.latitude.toString(),
             LONGITUDE: position.coords.longitude.toString(),
           })
+          setIsSaveConfirm(false)
         },
         (error) => {
           toast.error(error.message)
@@ -136,6 +143,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
       toast.error('Geolocation is not supported by this browser.')
     }
   }
+
   const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
 
   return (
@@ -229,7 +237,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
                       variant="outline"
                       className="h-auto rounded-full border-0 px-2"
                       onClick={() => handleSave(item.SEQ)}
-                      type="submit"
+                      type="button" // submit에서 button으로 변경
                     >
                       {isSaveRoute ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -252,6 +260,16 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
           isOpen={isConfirm}
           setIsOpen={setIsConfirm}
           callback={() => DeleteRoute(seq!)}
+        />
+
+        <ConfirmDialog
+          title="Save Route"
+          desc={`Are you sure you want to save route?`}
+          btnText="Save"
+          loading={isSaveRoute}
+          isOpen={isSaveConfirm}
+          setIsOpen={setIsSaveConfirm}
+          callback={confirmSave}
         />
       </DialogContent>
     </Dialog>

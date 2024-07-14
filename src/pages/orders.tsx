@@ -88,7 +88,7 @@ export default function OrderView() {
     }
   }, [isOpen])
 
-  const handleDoubleClick = (item: Order) => {
+  const handleItemClick = (item: Order) => {
     if (user.CUSTOMER_TYPE === 'LSP' && user.GRADE === '3') {
       setDetail(item)
       setOpen(true)
@@ -121,7 +121,7 @@ export default function OrderView() {
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
-			<TableHead>Route</TableHead>
+              <TableHead>Route</TableHead>
               <TableHead>TR No</TableHead>
               <TableHead>BL NO</TableHead>
               <TableHead>CNEE</TableHead>
@@ -141,7 +141,6 @@ export default function OrderView() {
               <TableHead>ITEM CODE</TableHead>
               <TableHead>PLT</TableHead>
               <TableHead>URGENT</TableHead>
-              
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -153,20 +152,21 @@ export default function OrderView() {
               .map((item) => (
                 <TableRow
                   key={item.TR_NO}
-                  onDoubleClick={() => handleDoubleClick(item)}
+                  onClick={() => handleItemClick(item)}
+                  className="cursor-pointer md:cursor-auto"
                 >
-					<TableCell>
-				                    <Button
-				                      variant="ghost"
-				                      className="h-10 w-10 rounded-full p-0"
-				                      onClick={() => {
-				                        setDetail(item)
-				                        setOpen(true)
-				                      }}
-				                    >
-				                      <Route className="h-4 w-4" />
-				                    </Button>
-				                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      className="h-10 w-10 rounded-full p-0"
+                      onClick={() => {
+                        setDetail(item)
+                        setOpen(true)
+                      }}
+                    >
+                      <Route className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
                   <TableCell>{item.TR_NO}</TableCell>
                   <TableCell>{item.BL_NO}</TableCell>
                   <TableCell>{item.CNEE}</TableCell>
@@ -192,7 +192,6 @@ export default function OrderView() {
                       <X className="h-4 w-4 text-destructive" />
                     )}
                   </TableCell>
-                  
                 </TableRow>
               ))}
           </TableBody>
@@ -222,7 +221,7 @@ export default function OrderView() {
         open={open}
         setOpen={setOpen}
         detail={detail}
-      ></RouteInfoControl>
+      />
 
       <ConfirmDialog
         title="Delete Order"
