@@ -15,7 +15,7 @@ const RouteMst = forwardRef<HTMLSelectElement, SelectProps>(
 
     return (
       <Select ref={ref} {...props}>
-        {isPending ? <option>Loading...</option> : <option>Select</option>}
+        {isPending ? <option>Loading...</option> : <option  value="">Select</option>}
         {RouteCd?.map(
           (item: {
             ROUTE_CODE: string

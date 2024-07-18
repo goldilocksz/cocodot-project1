@@ -29,7 +29,7 @@ const UserLang = ({ className, ...props }: Props) => {
 
   return (
     <Select className={className} {...props}>
-      <option>Select</option>
+      <option value="">Select</option>
       {isLoading ? (
         <option>Loading...</option>
       ) : (

@@ -26,7 +26,7 @@ const ClientCodeSelect = forwardRef<HTMLSelectElement, SelectProps>(
 
     return (
       <Select ref={ref} className={className} {...props}>
-        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {isLoading ? <option value="">Loading...</option> : <option value="">Select</option>}
         {clientCode.map((item: { CLIENT_CODE: string; CLIENT_NAME: string }) => (
           <option key={item.CLIENT_CODE} value={item.CLIENT_CODE}>
             {item.CLIENT_NAME}

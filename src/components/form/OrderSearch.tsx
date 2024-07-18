@@ -19,7 +19,7 @@ const Order: ForwardRefRenderFunction<HTMLSelectElement, OrderProps> =
 
     return (
       <Select ref={ref} className={className} {...props}>
-        {isPending ? <option>Loading...</option> : <option>Select</option>}
+        {isPending ? <option>Loading...</option> : <option value="">Select</option>}
         {Orders?.map((item: { LSP_CODE: string; LSP_NAME: string }) => (
           <option key={item.LSP_CODE} value={item.LSP_NAME}>
             {item.LSP_NAME}

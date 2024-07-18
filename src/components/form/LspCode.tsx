@@ -33,7 +33,7 @@ const LspCode = forwardRef<HTMLSelectElement, LspCodeProps>(
 
     return (
       <Select ref={ref} className={className} {...props}>
-        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {isLoading ? <option>Loading...</option> : <option value="">Select</option>}
         {lsps.map((item) => (
           <option key={item.LSP_CODE} value={item.LSP_NAME}>
             {item.LSP_NAME}

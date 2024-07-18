@@ -42,7 +42,7 @@ const FromTruckType = forwardRef<HTMLSelectElement, FromTruckTypeProps>(
 
     return (
       <Select ref={ref} {...props}>
-        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {isLoading ? <option>Loading...</option> : <option value="">Select</option>}
         {truckTypeCode.map((item) => (
           <option
             key={item.TRUCK_NO}

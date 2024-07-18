@@ -30,7 +30,7 @@ const RegionCode = forwardRef<HTMLSelectElement, RegionCodeProps>(
 
     return (
       <Select ref={ref} {...props} className={className}>
-        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {isLoading ? <option>Loading...</option> : <option value="">Select</option>}
         {regionCodes.map((item) => (
           <option key={item.DT_CODE} value={item.DT_CODE}>
             {item.LOC_VALUE}

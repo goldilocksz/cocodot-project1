@@ -35,7 +35,7 @@ const IncotermsForm = forwardRef<HTMLSelectElement, IncotermsFormProps>(
 
     return (
       <Select ref={ref} className={className} {...props}>
-        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {isLoading ? <option>Loading...</option> : <option value="">Select</option>}
         {incoterms.map((item) => (
           <option key={item.DT_CODE} value={item.LOC_VALUE}>
             {item.LOC_VALUE}

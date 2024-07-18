@@ -42,7 +42,7 @@ const DeptCodeSelect = forwardRef<HTMLSelectElement, DeptCodeSelectProps>(
 
     return (
       <Select ref={ref} {...props}>
-        {isLoading ? <option>Loading...</option> : <option>Select</option>}
+        {isLoading ? <option>Loading...</option> : <option value="">Select</option>}
         {deptCode.map((item) => (
           <option
             key={item.DEPT_CODE}

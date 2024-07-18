@@ -30,7 +30,7 @@ const CommonTruckType = forwardRef<
 
   return (
     <Select ref={ref} {...props}>
-      {isLoading ? <option>Loading...</option> : <option>Select</option>}
+      {isLoading ? <option>Loading...</option> : <option value="">Select</option>}
       {truckTypeCode.map((item: { DT_CODE: string; LOC_VALUE: string }) => (
         <option key={item.DT_CODE} value={item.LOC_VALUE}>
           {item.DT_CODE}
