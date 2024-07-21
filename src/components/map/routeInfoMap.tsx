@@ -9,6 +9,7 @@ export default function GoogleRouteInfo({ data }: { data: any }) {
     const initMap = async () => {
       const loader = new Loader({
         apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
+		//apiKey:"AIzaSyB5JRlvlHJ09OsXR7WF4r5rzJ7qt9AazEg",
         version: 'weekly',
       })
 
