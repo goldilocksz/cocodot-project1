@@ -28,7 +28,6 @@ export default function AppRoute() {
       const response = await request.post('/webCommon/getMenu', {
         OS_TYPE: 'WEB',
       })
-	  debugger;
       const findMenu = response.data.find(
         (item: any) => item.SRC_PATH === pathname,
       )
