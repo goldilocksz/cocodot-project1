@@ -22,6 +22,7 @@ import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import RouteInfoControl from '@/components/dialog/RouteInfoControl'
 import OrderSearch from '@/components/form/OrderSearch'
 import { dateFormat } from '@/utils/utils'
+import gridStyle from '@/gridStyle.css'; // CSS 모듈 파일을 import합니다.
 
 export interface Search {
   JOB_DATE_FROM: string
@@ -45,7 +46,7 @@ export default function OrderView() {
     },
   )
   const [isOpen, setIsOpen] = useState(false)
-  const [open, setOpen] = useState(false)
+  const [isRouteInfoOpen, setIsRouteInfoOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
@@ -88,14 +89,27 @@ export default function OrderView() {
     }
   }, [isOpen])
 
+  // RouteInfoControl이 닫힐 때 OrderControl을 닫는 useEffect 추가
+  useEffect(() => {
+    if (!isRouteInfoOpen) {
+      setIsOpen(false)
+    }
+  }, [isRouteInfoOpen])
+
   const handleItemClick = (item: Order) => {
     if (user.CUSTOMER_TYPE === 'LSP' && user.GRADE === '3') {
       setDetail(item)
-      setOpen(true)
+      setIsRouteInfoOpen(true) // RouteInfoControl 열기
     } else {
       setDetail(item)
       setIsOpen(true)
     }
+  }
+
+  const handleRouteInfoClick = (item: Order) => {
+    setDetail(item)
+    setIsRouteInfoOpen(true) // RouteInfoControl 열기
+    setIsOpen(false) // OrderControl 닫기
   }
 
   return (
@@ -118,6 +132,7 @@ export default function OrderView() {
       </div>
 
       <Card className="relative mt-6 p-6">
+	  <OrderSearch search={search} setSearch={setSearch} />
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
@@ -159,10 +174,7 @@ export default function OrderView() {
                     <Button
                       variant="ghost"
                       className="h-10 w-10 rounded-full p-0"
-                      onClick={() => {
-                        setDetail(item)
-                        setOpen(true)
-                      }}
+                      onClick={() => handleRouteInfoClick(item)}
                     >
                       <Route className="h-4 w-4" />
                     </Button>
@@ -210,7 +222,7 @@ export default function OrderView() {
 
       <OrderControl
         detail={detail}
-        isOpen={isOpen}
+        isOpen={!isRouteInfoOpen && isOpen} // RouteInfoControl이 열릴 때 OrderControl을 닫기
         setIsOpen={setIsOpen}
         setIsConfirm={setIsConfirm}
         isDeleteOrder={isDeleteOrder}
@@ -218,8 +230,8 @@ export default function OrderView() {
       />
 
       <RouteInfoControl
-        open={open}
-        setOpen={setOpen}
+        open={isRouteInfoOpen}
+        setOpen={setIsRouteInfoOpen}
         detail={detail}
       />
 
