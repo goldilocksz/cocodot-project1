@@ -252,3 +252,28 @@ export interface TrakingInfo {
   LATITUDE: string
   SEQ: string
 }
+
+export interface RouteHistory {
+  COMPANY_CODE: string
+  TR_NO: string
+  SEQ: string
+  TRUCK_NO: string
+  CHECK_DATE: string
+  LATITUDE: string
+  LONGITUDE: string
+  STATUS: string
+  REMARKS: string
+  TIME_ZONE: string
+  ADD_DATE: string
+  ADD_USER_ID: string
+  ADD_USER_NAME: string
+  UPDATE_DATE: string
+  UPDATE_USER_ID: string
+  UPDATE_USER_NAME: string
+}
+
+export interface TimeTableData {
+  SEQ: string
+  Datetime: string
+  SEQ_NAME: string
+}
