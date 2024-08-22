@@ -13,12 +13,25 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { FormEvent, MutableRefObject, useEffect, useRef, useState } from 'react'
+import { FormEvent, MutableRefObject, useEffect, useRef, useState, useReducer } from 'react'
 import { User, Monitoring } from '@/types/data'
 import request from '@/utils/request'
 import Loading from '@/components/ui/loading'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import { Textarea } from '@/components/ui/textarea'
+import GoogleMapMonitoring from '@/components/map/monitoringMap'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import GPSInfoControl from '@/components/dialog/GPSInfoControl'
+import { Order } from '@/types/data'
+import dayjs from 'dayjs'
+
+export interface Search {
+  JOB_DATE_FROM: string
+  JOB_DATE_TO: string
+  LSP_CD: string
+  TR_NO: string
+  random: number
+}
 
 const AddDiaglog = ({ refetch }: { refetch: () => void }) => {
   const [no, setNo] = useState('')
@@ -90,9 +103,25 @@ const AddDiaglog = ({ refetch }: { refetch: () => void }) => {
 }
 
 export default function MonitoringView() {
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
   const [userList, setUserList] = useState<User[]>([])
   const [isConfirm, setIsConfirm] = useState(false)
   const [refNo, setRefNo] = useState('')
+
+  const [isGPSInfoOpen, setIsGPSInfoOpen] = useState(false)
+  const [detail, setDetail] = useState<Order | undefined>()
+
+  const [search, setSearch] = useReducer(
+    (state: Search, newState: Partial<Search>) => ({ ...state, ...newState }),
+    {
+      JOB_DATE_FROM: dayjs().subtract(13, 'day').format('YYYYMMDD'),
+      JOB_DATE_TO: dayjs().format('YYYYMMDD'),
+      LSP_CD: '',
+      TR_NO: '',
+      random: Math.random(),
+    },
+  )
+
 
   const {
     data: Monitoring,
@@ -120,6 +149,29 @@ export default function MonitoringView() {
       },
     })
 
+  const {
+    data: orderList,
+    isPending
+  } = useQuery<Order[]>({
+    queryKey: ['getOrderList', search],
+    queryFn: async () => {
+      const { data } = await request.post('/order/getOrderList', {
+        JOB_DATE_FROM: search.JOB_DATE_FROM,
+        JOB_DATE_TO: search.JOB_DATE_TO,
+        LSP_CD: search.LSP_CD,
+        TR_NO: search.TR_NO,
+      })
+
+      return data
+    },
+  })
+
+
+  const handleCardClick = (item: Order) => {
+    setDetail(item)
+    setIsGPSInfoOpen(true)
+  }
+
   return (
     <section className="relative grow">
       <Loading isLoading={isLoading || isRefetching || isDeleteMonitoring} />
@@ -142,7 +194,14 @@ export default function MonitoringView() {
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.05 }}
           >
-            <Card className="h-[210px] p-6">
+            <Card
+              className=" h-[210px] p-6"
+              onClick={() => {
+                const filteredOrder = (orderList || []).find((order) => order.TR_NO === item.REF_NO);
+                if (filteredOrder) {
+                  handleCardClick(filteredOrder);
+                }
+              }}>
               <div className="flex items-center justify-between">
                 <div>
                   <div>{item.REF_NO}</div>
@@ -202,6 +261,70 @@ export default function MonitoringView() {
           </motion.div>
         ))}
       </div>
+
+      <div className='flex w-full gap-6 mt-3 flex-col 2xl:flex-row'>
+        <div className='w-full bg-red-500'>
+          <GoogleMapMonitoring data={Monitoring} />
+        </div>
+        <div className='min-w-[368px]'>
+          <Table>
+            <TableBody>
+              <TableRow className='whitespace-pre-line text-xs'>
+                <TableCell>LOL</TableCell>
+                <TableCell>1</TableCell>
+              </TableRow>
+              <TableRow className='whitespace-pre-line text-xs'>
+                <TableCell>LOL</TableCell>
+                <TableCell>1</TableCell>
+              </TableRow>
+              <TableRow className='whitespace-pre-line text-xs'>
+                <TableCell>LOL</TableCell>
+                <TableCell>1</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+
+      <div className='w-full mt-3'>
+        <Table>
+          <TableHeader>
+            <TableRow className='whitespace-pre-line text-xs'>
+              <TableCell>COLOR</TableCell>
+              <TableCell>TR NO</TableCell>
+              <TableCell>BL NO</TableCell>
+              <TableCell>POL</TableCell>
+              <TableCell>POD</TableCell>
+              <TableCell>LSP</TableCell>
+              <TableCell>STATUS</TableCell>
+              <TableCell>TIME</TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {/* TR NO에 맞는 정보들을 불러와서 새롭게 넣어줘야함 */}
+            {Monitoring?.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{ }</TableCell>
+                <TableCell>{item.REF_NO}</TableCell>
+                <TableCell>{ }</TableCell>
+                <TableCell>{ }</TableCell>
+                <TableCell>{item.REMARKS}</TableCell>
+                <TableCell>{item.COMPANY_CODE}</TableCell>
+                <TableCell>{item.NOW_STATUS}</TableCell>
+                <TableCell>{dateFormat(item.LAST_UPDATE_DATE)}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <GPSInfoControl
+        open={isGPSInfoOpen}
+        setOpen={setIsGPSInfoOpen}
+        detail={detail}
+      />
+
       <ConfirmDialog
         title="Delete Monitoring"
         desc={`Are you sure you want to delete Monitoring`}

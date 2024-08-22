@@ -1,4 +1,4 @@
-import { Check, Plus, RefreshCcw, Route, X } from 'lucide-react'
+import { Check, Plus, RefreshCcw, Route, X, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useEffect, useReducer, useState } from 'react'
 import { Order } from '@/types/data'
@@ -22,7 +22,8 @@ import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import RouteInfoControl from '@/components/dialog/RouteInfoControl'
 import OrderSearch from '@/components/form/OrderSearch'
 import { dateFormat } from '@/utils/utils'
-import gridStyle from '@/gridStyle.css'; // CSS 모듈 파일을 import합니다.
+import gridStyle from '@/gridStyle.css' // CSS 모듈 파일을 import합니다.
+import GPSInfoControl from '@/components/dialog/GPSInfoControl'
 
 export interface Search {
   JOB_DATE_FROM: string
@@ -47,6 +48,7 @@ export default function OrderView() {
   )
   const [isOpen, setIsOpen] = useState(false)
   const [isRouteInfoOpen, setIsRouteInfoOpen] = useState(false)
+  const [isGPSInfoOpen, setIsGPSInfoOpen] = useState(false)
   const [isConfirm, setIsConfirm] = useState(false)
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState('10')
@@ -96,9 +98,17 @@ export default function OrderView() {
     }
   }, [isRouteInfoOpen])
 
+  // GPSInfoControl이 닫힐 때 OrderControl을 닫는 useEffect 추가
+  useEffect(() => {
+    if (!isGPSInfoOpen) {
+      setIsOpen(false)
+    }
+  }, [isGPSInfoOpen])
+
   const handleItemClick = (item: Order) => {
     if (user.CUSTOMER_TYPE === 'LSP' && user.GRADE === '3') {
       setDetail(item)
+      setIsGPSInfoOpen(true)
       setIsRouteInfoOpen(true) // RouteInfoControl 열기
     } else {
       setDetail(item)
@@ -109,6 +119,12 @@ export default function OrderView() {
   const handleRouteInfoClick = (item: Order) => {
     setDetail(item)
     setIsRouteInfoOpen(true) // RouteInfoControl 열기
+    setIsOpen(false) // OrderControl 닫기
+  }
+
+  const handleGPSInfoClick = (item: Order) => {
+    setDetail(item)
+    setIsGPSInfoOpen(true) // GPSInfoControl 열기
     setIsOpen(false) // OrderControl 닫기
   }
 
@@ -132,11 +148,12 @@ export default function OrderView() {
       </div>
 
       <Card className="relative mt-6 p-6">
-	  <OrderSearch search={search} setSearch={setSearch} />
+        <OrderSearch search={search} setSearch={setSearch} />
         <Table className="mt-6 min-w-[1280px]">
           <TableHeader className="capitalize">
             <TableRow>
               <TableHead>Route</TableHead>
+              <TableHead>GPS</TableHead>
               <TableHead>TR No</TableHead>
               <TableHead>BL NO</TableHead>
               <TableHead>CNEE</TableHead>
@@ -177,6 +194,15 @@ export default function OrderView() {
                       onClick={() => handleRouteInfoClick(item)}
                     >
                       <Route className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      className="h-10 w-10 rounded-full p-0"
+                      onClick={() => handleGPSInfoClick(item)}
+                    >
+                      <MapPin className="h-5 w-5" />
                     </Button>
                   </TableCell>
                   <TableCell>{item.TR_NO}</TableCell>
@@ -222,7 +248,7 @@ export default function OrderView() {
 
       <OrderControl
         detail={detail}
-        isOpen={!isRouteInfoOpen && isOpen} // RouteInfoControl이 열릴 때 OrderControl을 닫기
+        isOpen={!isRouteInfoOpen && !isGPSInfoOpen && isOpen} // RouteInfoControl이 열릴 때 OrderControl을 닫기
         setIsOpen={setIsOpen}
         setIsConfirm={setIsConfirm}
         isDeleteOrder={isDeleteOrder}
@@ -232,6 +258,12 @@ export default function OrderView() {
       <RouteInfoControl
         open={isRouteInfoOpen}
         setOpen={setIsRouteInfoOpen}
+        detail={detail}
+      />
+
+      <GPSInfoControl
+        open={isGPSInfoOpen}
+        setOpen={setIsGPSInfoOpen}
         detail={detail}
       />
 
