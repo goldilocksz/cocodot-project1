@@ -107,10 +107,12 @@ export default function OrderView() {
 
   const handleItemClick = (item: Order) => {
     if (user.CUSTOMER_TYPE === 'LSP' && user.GRADE === '3') {
+      console.log('LSP')
       setDetail(item)
-      setIsGPSInfoOpen(true)
-      setIsRouteInfoOpen(true) // RouteInfoControl 열기
+      // setIsGPSInfoOpen(true)
+      // setIsRouteInfoOpen(true)
     } else {
+      console.log('ADMIN')
       setDetail(item)
       setIsOpen(true)
     }
