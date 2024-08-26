@@ -258,13 +258,16 @@ export default function DashboardView() {
           progressRangeDate?.to &&
           dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
-      if (!response.data) {
-        return []
-      } else {
+
+      // response.data가 배열인지 확인
+      if (Array.isArray(response.data)) {
         return response.data.map((item: any, index: number) => ({
           ...item,
           id: index + 1,
-        }))
+        }));
+      } else {
+        // console.error("응답 데이터가 배열이 아닙니다:", response.data);
+        return []; // 또는 적절한 기본값 반환
       }
     },
   })
