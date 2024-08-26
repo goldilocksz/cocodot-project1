@@ -44,7 +44,7 @@ export default function TimeTableDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(value) => setIsOpen(value)}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle>TimeTable</DialogTitle>
         </DialogHeader>
