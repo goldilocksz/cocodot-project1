@@ -187,79 +187,86 @@ export default function MonitoringView() {
         </div>
       </div>
       <div className="relative mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-        {Monitoring?.map((item, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <Card
-              className=" h-[210px] p-6"
-              onClick={() => {
-                const filteredOrder = (orderList || []).find((order) => order.TR_NO === item.REF_NO);
-                if (filteredOrder) {
-                  handleCardClick(filteredOrder);
-                }
-              }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div>{item.REF_NO}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {dateFormat(item.LAST_UPDATE_DATE)}
+        {Monitoring && Monitoring.length > 0 ? (
+          Monitoring?.map((item, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <Card
+                className=" h-[210px] p-6"
+                onClick={() => {
+                  const filteredOrder = (orderList || []).find((order) => order.TR_NO === item.REF_NO);
+                  if (filteredOrder) {
+                    handleCardClick(filteredOrder);
+                  }
+                }}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div>{item.REF_NO}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {dateFormat(item.LAST_UPDATE_DATE)}
+                    </div>
+                  </div>
+                  <div className="relative flex h-3 w-3 self-start">
+                    <span
+                      className={cn(
+                        'absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75',
+                        item.CHECK_YN === 'N' && 'bg-red-400',
+                      )}
+                    ></span>
+                    <span
+                      className={cn(
+                        'relative inline-flex h-3 w-3 rounded-full bg-green-500',
+                        item.CHECK_YN === 'N' && 'bg-red-400',
+                      )}
+                    ></span>
                   </div>
                 </div>
-                <div className="relative flex h-3 w-3 self-start">
-                  <span
-                    className={cn(
-                      'absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75',
-                      item.CHECK_YN === 'N' && 'bg-red-400',
-                    )}
-                  ></span>
-                  <span
-                    className={cn(
-                      'relative inline-flex h-3 w-3 rounded-full bg-green-500',
-                      item.CHECK_YN === 'N' && 'bg-red-400',
-                    )}
-                  ></span>
-                </div>
-              </div>
-              <CardContent className="mt-3 flex items-center justify-between p-0">
-                <div className="flex flex-col gap-1">
-                  <div className="flex">
-                    <div className="w-[100px] shrink-0 text-muted-foreground">
-                      LSP:
+                <CardContent className="mt-3 flex items-center justify-between p-0">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex">
+                      <div className="w-[100px] shrink-0 text-muted-foreground">
+                        LSP:
+                      </div>
+                      <div className="ml-1">{item.LSP_CD}</div>
                     </div>
-                    <div className="ml-1">{item.LSP_CD}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-[100px] shrink-0 text-muted-foreground">
-                      Remarks:
+                    <div className="flex">
+                      <div className="w-[100px] shrink-0 text-muted-foreground">
+                        Remarks:
+                      </div>
+                      <div className="ml-1">{item.REMARKS}</div>
                     </div>
-                    <div className="ml-1">{item.REMARKS}</div>
-                  </div>
-                  <div className="flex">
-                    <div className="w-[100px] shrink-0 text-muted-foreground">
-                      Now Status:
+                    <div className="flex">
+                      <div className="w-[100px] shrink-0 text-muted-foreground">
+                        Now Status:
+                      </div>
+                      <div className="ml-1 flex-1">{item.NOW_STATUS}</div>
                     </div>
-                    <div className="ml-1 flex-1">{item.NOW_STATUS}</div>
                   </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  className="-mr-3 h-10 w-10 self-end rounded-full p-0"
-                  onClick={() => {
-                    setRefNo(item.REF_NO)
-                    setIsConfirm(true)
-                  }}
-                  disabled={isDeleteMonitoring}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
+                  <Button
+                    variant="ghost"
+                    className="-mr-3 h-10 w-10 self-end rounded-full p-0"
+                    onClick={() => {
+                      setRefNo(item.REF_NO)
+                      setIsConfirm(true)
+                    }}
+                    disabled={isDeleteMonitoring}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))
+        ) : (
+          <div className='h-[210px] p-6 rounded-lg border border-gray-200'>
+            No Data
+          </div>
+        )}
+
       </div>
 
       <div className='flex w-full gap-6 mt-3 flex-col 2xl:flex-row'>
@@ -302,19 +309,32 @@ export default function MonitoringView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* TR NO에 맞는 정보들을 불러와서 새롭게 넣어줘야함 */}
-            {Monitoring?.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{ }</TableCell>
-                <TableCell>{item.REF_NO}</TableCell>
-                <TableCell>{ }</TableCell>
-                <TableCell>{ }</TableCell>
-                <TableCell>{item.REMARKS}</TableCell>
-                <TableCell>{item.COMPANY_CODE}</TableCell>
-                <TableCell>{item.NOW_STATUS}</TableCell>
-                <TableCell>{dateFormat(item.LAST_UPDATE_DATE)}</TableCell>
+            {Monitoring && Monitoring.length > 0 ? (
+              Monitoring?.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell>{ }</TableCell>
+                  <TableCell>{item.REF_NO}</TableCell>
+                  <TableCell>{item.BL_NO}</TableCell>
+                  <TableCell>{item.POL}</TableCell>
+                  <TableCell>{item.POD}</TableCell>
+                  <TableCell>{item.LSP_CD}</TableCell>
+                  <TableCell>{item.STATUS}</TableCell>
+                  <TableCell>{dateFormat(item.LAST_UPDATE_DATE)}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
               </TableRow>
-            ))}
+            )
+            }
           </TableBody>
         </Table>
       </div>

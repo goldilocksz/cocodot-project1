@@ -205,6 +205,9 @@ export interface Monitoring {
   LAST_UPDATE_DATE: string
   CHECK_YN: string
   NOW_STATUS: string
+  POL: string
+  POD: string
+  BL_NO: string
 }
 
 export interface Customer {

@@ -258,10 +258,14 @@ export default function DashboardView() {
           progressRangeDate?.to &&
           dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
-      return response.data.map((item: any, index: number) => ({
-        ...item,
-        id: index + 1,
-      }))
+      if (!response.data) {
+        return []
+      } else {
+        return response.data.map((item: any, index: number) => ({
+          ...item,
+          id: index + 1,
+        }))
+      }
     },
   })
 
