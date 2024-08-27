@@ -23,8 +23,7 @@ export default function GoogleMapMulti({
 
     const initMap = async () => {
       const loader = new Loader({
-        apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
-        // apiKey: 'AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s',
+        apiKey: 'AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s',
         version: 'weekly',
       })
 
@@ -40,19 +39,20 @@ export default function GoogleMapMulti({
         strokeWeight: 1,
       }
 
+      const lastData = data[data.length - 1];
+
       const mapOptions = {
         center: {
           lat: Number(
-            gps ? gps[gps.length - 1].LATITUDE : data[data.length - 1].LATITUDE,
+            gps && gps.length > 0 ? gps[gps.length - 1].LATITUDE : lastData ? lastData.LATITUDE : 0,
           ),
           lng: Number(
-            gps
-              ? gps[gps.length - 1].LONGITUDE
-              : data[data.length - 1].LONGITUDE,
+            gps && gps.length > 0 ? gps[gps.length - 1].LONGITUDE : lastData ? lastData.LONGITUDE : 0,
           ),
         },
         zoom: 14,
       }
+
       const map = new Map(ref.current!, mapOptions)
       mapRef.current = map
 
@@ -128,7 +128,6 @@ export default function GoogleMapMulti({
   }, [data, gps])
 
   useEffect(() => {
-    console.log(highlightedIndex)
     // if (markersRef.current.length > 0 && highlightedIndex !== null) {
     //   markersRef.current.forEach((marker, index) => {
     //     if (index === highlightedIndex) {

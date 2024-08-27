@@ -13,6 +13,7 @@ import Common from '@/pages/common'
 import RouteCom from '@/pages/route'
 import Customer from '@/pages/customer'
 import GPSMap from '@/pages/GPSMap'
+import RouteShare from '@/pages/route.share'
 import My from './pages/my'
 
 import NotFound from '@/pages/not-found'
@@ -30,7 +31,7 @@ export default function AppRoute() {
         navigate('/login');
       } else {
         // 특정 경로일 경우 getMenu 요청을 보내지 않음
-        if (!pathname.startsWith('/gps/')) {
+        if (!pathname.startsWith('/order/') || !pathname.startsWith('/gps/')) {
           const response = await request.post('/webCommon/getMenu', {
             OS_TYPE: 'WEB',
           });
@@ -53,7 +54,7 @@ export default function AppRoute() {
       }
     }
 
-    if (!pathname.startsWith('/gps/')) {
+    if (!pathname.startsWith('/order/') && !pathname.startsWith('/gps/')) {
       getMenu();
     }
 
@@ -63,6 +64,7 @@ export default function AppRoute() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/gps/:id" element={<GPSMap />}></Route>
+      <Route path="/order/:id" element={<RouteShare />}></Route>
       <Route element={<PrivateRoutes />}>
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />}></Route>
