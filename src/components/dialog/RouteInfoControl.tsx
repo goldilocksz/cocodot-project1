@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Button } from '@/components/ui/button'
+import { Ban, Play, Sheet, Copy } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import {
   Form,
@@ -27,6 +28,7 @@ import request from '@/utils/request'
 import { omit } from 'radash'
 import ConfirmDialog from './ConfirmDialog'
 import GoogleRouteInfo from '../map/routeInfoMap'
+import { encodeBase64 } from '@/utils/base64'
 
 type Props = {
   detail: Order | undefined
@@ -146,11 +148,34 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
 
   const formSchemaMap = Object.keys(formSchema.shape) as FormKeys[]
 
+  const handleCopyUrlClick = () => {
+    const { protocol, host } = window.location;
+    const base64URL =
+      detail!.TR_NO + ' ' + detail?.ADD_DATE + ' ' + detail?.UPDATE_DATE
+    const encodeTRNO = encodeBase64(base64URL)
+
+    const newUrl = `${protocol}//${host}/order/${encodeTRNO}`
+    navigator.clipboard
+      .writeText(newUrl)
+      .then(() => {
+        toast.success('Copied to clipboard')
+      })
+      .catch((error) => {
+        console.log('Error copying to clipboard:', error)
+      })
+  }
+
   return (
     <Dialog open={open} onOpenChange={(value) => setOpen(value)}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle>{detail ? 'Edit' : 'Add'} Route Information</DialogTitle>
+          <div className='flex justify-end'>
+            <Button className="flex gap-1" onClick={handleCopyUrlClick}>
+              <Copy className="h-4 w-4" />
+              COPY
+            </Button>
+          </div>
         </DialogHeader>
 
         <Form {...form}>

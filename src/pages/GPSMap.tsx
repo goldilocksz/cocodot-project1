@@ -14,6 +14,7 @@ import TimeTableDialog from '@/components/dialog/TimeTableDialog'
 import { useParams } from 'react-router-dom'
 import { decodeBase64 } from '@/utils/base64'
 import publicRequest from '@/utils/public.request'
+import { Loader } from '@googlemaps/js-api-loader'
 
 const formSchema = z.object({
   JOB_DATE: z.string().optional(),
@@ -41,7 +42,7 @@ export default function GPSMap() {
   const [isSaveConfirm, setIsSaveConfirm] = useState(false)
   const [seq, setSeq] = useState<string>()
   const [routeHistory, setRouteHistory] = useState<TimeTableData[]>([])
-  const [intervalId, setIntervalId] = useState<number | null>(null)
+  const [geocoder, setGeocoder] = useState<google.maps.Geocoder>()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: RouteDefault,
@@ -56,21 +57,20 @@ export default function GPSMap() {
     }
   }, [id])
 
-  // const {
-  //   data: trakingInfo,
-  //   isPending: isTrakingInfo,
-  //   refetch,
-  // } = useQuery<TrakingInfo[]>({
-  //   queryKey: ['getTrackingInfo', TRNO],
-  //   queryFn: async () => {
-  //     const { data } = await request.post('/order/getTrackingInfo', {
-  //       TR_NO: TRNO,
-  //     })
-  //     console.log('원피스', data)
-  //     return data
-  //   },
-  //   enabled: !!TRNO,
-  // })
+  const {
+    data: trakingInfo,
+    isPending: isTrakingInfo,
+    refetch,
+  } = useQuery<TrakingInfo[]>({
+    queryKey: ['getTrackingInfo', TRNO],
+    queryFn: async () => {
+      const { data } = await request.post('/public-data/getTrackingInfo', {
+        TR_NO: TRNO,
+      })
+      return data.data
+    },
+    enabled: !!TRNO,
+  })
 
   const {
     data: fetchedRouteHistory,
@@ -79,11 +79,13 @@ export default function GPSMap() {
   } = useQuery({
     queryKey: ['getOrderRouteHistory', TRNO],
     queryFn: async () => {
-      const { data } = await publicRequest.post('/public-data/getTrackingInfo', {
-        TR_NO: TRNO,
-      })
-      console.log('원피스', data)
-      return data.data;
+      const { data } = await publicRequest.post(
+        '/public-data/getGPSRoute',
+        {
+          TR_NO: TRNO,
+        },
+      )
+      return data.data
     },
     enabled: !!TRNO,
   })
@@ -196,38 +198,87 @@ export default function GPSMap() {
   }
 
   useEffect(() => {
-    if (fetchedRouteHistory) {
-      const enrichedRouteHistory = fetchedRouteHistory.map((history: any) => {
-        const { SEQ, ADD_DATE } = history
+    const loader = new Loader({
+      apiKey: 'AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s',
+      version: 'weekly',
+    })
 
-        // const closestTrackingInfo = trakingInfo.reduce((closest, info) => {
-        //   const prevLat = parseFloat(info.LATITUDE)
-        //   const prevLon = parseFloat(info.LONGITUDE)
-        //   const currentDistance = getDistance(
-        //     prevLat,
-        //     prevLon,
-        //     parseFloat(info.LATITUDE),
-        //     parseFloat(info.LONGITUDE),
-        //   )
-        //   const closestDistance = getDistance(
-        //     prevLat,
-        //     prevLon,
-        //     parseFloat(closest.LATITUDE),
-        //     parseFloat(closest.LONGITUDE),
-        //   )
-
-        //   return currentDistance < closestDistance ? info : closest
-        // }, trakingInfo[0])
-
-        return {
-          SEQ,
-          Datetime: ADD_DATE,
-          // SEQ_NAME: closestTrackingInfo.SEQ_NAME || '',
-        }
+    loader
+      .load()
+      .then(() => {
+        const googleGeocoder = new google.maps.Geocoder()
+        setGeocoder(googleGeocoder)
       })
-      setRouteHistory(enrichedRouteHistory)
+      .catch((e) => {
+        console.error('Google Maps API 로드에 실패했습니다:', e)
+      })
+  }, [])
+
+  useEffect(() => {
+    console.log('fetchedRouteHistory', fetchedRouteHistory)
+    console.log('trakingInfo', trakingInfo)
+
+    const updateAddress = async () => {
+      if (fetchedRouteHistory && trakingInfo) {
+        console.log('오긴왔다')
+
+        const enrichedRouteHistory: any = []
+
+        for (const history of fetchedRouteHistory) {
+          const { SEQ, ADD_DATE } = history
+          if (geocoder) {
+            const address = await geocodeLatLng(
+              geocoder,
+              parseFloat(history.LATITUDE),
+              parseFloat(history.LONGITUDE),
+            )
+            enrichedRouteHistory.push({
+              SEQ,
+              Datetime: ADD_DATE,
+              SEQ_NAME: address || ' ',
+            })
+          }
+        }
+        console.log(enrichedRouteHistory)
+        setRouteHistory(enrichedRouteHistory)
+      } else {
+        const enrichedRouteHistory: any = []
+        setRouteHistory(enrichedRouteHistory)
+      }
     }
-  }, [fetchedRouteHistory])
+    updateAddress()
+  }, [fetchedRouteHistory, trakingInfo])
+
+  async function geocodeLatLng(
+    geocoder: google.maps.Geocoder,
+    lat: number,
+    lng: number,
+  ): Promise<string> {
+    const latlng = {
+      lat: lat,
+      lng: lng,
+    }
+    return new Promise((resolve, reject) => {
+      //에러발생시 reject [then], 정상실행시 resolve [catch] (callback)
+      geocoder
+        .geocode({ location: latlng })
+        .then((response) => {
+          if (response.results[0]) {
+            const address = response.results[0].address_components
+              .map((address) => address.short_name)
+              .join(' ')
+            resolve(address)
+          } else {
+            console.log('error')
+            resolve(' ')
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          reject(' ')
+        })
+    })
+  }
 
   return (
     <div className="">
@@ -255,10 +306,10 @@ export default function GPSMap() {
           </Button>
         </div>
         <div className="h-full w-full">
-          {fetchedRouteHistory && fetchedRouteHistory.length > 0 && (
+          {trakingInfo && trakingInfo.length > 0 && (
             <GoogleMapMulti
-              key={fetchedRouteHistory.length}
-              data={null}
+              key={trakingInfo.length}
+              data={trakingInfo}
               gps={fetchedRouteHistory}
               highlightedIndex={highlightedIndex}
             />

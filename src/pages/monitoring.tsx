@@ -13,14 +13,28 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { FormEvent, MutableRefObject, useEffect, useRef, useState, useReducer } from 'react'
+import {
+  FormEvent,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+  useReducer,
+} from 'react'
 import { User, Monitoring } from '@/types/data'
 import request from '@/utils/request'
 import Loading from '@/components/ui/loading'
 import ConfirmDialog from '@/components/dialog/ConfirmDialog'
 import { Textarea } from '@/components/ui/textarea'
 import GoogleMapMonitoring from '@/components/map/monitoringMap'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import GPSInfoControl from '@/components/dialog/GPSInfoControl'
 import { Order } from '@/types/data'
 import dayjs from 'dayjs'
@@ -31,6 +45,12 @@ export interface Search {
   LSP_CD: string
   TR_NO: string
   random: number
+}
+
+export interface MonitoringRouteRight {
+  CNT: string
+  LOC: string
+  RANK_NUM: string
 }
 
 const AddDiaglog = ({ refetch }: { refetch: () => void }) => {
@@ -122,7 +142,6 @@ export default function MonitoringView() {
     },
   )
 
-
   const {
     data: Monitoring,
     refetch: RefetchMonitoring,
@@ -134,8 +153,36 @@ export default function MonitoringView() {
     queryFn: async () => {
       const { data } = await request.post('/monitoring/getMonitoring', {})
 
+      console.log('Monitoring', data)
       setUserList(data)
-      return data ?? []
+      return Array.isArray(data) ? data : []
+    },
+  })
+
+  const { data: MonitoringRouteRight } = useQuery<MonitoringRouteRight[]>({
+    queryKey: ['getMonitoringRouteRight'],
+    queryFn: async () => {
+      const { data } = await request.post(
+        '/monitoring/getMonitoringRouteRight',
+        {},
+      )
+
+      return Array.isArray(data.data) ? data.data : []
+    },
+  })
+
+  const {
+    data: MonitoringRoute,
+    refetch: RefetchMonitoringRoute,
+    isLoading: isLoadingMonitoringRoute,
+    isRefetching: isRefetchingMonitoringRoute,
+  } = useQuery<Monitoring[]>({
+    queryKey: ['getMonitoringRoute'],
+    queryFn: async () => {
+      const { data } = await request.post('/monitoring/getMonitoringRoute', {})
+      console.log('MonitoringRoute', data)
+      setUserList(data)
+      return Array.isArray(data) ? data : []
     },
   })
 
@@ -149,10 +196,7 @@ export default function MonitoringView() {
       },
     })
 
-  const {
-    data: orderList,
-    isPending
-  } = useQuery<Order[]>({
+  const { data: orderList, isPending } = useQuery<Order[]>({
     queryKey: ['getOrderList', search],
     queryFn: async () => {
       const { data } = await request.post('/order/getOrderList', {
@@ -162,15 +206,21 @@ export default function MonitoringView() {
         TR_NO: search.TR_NO,
       })
 
+      console.log('orderList', data)
       return data
     },
   })
-
 
   const handleCardClick = (item: Order) => {
     setDetail(item)
     setIsGPSInfoOpen(true)
   }
+
+  useEffect(() => {
+    if (!MonitoringRoute || MonitoringRoute.length === 0) {
+      RefetchMonitoringRoute()
+    }
+  }, [MonitoringRoute, RefetchMonitoringRoute])
 
   return (
     <section className="relative grow">
@@ -198,11 +248,14 @@ export default function MonitoringView() {
               <Card
                 className=" h-[210px] p-6"
                 onClick={() => {
-                  const filteredOrder = (orderList || []).find((order) => order.TR_NO === item.REF_NO);
+                  const filteredOrder = (orderList || []).find(
+                    (order) => order.TR_NO === item.REF_NO,
+                  )
                   if (filteredOrder) {
-                    handleCardClick(filteredOrder);
+                    handleCardClick(filteredOrder)
                   }
-                }}>
+                }}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <div>{item.REF_NO}</div>
@@ -262,48 +315,55 @@ export default function MonitoringView() {
             </motion.div>
           ))
         ) : (
-          <div className='h-[210px] p-6 rounded-lg border border-gray-200'>
+          <div className="h-[210px] rounded-lg border border-gray-200 p-6">
             No Data
           </div>
         )}
-
       </div>
 
-      <div className='flex w-full gap-6 mt-3 flex-col 2xl:flex-row'>
-        <div className='w-full bg-red-500'>
-          <GoogleMapMonitoring data={Monitoring} />
+      <div className="mt-3 flex w-full flex-col gap-6 2xl:flex-row">
+        <div className="w-full bg-red-500">
+          {MonitoringRoute && MonitoringRoute.length > 0 ? (
+            <GoogleMapMonitoring data={MonitoringRoute} />
+          ) : (
+            <Loading isLoading={isLoadingMonitoringRoute} />
+          )}
         </div>
-        <div className='min-w-[368px]'>
+        <div className="min-w-[368px]">
           <Table>
             <TableBody>
-              <TableRow className='whitespace-pre-line text-xs'>
-                <TableCell>LOL</TableCell>
-                <TableCell>1</TableCell>
-              </TableRow>
-              <TableRow className='whitespace-pre-line text-xs'>
-                <TableCell>LOL</TableCell>
-                <TableCell>1</TableCell>
-              </TableRow>
-              <TableRow className='whitespace-pre-line text-xs'>
-                <TableCell>LOL</TableCell>
-                <TableCell>1</TableCell>
-              </TableRow>
+              {MonitoringRouteRight && MonitoringRouteRight.length > 0 ? (
+                MonitoringRouteRight?.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{item.CNT}</TableCell>
+                    <TableCell>{item.LOC}</TableCell>
+                    <TableCell>{item.RANK_NUM}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell>-</TableCell>
+                  <TableCell>-</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
       </div>
 
-
-      <div className='w-full mt-3'>
+      <div className="mt-3 w-full">
         <Table>
           <TableHeader>
-            <TableRow className='whitespace-pre-line text-xs'>
+            <TableRow className="whitespace-pre-line text-xs">
               <TableCell>COLOR</TableCell>
+              <TableCell>COMPANY</TableCell>
               <TableCell>TR NO</TableCell>
-              <TableCell>BL NO</TableCell>
+              <TableCell>CHECK</TableCell>
+              <TableCell>REMARKS</TableCell>
               <TableCell>POL</TableCell>
               <TableCell>POD</TableCell>
               <TableCell>LSP</TableCell>
+              <TableCell>CNEE</TableCell>
               <TableCell>STATUS</TableCell>
               <TableCell>TIME</TableCell>
             </TableRow>
@@ -312,12 +372,15 @@ export default function MonitoringView() {
             {Monitoring && Monitoring.length > 0 ? (
               Monitoring?.map((item, index) => (
                 <TableRow key={index}>
-                  <TableCell>{ }</TableCell>
+                  <TableCell>{}</TableCell>
+                  <TableCell>{item.COMPANY_CODE}</TableCell>
                   <TableCell>{item.REF_NO}</TableCell>
-                  <TableCell>{item.BL_NO}</TableCell>
+                  <TableCell>{item.CHECK_YN}</TableCell>
+                  <TableCell>{item.REMARKS}</TableCell>
                   <TableCell>{item.POL}</TableCell>
                   <TableCell>{item.POD}</TableCell>
                   <TableCell>{item.LSP_CD}</TableCell>
+                  <TableCell>{item.CNEE}</TableCell>
                   <TableCell>{item.STATUS}</TableCell>
                   <TableCell>{dateFormat(item.LAST_UPDATE_DATE)}</TableCell>
                 </TableRow>
@@ -332,9 +395,10 @@ export default function MonitoringView() {
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
+                <TableCell>-</TableCell>
               </TableRow>
-            )
-            }
+            )}
           </TableBody>
         </Table>
       </div>

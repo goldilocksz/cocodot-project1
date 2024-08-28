@@ -6,13 +6,20 @@ import { Button } from '@/components/ui/button'
 import { Ban, Play, Sheet, Copy } from 'lucide-react'
 import { Dialog, DialogContent } from '../ui/dialog'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Order, RouteHistory, TimeTableData, TrakingInfo, Monitoring } from '@/types/data'
+import {
+  Order,
+  RouteHistory,
+  TimeTableData,
+  TrakingInfo,
+  Monitoring,
+} from '@/types/data'
 import { toast } from 'sonner'
 import request from '@/utils/request'
 import ConfirmDialog from './ConfirmDialog'
 import GoogleMapMulti from '../map/multi'
 import TimeTableDialog from './TimeTableDialog'
 import { decodeBase64, encodeBase64 } from '@/utils/base64'
+import { Loader } from '@googlemaps/js-api-loader'
 
 type Props = {
   detail: Order | undefined
@@ -47,6 +54,7 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: RouteDefault,
   })
+  const [geocoder, setGeocoder] = useState<google.maps.Geocoder>()
 
   const {
     data: trakingInfo,
@@ -120,42 +128,95 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
   })
 
   useEffect(() => {
-    if (fetchedRouteHistory && trakingInfo) {
-      const enrichedRouteHistory = fetchedRouteHistory.map((history: any) => {
-        const { SEQ, ADD_DATE } = history
-
-        const closestTrackingInfo = trakingInfo.reduce((closest, info) => {
-          const prevLat = parseFloat(info.LATITUDE)
-          const prevLon = parseFloat(info.LONGITUDE)
-          const currentDistance = getDistance(
-            prevLat,
-            prevLon,
-            parseFloat(info.LATITUDE),
-            parseFloat(info.LONGITUDE),
-          )
-          const closestDistance = getDistance(
-            prevLat,
-            prevLon,
-            parseFloat(closest.LATITUDE),
-            parseFloat(closest.LONGITUDE),
-          )
-
-          return currentDistance < closestDistance ? info : closest
-        }, trakingInfo[0])
-
-        return {
-          SEQ,
-          Datetime: ADD_DATE,
-          SEQ_NAME: closestTrackingInfo.SEQ_NAME || '',
-        }
-      })
-      console.log(enrichedRouteHistory)
-      setRouteHistory(enrichedRouteHistory)
+    if (!fetchedRouteHistory || fetchedRouteHistory.length === 0) {
+      refetchRouteHistory()
     }
-  }, [fetchedRouteHistory])
+  }, [fetchedRouteHistory, refetchRouteHistory])
 
   useEffect(() => {
-    console.log(detail)
+    const loader = new Loader({
+      apiKey: 'AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s',
+      version: 'weekly',
+    })
+
+    loader
+      .load()
+      .then(() => {
+        const googleGeocoder = new google.maps.Geocoder()
+        setGeocoder(googleGeocoder)
+      })
+      .catch((e) => {
+        console.error('Google Maps API 로드에 실패했습니다:', e)
+      })
+  }, [])
+
+  useEffect(() => {
+    const updateAddress = async () => {
+      if (fetchedRouteHistory && trakingInfo) {
+        console.log(fetchedRouteHistory)
+        const enrichedRouteHistory: any = []
+
+        for (const history of fetchedRouteHistory) {
+          const { SEQ, ADD_DATE } = history
+          if (geocoder) {
+            const address = await geocodeLatLng(
+              geocoder,
+              parseFloat(history.LATITUDE),
+              parseFloat(history.LONGITUDE),
+            )
+            enrichedRouteHistory.push({
+              SEQ,
+              Datetime: ADD_DATE,
+              SEQ_NAME: address || ' ',
+            })
+          }
+        }
+
+        // SEQ에 따라 정렬
+        enrichedRouteHistory.sort((a, b) => a.SEQ - b.SEQ);
+
+        console.log(enrichedRouteHistory)
+        setRouteHistory(enrichedRouteHistory)
+      } else {
+        const enrichedRouteHistory: any = []
+        setRouteHistory(enrichedRouteHistory)
+      }
+    }
+    updateAddress()
+  }, [fetchedRouteHistory])
+
+  async function geocodeLatLng(
+    geocoder: google.maps.Geocoder,
+    lat: number,
+    lng: number,
+  ): Promise<string> {
+    const latlng = {
+      lat: lat,
+      lng: lng,
+    }
+    return new Promise((resolve, reject) => {
+      //에러발생시 reject [then], 정상실행시 resolve [catch] (callback)
+      geocoder
+        .geocode({ location: latlng })
+        .then((response) => {
+          if (response.results[0]) {
+            const address = response.results[0].address_components
+              .map((address) => address.short_name)
+              .join(' ')
+            resolve(address)
+          } else {
+            console.log('error')
+            resolve(' ')
+          }
+        })
+        .catch((error) => {
+          console.log(error)
+          reject(' ')
+        })
+    })
+  }
+
+  useEffect(() => {
     if (detail) {
       form.reset(detail)
     }
@@ -249,7 +310,6 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
       return
     }
 
-    let sibal = 0.001
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -276,48 +336,50 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
               toast.error('Error sending tracking data: ' + error.message)
             })
 
-          const id = window.setInterval(() => {
-            sibal += 0.001
-            refetchRouteHistory()
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(
-                (position) => {
-                  console.log(
-                    'Position at interval:',
-                    position.coords.latitude + sibal,
-                    position.coords.longitude + sibal,
-                  )
-                  const requsetData = updateTrackingDistance(
-                    position.coords.latitude + sibal,
-                    position.coords.longitude + sibal,
-                  )
-                  request
-                    .post('/order/updateRouteHistory', requsetData)
-                    .then((response) => {
-                      if (!response.data) {
-                        toast.error('Failed to send tracking data')
-                      } else {
-                        toast.success('Tracking data sent successfully')
-                      }
-                    })
-                    .catch((error) => {
-                      toast.error(
-                        'Error sending tracking data: ' + error.message,
-                      )
-                    })
-                },
-                (error) => {
-                  toast.error(error.message)
-                },
-                {
-                  enableHighAccuracy: true,
-                },
-              )
-            } else {
-              toast.error('Geolocation is not supported by this browser.')
-            }
-            // }, 5 * 1000) //test용 5초마다 위치 요청
-          }, 15 * 60 * 1000) // 15분마다 위치 요청
+          const id = window.setInterval(
+            () => {
+              refetchRouteHistory()
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    console.log(
+                      'Position at interval:',
+                      position.coords.latitude,
+                      position.coords.longitude,
+                    )
+                    const requsetData = updateTrackingDistance(
+                      position.coords.latitude,
+                      position.coords.longitude,
+                    )
+                    request
+                      .post('/order/updateRouteHistory', requsetData)
+                      .then((response) => {
+                        if (!response.data) {
+                          toast.error('Failed to send tracking data')
+                        } else {
+                          toast.success('Tracking data sent successfully')
+                        }
+                      })
+                      .catch((error) => {
+                        toast.error(
+                          'Error sending tracking data: ' + error.message,
+                        )
+                      })
+                  },
+                  (error) => {
+                    toast.error(error.message)
+                  },
+                  {
+                    enableHighAccuracy: true,
+                  },
+                )
+              } else {
+                toast.error('Geolocation is not supported by this browser.')
+              }
+              // }, 5 * 1000) //test용 5초마다 위치 요청
+            },
+            15 * 60 * 1000,
+          ) // 15분마다 위치 요청
 
           setIntervalId(id)
         },
