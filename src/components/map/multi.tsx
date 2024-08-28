@@ -23,7 +23,7 @@ export default function GoogleMapMulti({
 
     const initMap = async () => {
       const loader = new Loader({
-        apiKey: 'AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s',
+        apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
         version: 'weekly',
       })
 
