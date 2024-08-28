@@ -16,8 +16,7 @@ export default function VanilaMap({
     const markers: google.maps.Marker[] = []
     const initMap = async () => {
       const loader = new Loader({
-        // apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
-        apiKey: "AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s",
+        apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
         version: 'weekly',
       })
 

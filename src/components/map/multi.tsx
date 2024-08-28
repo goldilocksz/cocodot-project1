@@ -23,14 +23,14 @@ export default function GoogleMapMulti({
 
     const initMap = async () => {
       const loader = new Loader({
-        apiKey: 'AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s',
+        apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
         version: 'weekly',
       })
 
       const { Map } = await loader.importLibrary('maps')
       const { AdvancedMarkerElement } = await loader.importLibrary('marker')
 
-      const dotIcon = {
+      const gpsDotIcon = {
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: '#62D811',
         fillOpacity: 1,
@@ -39,15 +39,32 @@ export default function GoogleMapMulti({
         strokeWeight: 1,
       }
 
-      const lastData = data[data.length - 1];
+      const dotIcon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#397d0b',
+        fillOpacity: 1,
+        scale: 4,
+        strokeColor: '#397d0b',
+        strokeWeight: 1,
+      }
+
+      const lastData = data[data.length - 1]
 
       const mapOptions = {
         center: {
           lat: Number(
-            gps && gps.length > 0 ? gps[gps.length - 1].LATITUDE : lastData ? lastData.LATITUDE : 0,
+            gps && gps.length > 0
+              ? gps[gps.length - 1].LATITUDE
+              : lastData
+                ? lastData.LATITUDE
+                : 0,
           ),
           lng: Number(
-            gps && gps.length > 0 ? gps[gps.length - 1].LONGITUDE : lastData ? lastData.LONGITUDE : 0,
+            gps && gps.length > 0
+              ? gps[gps.length - 1].LONGITUDE
+              : lastData
+                ? lastData.LONGITUDE
+                : 0,
           ),
         },
         zoom: 14,
@@ -82,10 +99,10 @@ export default function GoogleMapMulti({
             icon: isStartOrEnd ? undefined : dotIcon,
           })
           markers.push(defaultMarker)
-          paths.push({
-            lat: Number(item.LATITUDE),
-            lng: Number(item.LONGITUDE),
-          })
+          // paths.push({
+          //   lat: Number(item.LATITUDE),
+          //   lng: Number(item.LONGITUDE),
+          // })
         })
       }
 
@@ -99,7 +116,7 @@ export default function GoogleMapMulti({
               lng: Number(item.LONGITUDE),
             },
             map: map,
-            icon: dotIcon,
+            icon: gpsDotIcon,
           })
           markers.push(gpsMarker)
           gpsMarkers.push(gpsMarker)
@@ -118,7 +135,7 @@ export default function GoogleMapMulti({
           geodesic: true,
           strokeColor: '#FF0000',
           strokeOpacity: 1.0,
-          strokeWeight: 3,
+          strokeWeight: 2,
           map: map,
         })
       }

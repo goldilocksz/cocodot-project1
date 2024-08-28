@@ -79,7 +79,7 @@ export default function RouteShare() {
             const { data } = await publicRequest.post('/public-data/getTrackingInfo', {
                 TR_NO: TRNO,
             })
-            console.log('원피스', data)
+
             return Array.isArray(data.data) ? data.data : []
         },
         enabled: !!TRNO,
