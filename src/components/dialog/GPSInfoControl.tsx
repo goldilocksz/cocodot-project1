@@ -135,7 +135,7 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
 
   useEffect(() => {
     const loader = new Loader({
-      apiKey: 'AIzaSyAUul4WOPFSjQoEI8z99NF-UadzHiyBr0s',
+      apiKey: import.meta.env.VITE_GOOGLE_MAP_KEY,
       version: 'weekly',
     })
 
@@ -149,7 +149,7 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
         console.error('Google Maps API 로드에 실패했습니다:', e)
       })
   }, [])
-
+      
   useEffect(() => {
     const updateAddress = async () => {
       if (fetchedRouteHistory && trakingInfo) {

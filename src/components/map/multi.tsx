@@ -53,7 +53,8 @@ export default function GoogleMapMulti({
       const mapOptions = {
         center: {
           lat: Number(
-            gps && gps.length > 0
+
+<!--             gps && gps.length > 0
               ? gps[gps.length - 1].LATITUDE
               : lastData
                 ? lastData.LATITUDE
@@ -64,7 +65,13 @@ export default function GoogleMapMulti({
               ? gps[gps.length - 1].LONGITUDE
               : lastData
                 ? lastData.LONGITUDE
-                : 0,
+                : 0, -->
+
+            gps && gps.length > 0 ? gps[gps.length - 1].LATITUDE : lastData ? lastData.LATITUDE : 0,
+          ),
+          lng: Number(
+            gps && gps.length > 0 ? gps[gps.length - 1].LONGITUDE : lastData ? lastData.LONGITUDE : 0,
+
           ),
         },
         zoom: 14,

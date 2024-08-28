@@ -79,6 +79,7 @@ export default function RouteShare() {
             const { data } = await publicRequest.post('/public-data/getTrackingInfo', {
                 TR_NO: TRNO,
             })
+
             return Array.isArray(data.data) ? data.data : []
         },
         enabled: !!TRNO,
