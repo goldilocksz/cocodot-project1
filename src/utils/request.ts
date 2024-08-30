@@ -26,10 +26,21 @@ request.interceptors.response.use(
   },
   (error) => {
     if (error.response.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      toast.error('토큰이 만료되어 자동 로그아웃 되였습니다.')
-      location.href = '/login'
+      const errorMessage = error.response.data
+
+      if (errorMessage === 'Authorization token missing or invalid') {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        toast.error('토큰이 만료되어 자동 로그아웃 되였습니다.')
+        alert('토큰이 만료되어 자동 로그아웃 되였습니다.')
+        location.href = '/login'
+      } else if (errorMessage === 'Token is invalid due to another login') {
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        toast.error('다른 장치에서 로그인하여 자동 로그아웃 되었습니다.')
+        alert('다른 장치에서 로그인하여 자동 로그아웃 되었습니다.')
+        location.href = '/login'
+      }
     }
 
     return Promise.reject(

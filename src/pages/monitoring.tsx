@@ -322,7 +322,7 @@ export default function MonitoringView() {
       </div>
 
       <div className="mt-3 flex w-full flex-col gap-6 2xl:flex-row">
-        <div className="w-full bg-red-500">
+        <div className="w-full">
           {MonitoringRoute && MonitoringRoute.length > 0 ? (
             <GoogleMapMonitoring data={MonitoringRoute} />
           ) : (
@@ -372,7 +372,7 @@ export default function MonitoringView() {
             {Monitoring && Monitoring.length > 0 ? (
               Monitoring?.map((item, index) => (
                 <TableRow key={index}>
-                  <TableCell>{}</TableCell>
+                  <TableCell>{ }</TableCell>
                   <TableCell>{item.COMPANY_CODE}</TableCell>
                   <TableCell>{item.REF_NO}</TableCell>
                   <TableCell>{item.CHECK_YN}</TableCell>
