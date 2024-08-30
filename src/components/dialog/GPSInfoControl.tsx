@@ -149,11 +149,11 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
         console.error('Google Maps API 로드에 실패했습니다:', e)
       })
   }, [])
-      
+
   useEffect(() => {
     const updateAddress = async () => {
       if (fetchedRouteHistory && trakingInfo) {
-        console.log(fetchedRouteHistory)
+        fetchedRouteHistory.sort((a: any, b: any) => a.SEQ - b.SEQ)
         const enrichedRouteHistory: any = []
 
         for (const history of fetchedRouteHistory) {
@@ -173,9 +173,8 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
         }
 
         // SEQ에 따라 정렬
-        enrichedRouteHistory.sort((a, b) => a.SEQ - b.SEQ);
+        enrichedRouteHistory.sort((a: any, b: any) => a.SEQ - b.SEQ);
 
-        console.log(enrichedRouteHistory)
         setRouteHistory(enrichedRouteHistory)
       } else {
         const enrichedRouteHistory: any = []

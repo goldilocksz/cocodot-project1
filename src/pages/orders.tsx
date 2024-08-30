@@ -178,62 +178,70 @@ export default function OrderView() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orderList
-              ?.slice(
-                (page - 1) * parseInt(pageSize),
-                page * parseInt(pageSize),
-              )
-              .map((item) => (
-                <TableRow
-                  key={item.TR_NO}
-                  onClick={() => handleItemClick(item)}
-                  className="cursor-pointer md:cursor-auto"
-                >
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      className="h-10 w-10 rounded-full p-0"
-                      onClick={() => handleRouteInfoClick(item)}
-                    >
-                      <Route className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="ghost"
-                      className="h-10 w-10 rounded-full p-0"
-                      onClick={() => handleGPSInfoClick(item)}
-                    >
-                      <MapPin className="h-5 w-5" />
-                    </Button>
-                  </TableCell>
-                  <TableCell>{item.TR_NO}</TableCell>
-                  <TableCell>{item.BL_NO}</TableCell>
-                  <TableCell>{item.CNEE}</TableCell>
-                  <TableCell>{item.LSP_CD}</TableCell>
-                  <TableCell>{item.POL}</TableCell>
-                  <TableCell>{item.VENDOR_NAME}</TableCell>
-                  <TableCell>{item.REF_INVOICE_NO}</TableCell>
-                  <TableCell>{item.INCOTERMS}</TableCell>
-                  <TableCell>{item.FROM_ROUTE_CODE}</TableCell>
-                  <TableCell>{item.TO_ROUTE_CODE}</TableCell>
-                  <TableCell>{item.FROM_TRUCK_NO}</TableCell>
-                  <TableCell>{item.FROM_TRUCK_TYPE}</TableCell>
-                  <TableCell>{item.TO_TRUCK_NO}</TableCell>
-                  <TableCell>{item.TO_TRUCK_TYPE}</TableCell>
-                  <TableCell>{item.REGION_NAME}</TableCell>
-                  <TableCell>{dateFormat(item.CC_DONE_TIME)}</TableCell>
-                  <TableCell>{item.ITEM_CODE}</TableCell>
-                  <TableCell>{item.PLT_QTY}</TableCell>
-                  <TableCell>
-                    {item.URGENT === 'Y' ? (
-                      <Check className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <X className="h-4 w-4 text-destructive" />
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+            {Array.isArray(orderList) && orderList.length > 0 ? (
+              orderList
+                .slice(
+                  (page - 1) * parseInt(pageSize),
+                  page * parseInt(pageSize),
+                )
+                .map((item) => (
+                  <TableRow
+                    key={item.TR_NO}
+                    onClick={() => handleItemClick(item)}
+                    className="cursor-pointer md:cursor-auto"
+                  >
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        className="h-10 w-10 rounded-full p-0"
+                        onClick={() => handleRouteInfoClick(item)}
+                      >
+                        <Route className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        className="h-10 w-10 rounded-full p-0"
+                        onClick={() => handleGPSInfoClick(item)}
+                      >
+                        <MapPin className="h-5 w-5" />
+                      </Button>
+                    </TableCell>
+                    <TableCell>{item.TR_NO}</TableCell>
+                    <TableCell>{item.BL_NO}</TableCell>
+                    <TableCell>{item.CNEE}</TableCell>
+                    <TableCell>{item.LSP_CD}</TableCell>
+                    <TableCell>{item.POL}</TableCell>
+                    <TableCell>{item.VENDOR_NAME}</TableCell>
+                    <TableCell>{item.REF_INVOICE_NO}</TableCell>
+                    <TableCell>{item.INCOTERMS}</TableCell>
+                    <TableCell>{item.FROM_ROUTE_CODE}</TableCell>
+                    <TableCell>{item.TO_ROUTE_CODE}</TableCell>
+                    <TableCell>{item.FROM_TRUCK_NO}</TableCell>
+                    <TableCell>{item.FROM_TRUCK_TYPE}</TableCell>
+                    <TableCell>{item.TO_TRUCK_NO}</TableCell>
+                    <TableCell>{item.TO_TRUCK_TYPE}</TableCell>
+                    <TableCell>{item.REGION_NAME}</TableCell>
+                    <TableCell>{dateFormat(item.CC_DONE_TIME)}</TableCell>
+                    <TableCell>{item.ITEM_CODE}</TableCell>
+                    <TableCell>{item.PLT_QTY}</TableCell>
+                    <TableCell>
+                      {item.URGENT === 'Y' ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <X className="h-4 w-4 text-destructive" />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))) : (
+              <TableRow>
+                <TableCell colSpan={21} className="text-center">
+                  No data
+                </TableCell>
+              </TableRow>
+            )
+            }
           </TableBody>
         </Table>
 

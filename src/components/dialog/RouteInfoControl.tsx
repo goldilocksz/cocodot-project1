@@ -70,6 +70,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
       const { data } = await request.post('/order/getTrackingInfo', {
         TR_NO: detail?.TR_NO,
       })
+      console.log('data', data)
       return data
     },
     enabled: !!detail?.TR_NO && open,
@@ -121,9 +122,21 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     }
   }, [open])
 
-  const handleSave = async (SEQ: string) => {
-    setSeq(SEQ)
+  const handleSave = async (item: TrakingInfo) => {
+    setSeq(item.SEQ)
     setIsSaveConfirm(true)
+
+    // GPS API 시작 위치, 종료 위치
+    if (trakingInfo) {
+      const index = trakingInfo.findIndex((i) => i.SEQ === item.SEQ)
+      if (index === 0 || trakingInfo[index - 1].NATION_CD !== trakingInfo[index].NATION_CD) {
+        console.log('각 GPS API 시작 위치')
+      }
+
+      if (index + 1 < trakingInfo.length && trakingInfo[index + 1].NATION_CD !== trakingInfo[index].NATION_CD) {
+        console.log('각 GPS API 종료 위치')
+      }
+    }
   }
 
   const confirmSave = async () => {
@@ -261,7 +274,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
                     <Button
                       variant="outline"
                       className="h-auto rounded-full border-0 px-2"
-                      onClick={() => handleSave(item.SEQ)}
+                      onClick={() => handleSave(item)}
                       type="button" // submit에서 button으로 변경
                     >
                       {isSaveRoute ? (

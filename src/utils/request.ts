@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { toast } from 'sonner'
+import { debounce } from 'lodash'
 
 export const request = axios.create({
   //baseURL: 'http://27.71.17.99:9090',
@@ -20,23 +21,38 @@ request.interceptors.request.use(
   },
 )
 
+// 에러 처리 함수
+const handleError = debounce((error: any) => {
+  if (error.response && error.response.status === 401) {
+    const errorMessage = error.response.data
+
+    if (errorMessage === 'Authorization token missing or invalid') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      toast.error('토큰이 만료되어 자동 로그아웃 되였습니다.')
+      alert('토큰이 만료되어 자동 로그아웃 되였습니다.')
+      location.href = '/login'
+    } else if (errorMessage === 'Token is invalid due to another login') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      toast.error('다른 장치에서 로그인하여 자동 로그아웃 되었습니다.')
+      alert('다른 장치에서 로그인하여 자동 로그아웃 되었습니다.')
+      location.href = '/login'
+    }
+  }
+
+  return Promise.reject(
+    error.code === 'ERR_NETWORK' ? '허용되지 않은 네트워크 접근입니다.' : error,
+  )
+}, 300) // 300ms 딜레이
+
+// 응답 인터셉터
 request.interceptors.response.use(
   (response) => {
     return response
   },
   (error) => {
-    if (error.response.status === 401) {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      toast.error('토큰이 만료되어 자동 로그아웃 되였습니다.')
-      location.href = '/login'
-    }
-
-    return Promise.reject(
-      error.code === 'ERR_NETWORK'
-        ? '허용되지 않은 네트워크 접근입니다.'
-        : error,
-    )
+    handleError(error) // 디바운스된 에러 핸들러 호출
   },
 )
 
