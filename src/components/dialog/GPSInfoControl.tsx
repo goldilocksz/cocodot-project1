@@ -81,7 +81,6 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
       const { data } = await request.post('/order/getOrderRouteHistory', {
         TR_NO: detail?.TR_NO,
       })
-      console.log(data)
       return data
     },
     enabled: !!detail?.TR_NO && open,
@@ -173,7 +172,7 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
         }
 
         // SEQ에 따라 정렬
-        enrichedRouteHistory.sort((a: any, b: any) => a.SEQ - b.SEQ);
+        enrichedRouteHistory.sort((a: any, b: any) => a.SEQ - b.SEQ)
 
         setRouteHistory(enrichedRouteHistory)
       } else {
@@ -260,9 +259,9 @@ export default function GPSInfoControl({ detail, open, setOpen }: Props) {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2)
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c // 거리 (킬로미터 단위)
   }

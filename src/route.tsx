@@ -43,13 +43,13 @@ export default function AppRoute() {
             (item: any) => item.SRC_PATH === '/orders',
           );
 
-          // if (!findMenu && findMenu2) {
-          //   navigate('/orders');
-          // }
+          if (!findMenu && findMenu2) {
+            navigate('/orders');
+          }
 
-          // if (!findMenu && !findMenu2) {
-          //   navigate('/my');
-          // }
+          if (!findMenu && !findMenu2) {
+            navigate('/my');
+          }
         }
       }
     }

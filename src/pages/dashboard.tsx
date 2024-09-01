@@ -259,6 +259,11 @@ export default function DashboardView() {
           dayjs(progressRangeDate.to).format('YYYYMMDD'),
       })
 
+      if (!response || !response.data) {
+        console.error('응답 데이터가 없습니다:');
+        return [];
+      }
+
       // response.data가 배열인지 확인
       if (Array.isArray(response.data)) {
         return response.data.map((item: any, index: number) => ({
