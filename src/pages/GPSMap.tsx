@@ -79,12 +79,9 @@ export default function GPSMap() {
   } = useQuery({
     queryKey: ['getOrderRouteHistory', TRNO],
     queryFn: async () => {
-      const { data } = await publicRequest.post(
-        '/public-data/getGPSRoute',
-        {
-          TR_NO: TRNO,
-        },
-      )
+      const { data } = await publicRequest.post('/public-data/getGPSRoute', {
+        TR_NO: TRNO,
+      })
       return data.data
     },
     enabled: !!TRNO,
@@ -183,9 +180,9 @@ export default function GPSMap() {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(lat1 * (Math.PI / 180)) *
-      Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2)
+        Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2)
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c // 거리 (킬로미터 단위)
   }
@@ -221,7 +218,7 @@ export default function GPSMap() {
     const updateAddress = async () => {
       if (fetchedRouteHistory && trakingInfo) {
         console.log('오긴왔다')
-
+        fetchedRouteHistory.sort((a: any, b: any) => a.SEQ - b.SEQ)
         const enrichedRouteHistory: any = []
 
         for (const history of fetchedRouteHistory) {
@@ -239,6 +236,7 @@ export default function GPSMap() {
             })
           }
         }
+        enrichedRouteHistory.sort((a: any, b: any) => a.SEQ - b.SEQ)
         console.log(enrichedRouteHistory)
         setRouteHistory(enrichedRouteHistory)
       } else {

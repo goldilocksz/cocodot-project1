@@ -29,6 +29,8 @@ import { omit } from 'radash'
 import ConfirmDialog from './ConfirmDialog'
 import GoogleRouteInfo from '../map/routeInfoMap'
 import { encodeBase64 } from '@/utils/base64'
+import { set } from 'lodash'
+import { is } from 'date-fns/locale'
 
 type Props = {
   detail: Order | undefined
@@ -55,6 +57,9 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
   const [isConfirm, setIsConfirm] = useState(false)
   const [isSaveConfirm, setIsSaveConfirm] = useState(false) // Save 확인 대화상자 상태
   const [seq, setSeq] = useState<string>()
+  const [intervalId, setIntervalId] = useState<number | null>(null)
+  const [gpsStatus, setGpsStatus] = useState<string>('ready')
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: RouteDefault,
@@ -68,6 +73,22 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     queryKey: ['getTrackingInfo', detail?.TR_NO],
     queryFn: async () => {
       const { data } = await request.post('/order/getTrackingInfo', {
+        TR_NO: detail?.TR_NO,
+      })
+      console.log('data', data)
+      return data
+    },
+    enabled: !!detail?.TR_NO && open,
+  })
+
+  const {
+    data: fetchedRouteHistory,
+    isFetching: isRouteHistory,
+    refetch: refetchRouteHistory,
+  } = useQuery({
+    queryKey: ['getOrderRouteHistory', detail?.TR_NO],
+    queryFn: async () => {
+      const { data } = await request.post('/order/getOrderRouteHistory', {
         TR_NO: detail?.TR_NO,
       })
       return data
@@ -121,15 +142,184 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     }
   }, [open])
 
-  const handleSave = async (SEQ: string) => {
-    setSeq(SEQ)
+  const handleSave = async (item: TrakingInfo) => {
+    setSeq(item.SEQ)
     setIsSaveConfirm(true)
+
+    // GPS API 시작 위치, 종료 위치
+    if (trakingInfo) {
+      const index = trakingInfo.findIndex((i) => i.SEQ === item.SEQ)
+      if (index === 0 || trakingInfo[index - 1].NATION_CD !== trakingInfo[index].NATION_CD) {
+        setGpsStatus('start')
+      }
+
+      if (index + 1 < trakingInfo.length && trakingInfo[index + 1].NATION_CD !== trakingInfo[index].NATION_CD) {
+        setGpsStatus('end')
+      }
+    }
   }
+
+  // ******************************************
+
+  const gpsControl = () => {
+    if (intervalId) {
+      clearInterval(intervalId)
+      setIntervalId(null)
+      return
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log(
+            'Initial position:',
+            position.coords.latitude,
+            position.coords.longitude,
+          )
+          const requsetData = updateTrackingDistance(
+            position.coords.latitude,
+            position.coords.longitude,
+          )
+
+          request
+            .post('/order/updateRouteHistory', requsetData)
+            .then((response) => {
+              if (!response.data) {
+                toast.error('Failed to send tracking data')
+              } else {
+                toast.success('Tracking data sent successfully')
+              }
+            })
+            .catch((error) => {
+              toast.error('Error sending tracking data: ' + error.message)
+            })
+
+          const id = window.setInterval(
+            () => {
+              refetchRouteHistory()
+              if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                    console.log(
+                      'Position at interval:',
+                      position.coords.latitude,
+                      position.coords.longitude,
+                    )
+                    const requsetData = updateTrackingDistance(
+                      position.coords.latitude,
+                      position.coords.longitude,
+                    )
+                    request
+                      .post('/order/updateRouteHistory', requsetData)
+                      .then((response) => {
+                        if (!response.data) {
+                          toast.error('Failed to send tracking data')
+                        } else {
+                          toast.success('Tracking data sent successfully')
+                        }
+                      })
+                      .catch((error) => {
+                        toast.error(
+                          'Error sending tracking data: ' + error.message,
+                        )
+                      })
+                  },
+                  (error) => {
+                    toast.error(error.message)
+                  },
+                  {
+                    enableHighAccuracy: true,
+                  },
+                )
+              } else {
+                toast.error('Geolocation is not supported by this browser.')
+              }
+              // }, 5 * 1000) //test용 5초마다 위치 요청
+            },
+            15 * 60 * 1000,
+          ) // 15분마다 위치 요청
+
+          setIntervalId(id)
+        },
+        (error) => {
+          toast.error(error.message)
+        },
+        {
+          enableHighAccuracy: true,
+        },
+      )
+    } else {
+      toast.error('Geolocation is not supported by this browser.')
+    }
+  }
+
+  const getDistance = (
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ) => {
+    const R = 6371 // 지구 반경 (킬로미터 단위)
+    const dLat = (lat2 - lat1) * (Math.PI / 180)
+    const dLon = (lon2 - lon1) * (Math.PI / 180)
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c // 거리 (킬로미터 단위)
+  }
+
+  const updateTrackingDistance = (latitude: number, longitude: number) => {
+    if (trakingInfo && trakingInfo.length > 0) {
+      const distances = trakingInfo.map((info) => {
+        const prevLat = parseFloat(info.LATITUDE)
+        const prevLon = parseFloat(info.LONGITUDE)
+        return getDistance(prevLat, prevLon, latitude, longitude)
+      })
+      console.log(distances)
+      const minDistanceIndex = distances.indexOf(Math.min(...distances))
+      console.log(minDistanceIndex)
+
+      const data = {
+        COMPANY_CODE: detail?.COMPANY_CODE,
+        TR_NO: detail?.TR_NO,
+        SEQ: 1,
+        TRUCK_NO: trakingInfo[minDistanceIndex].TRUCK_NO,
+        CHECK_DATE: new Date().toISOString(),
+        LATITUDE: latitude.toString(),
+        LONGITUDE: longitude.toString(),
+        STATUS: detail?.STATUS,
+        REMARKS: detail?.REMARKS,
+        TIME_ZONE: '+09:00',
+        ADD_DATE: new Date().toISOString(),
+        ADD_USER_ID: detail?.ADD_USER_ID,
+        ADD_USER_NAME: detail?.ADD_USER_NAME,
+        UPDATE_DATE: new Date().toISOString(),
+        UPDATE_USER_ID: new Date().toISOString(),
+        UPDATE_USER_NAME: detail?.ADD_USER_NAME,
+      }
+
+      console.log(data)
+      return data
+    }
+  }
+
+  // ******************************************
 
   const confirmSave = async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          if (gpsStatus === 'start') {
+            setGpsStatus('running')
+            gpsControl()
+          } else if (gpsStatus === 'end') {
+            gpsControl()
+          }
+
           SaveRoute({
             SEQ: seq!,
             LATITUDE: position.coords.latitude.toString(),
@@ -261,7 +451,7 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
                     <Button
                       variant="outline"
                       className="h-auto rounded-full border-0 px-2"
-                      onClick={() => handleSave(item.SEQ)}
+                      onClick={() => handleSave(item)}
                       type="button" // submit에서 button으로 변경
                     >
                       {isSaveRoute ? (

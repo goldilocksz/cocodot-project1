@@ -13,13 +13,22 @@ export default function GoogleMapMulti({
   const ref = useRef<HTMLDivElement>(null)
   const mapRef = useRef<google.maps.Map | null>(null)
   const markersRef = useRef<google.maps.Marker[]>([])
-  const gpsMarkersRef = useRef<google.maps.Marker[]>([])
-  const routePathRef = useRef<google.maps.Polyline | null>(null)
+
+  const gpsMarkersRef = useRef<google.maps.Marker[]>([]) //TimeTable 클릭시 하이라이트 용
+
+  // const routePathRef = useRef<google.maps.Polyline | null>(null)
+  const routeVNPathRef = useRef<google.maps.Polyline | null>(null)
+  const routeCNPathRef = useRef<google.maps.Polyline | null>(null)
 
   useEffect(() => {
+    console.log(gps)
     const markers: google.maps.Marker[] = []
+
     const gpsMarkers: google.maps.Marker[] = []
+
     const paths: google.maps.LatLngLiteral[] = []
+    const VNPaths: google.maps.LatLngLiteral[] = [] //베트남 경로
+    const CNPaths: google.maps.LatLngLiteral[] = [] //중국 경로
 
     const initMap = async () => {
       const loader = new Loader({
@@ -30,12 +39,23 @@ export default function GoogleMapMulti({
       const { Map } = await loader.importLibrary('maps')
       const { AdvancedMarkerElement } = await loader.importLibrary('marker')
 
-      const gpsDotIcon = {
+      const gpsVNDotIcon = {
+        // VN - 초록색 점
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: '#62D811',
         fillOpacity: 1,
         scale: 4,
         strokeColor: '#62D811',
+        strokeWeight: 1,
+      }
+
+      const gpsCNDotIcon = {
+        // CN - 노란색 점
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#ffbb00',
+        fillOpacity: 1,
+        scale: 4,
+        strokeColor: '#ffbb00',
         strokeWeight: 1,
       }
 
@@ -79,10 +99,19 @@ export default function GoogleMapMulti({
       gpsMarkersRef.current.forEach((marker) => marker.setMap(null))
       gpsMarkersRef.current = []
 
-      if (routePathRef.current) {
-        routePathRef.current.setMap(null)
-        routePathRef.current = null
+      if (routeVNPathRef.current) {
+        routeVNPathRef.current.setMap(null)
+        routeVNPathRef.current = null
       }
+      if (routeCNPathRef.current) {
+        routeCNPathRef.current.setMap(null)
+        routeCNPathRef.current = null
+      }
+
+      // if (routePathRef.current) {
+      //   routePathRef.current.setMap(null)
+      //   routePathRef.current = null
+      // }
 
       if (data) {
         data.forEach((item: any, index: number) => {
@@ -99,39 +128,66 @@ export default function GoogleMapMulti({
             icon: isStartOrEnd ? undefined : dotIcon,
           })
           markers.push(defaultMarker)
-          // paths.push({
-          //   lat: Number(item.LATITUDE),
-          //   lng: Number(item.LONGITUDE),
-          // })
         })
       }
 
       if (gps) {
+        const firstData = gps[0].TRUCK_NO
         gps.forEach((item: any) => {
           if (item.LATITUDE === 'NULL' || item.LONGITUDE === 'NULL') return
 
-          const gpsMarker = new google.maps.Marker({
-            position: {
+          if (item.TRUCK_NO === firstData) {
+            const gpsMarker = new google.maps.Marker({
+              position: {
+                lat: Number(item.LATITUDE),
+                lng: Number(item.LONGITUDE),
+              },
+              map: map,
+              icon: gpsCNDotIcon,
+            })
+            gpsMarkers.push(gpsMarker)
+            CNPaths.push({
               lat: Number(item.LATITUDE),
               lng: Number(item.LONGITUDE),
-            },
-            map: map,
-            icon: gpsDotIcon,
-          })
-          markers.push(gpsMarker)
-          gpsMarkers.push(gpsMarker)
-          paths.push({
-            lat: Number(item.LATITUDE),
-            lng: Number(item.LONGITUDE),
-          })
+            })
+          } else {
+            const gpsMarker = new google.maps.Marker({
+              position: {
+                lat: Number(item.LATITUDE),
+                lng: Number(item.LONGITUDE),
+              },
+              map: map,
+              icon: gpsVNDotIcon,
+            })
+            gpsMarkers.push(gpsMarker)
+            VNPaths.push({
+              lat: Number(item.LATITUDE),
+              lng: Number(item.LONGITUDE),
+            })
+          }
+          // markers.push(gpsMarker)
         })
       }
+
       gpsMarkersRef.current = gpsMarkers
+
       markersRef.current = markers
 
-      if (paths.length > 1) {
-        routePathRef.current = new google.maps.Polyline({
-          path: paths,
+      if (VNPaths.length > 1) {
+        //베트남 파란색 선
+        routeVNPathRef.current = new google.maps.Polyline({
+          path: VNPaths,
+          geodesic: true,
+          strokeColor: '#0000FF',
+          strokeOpacity: 1.0,
+          strokeWeight: 2,
+          map: map,
+        })
+      }
+      if (CNPaths.length > 1) {
+        // 중국 빨간색 선
+        routeCNPathRef.current = new google.maps.Polyline({
+          path: CNPaths,
           geodesic: true,
           strokeColor: '#FF0000',
           strokeOpacity: 1.0,
@@ -139,6 +195,17 @@ export default function GoogleMapMulti({
           map: map,
         })
       }
+
+      // if (paths.length > 1) {
+      //   routePathRef.current = new google.maps.Polyline({
+      //     path: paths,
+      //     geodesic: true,
+      //     strokeColor: '#FF0000',
+      //     strokeOpacity: 1.0,
+      //     strokeWeight: 2,
+      //     map: map,
+      //   })
+      // }
     }
 
     initMap()
