@@ -24,16 +24,17 @@ const queryClient = new QueryClient({
   }),
 })
 
-// if ('serviceWorker' in navigator) {
-//   window.addEventListener('load', async () => {
-//     try {
-//       const registration = await navigator.serviceWorker.register('/service-worker.js');
-//       console.log('Service Worker registered with scope:', registration.scope);
-//     } catch (error) {
-//       console.error('Service Worker registeration failed:', error);
-//     }
-//   })
-// }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const registration =
+        await navigator.serviceWorker.register('/service-worker.js')
+      console.log('Service Worker registered with scope:', registration.scope)
+    } catch (error) {
+      console.error('Service Worker registeration failed:', error)
+    }
+  })
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

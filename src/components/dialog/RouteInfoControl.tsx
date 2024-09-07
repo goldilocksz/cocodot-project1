@@ -161,6 +161,65 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
 
   // ******************************************
 
+  const gpsControlTest = () => {
+    if (intervalId) {
+      clearInterval(intervalId)
+      setIntervalId(null)
+      return
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          console.log('Initial position:', latitude, longitude);
+
+          // Background Sync 등록
+          navigator.serviceWorker.ready.then((registration) => {
+            (registration as ServiceWorkerRegistration).sync.register('gps-sync');
+            console.log('Background Sync registered');
+          });
+
+          const id = window.setInterval(() => {
+            refetchRouteHistory();
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                console.log('Position at interval:', position.coords.latitude, position.coords.longitude);
+                const requestData = updateTrackingDistance(position.coords.latitude, position.coords.longitude);
+
+                request
+                  .post('/order/updateRouteHistory', requestData)
+                  .then((response) => {
+                    if (!response.data) {
+                      toast.error('Failed to send tracking data');
+                    } else {
+                      toast.success('Tracking data sent successfully');
+                    }
+                  })
+                  .catch((error) => {
+                    toast.error('Error sending tracking data: ' + error.message);
+                  });
+              },
+              (error) => {
+                toast.error(error.message);
+              },
+              { enableHighAccuracy: true }
+            );
+          }, 10 * 1000); // 15분마다 위치 요청
+
+          setIntervalId(id);
+        },
+        (error) => {
+          toast.error(error.message);
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      toast.error('Geolocation is not supported by this browser.');
+    }
+  }
+
   const gpsControl = () => {
     if (intervalId) {
       clearInterval(intervalId)
@@ -315,9 +374,9 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
         (position) => {
           if (gpsStatus === 'start') {
             setGpsStatus('running')
-            gpsControl()
+            gpsControlTest()
           } else if (gpsStatus === 'end') {
-            gpsControl()
+            gpsControlTest()
           }
 
           SaveRoute({
