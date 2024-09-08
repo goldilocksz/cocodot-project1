@@ -31,6 +31,9 @@ import GoogleRouteInfo from '../map/routeInfoMap'
 import { encodeBase64 } from '@/utils/base64'
 import { set } from 'lodash'
 import { is } from 'date-fns/locale'
+import { saveGPSData } from '@/utils/db'
+import { registerSync } from '@/utils/sync'
+import { requestNotificationPermission } from '@/utils/notification'
 
 type Props = {
   detail: Order | undefined
@@ -142,6 +145,10 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     }
   }, [open])
 
+  useEffect(() => {
+    requestNotificationPermission()
+  }, []);
+
   const handleSave = async (item: TrakingInfo) => {
     setSeq(item.SEQ)
     setIsSaveConfirm(true)
@@ -160,6 +167,63 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
   }
 
   // ******************************************
+
+  const gpsControlTest2 = () => {
+    if (intervalId) {
+      clearInterval(intervalId)
+      setIntervalId(null)
+      return
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const data = {
+            latutyde: position.coords.latitude,
+            longitude: position.coords.longitude,
+            timestamp: new Date().toISOString(),
+          }
+          await saveGPSData(data);
+          await registerSync();
+
+          const id = window.setInterval(async () => {
+            refetchRouteHistory();
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                async (position) => {
+                  const data = {
+                    latutyde: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    timestamp: new Date().toISOString(),
+                  }
+                  await saveGPSData(data);
+                  await registerSync();
+                },
+                (error) => {
+                  toast.error(error.message);
+                },
+                {
+                  enableHighAccuracy: true,
+                }
+              )
+            } else {
+              toast.error('Geolocation is not supported by this browser.');
+            }
+          }, 10 * 1000); // 15분마다 위치 요청
+
+          setIntervalId(id);
+        },
+        (error) => {
+          toast.error(error.message);
+        },
+        {
+          enableHighAccuracy: true
+        }
+      );
+    } else {
+      toast.error('Geolocation is not supported by this browser.');
+    }
+  }
 
   const gpsControlTest = () => {
     if (intervalId) {
@@ -374,9 +438,9 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
         (position) => {
           if (gpsStatus === 'start') {
             setGpsStatus('running')
-            gpsControlTest()
+            gpsControlTest2()
           } else if (gpsStatus === 'end') {
-            gpsControlTest()
+            gpsControlTest2()
           }
 
           SaveRoute({
