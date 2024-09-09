@@ -1,57 +1,57 @@
-self.addEventListener('instlall', (event) => {
-  console.log('Service Worker installed')
-})
+// self.addEventListener('instlall', (event) => {
+//   console.log('Service Worker installed')
+// })
 
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker activated')
-})
+// self.addEventListener('activate', (event) => {
+//   console.log('Service Worker activated')
+// })
 
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'gps-sync') {
-    event.waitUtil(syncGpsData())
-  }
-})
+// self.addEventListener('sync', (event) => {
+//   if (event.tag === 'gps-sync') {
+//     event.waitUtil(syncGpsData())
+//   }
+// })
 
-async function syncGpsData() {
-  const position = await getCurrentPosition()
+// async function syncGpsData() {
+//   const position = await getCurrentPosition()
 
-  if (position) {
-    const gpsData = {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-    }
+//   if (position) {
+//     const gpsData = {
+//       latitude: position.coords.latitude,
+//       longitude: position.coords.longitude,
+//     }
 
-    try {
-      const response = await fetch('/order/updateRouteHistory', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(gpsData),
-      })
+//     try {
+//       const response = await fetch('/order/updateRouteHistory', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `Bearer ${localStorage.getItem('token')}`,
+//         },
+//         body: JSON.stringify(gpsData),
+//       })
 
-      if (!response.ok) {
-        throw new Error('Network response wat not ok')
-      }
-      console.log('GPS data sent successfully')
-    } catch (error) {
-      console.error('Error sending GPS data: ', error)
-    }
-  }
-}
+//       if (!response.ok) {
+//         throw new Error('Network response wat not ok')
+//       }
+//       console.log('GPS data sent successfully')
+//     } catch (error) {
+//       console.error('Error sending GPS data: ', error)
+//     }
+//   }
+// }
 
-function getCurrentPosition() {
-  return new Promise((resolve, regect) => {
-    if (navigator.geolocation) {
-      navigator.getlocation.getCurrentPosition(resolve, reject, {
-        enableHighAccuracy: true,
-      })
-    } else {
-      reject('Geolocation is not supported by this browser.')
-    }
-  })
-}
+// function getCurrentPosition() {
+//   return new Promise((resolve, regect) => {
+//     if (navigator.geolocation) {
+//       navigator.getlocation.getCurrentPosition(resolve, reject, {
+//         enableHighAccuracy: true,
+//       })
+//     } else {
+//       reject('Geolocation is not supported by this browser.')
+//     }
+//   })
+// }
 
 // *****************************************************************************************************************
 

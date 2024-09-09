@@ -145,9 +145,9 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     }
   }, [open])
 
-  useEffect(() => {
-    requestNotificationPermission()
-  }, []);
+  // useEffect(() => {
+  //   requestNotificationPermission()
+  // }, []);
 
   const handleSave = async (item: TrakingInfo) => {
     setSeq(item.SEQ)
@@ -438,9 +438,9 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
         (position) => {
           if (gpsStatus === 'start') {
             setGpsStatus('running')
-            gpsControlTest2()
+            gpsControl()
           } else if (gpsStatus === 'end') {
-            gpsControlTest2()
+            gpsControl()
           }
 
           SaveRoute({
