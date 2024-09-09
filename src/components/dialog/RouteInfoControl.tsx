@@ -145,9 +145,9 @@ export default function RouteInfoControl({ detail, open, setOpen }: Props) {
     }
   }, [open])
 
-  // useEffect(() => {
-  //   requestNotificationPermission()
-  // }, []);
+  useEffect(() => {
+    requestNotificationPermission()
+  }, []);
 
   const handleSave = async (item: TrakingInfo) => {
     setSeq(item.SEQ)

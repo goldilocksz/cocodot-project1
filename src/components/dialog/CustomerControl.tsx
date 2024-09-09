@@ -141,7 +141,6 @@ export default function CustomerControl({
         CUSTOMER_CODE,
         DEPT_CODE,
       })
-      console.log('asd')
 
       refetchDept()
     },
