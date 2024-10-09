@@ -81,7 +81,7 @@ export default function BlReportView() {
           return []
         }
       },
-    })
+    }) 
 
   function downloadXlsx() {
   if (!BlReports?.length) return;
