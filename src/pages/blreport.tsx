@@ -50,23 +50,38 @@ export default function BlReportView() {
   )
 
   const {
-    data: BlReports,
-    isLoading: isGetBlReports,
-    isRefetching: isRefetchBlReports,
-    refetch,
-  } = useQuery<TrReport[]>({
-    queryKey: ['getBlReport', page, pageSize, search],
-    queryFn: async () => {
-      const { data }: { data: TrReport[] } = await request.post(
-        '/report/getBLReport',
-        {
-          ...omit(search, ['random']),
-        },
-      )
-      setList(data)
-      return data
-    },
-  })
+      data: BlReports,
+      isLoading: isGetBlReports,
+      isRefetching: isRefetchBlReports,
+      refetch,
+    } = useQuery<TrReport[]>({
+      queryKey: ['getBlReport', page, pageSize, search],
+      queryFn: async () => {
+        try {
+          const { data }: { data: TrReport[] | null } = await request.post(
+            '/report/getBLReport',
+            {
+              ...omit(search, ['random']),
+            },
+          )
+          
+          // data가 null이 아니면 setList와 return 수행
+          if (data) {
+            setList(data)
+            return data
+          } else {
+            // data가 null일 경우 빈 배열 또는 다른 적절한 값을 반환
+            setList([])
+            return []
+          }
+        } catch (error) {
+          // 오류 처리 로직
+          console.error("Error fetching report data:", error)
+          setList([])  // 오류 시에도 빈 배열로 처리
+          return []
+        }
+      },
+    })
 
   function downloadXlsx() {
   if (!BlReports?.length) return;

@@ -49,24 +49,40 @@ export default function TrReportView() {
     },
   )
   const {
-    data: TrReports,
-    isLoading: isGetTrReports,
-    isRefetching: isRefetchTrReports,
-    refetch,
-  } = useQuery<TrReport[]>({
-    queryKey: ['getTrReport', search],
-    queryFn: async () => {
-      const { data }: { data: TrReport[] } = await request.post(
-        '/report/getTRReport',
-        {
-          ...omit(search, ['random']),
-        },
-      )
-
-      setList(data)
-      return data
-    },
-  })
+      data: TrReports,
+      isLoading: isGetTrReports,
+      isRefetching: isRefetchTrReports,
+      refetch,
+    } = useQuery<TrReport[]>({
+      queryKey: ['getTrReport', search],
+      queryFn: async () => {
+        try {
+          const { data }: { data: TrReport[] | null } = await request.post(
+            '/report/getTRReport',
+            {
+              ...omit(search, ['random']),
+            },
+          )
+          
+          // data가 null이 아니면 setList와 return 수행
+          if (data) {
+            setList(data)
+            return data
+          } else {
+            // data가 null일 경우 빈 배열 또는 다른 적절한 값을 반환
+            setList([])
+            return []
+          }
+        } catch (error) {
+          // 오류 처리 로직
+          console.error("Error fetching TR report data:", error)
+          setList([])  // 오류 시에도 빈 배열로 처리
+          return []
+        }
+      },
+    })
+  
+  
 
   function downloadXlsx() {
       if (!TrReports?.length) return;
