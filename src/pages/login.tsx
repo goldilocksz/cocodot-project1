@@ -78,7 +78,7 @@ export default function LoginView() {
           </div>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>
-            Enter your email and Password to login
+            Enter your ID and Password to login
           </CardDescription>
         </CardHeader>
         <CardContent>
